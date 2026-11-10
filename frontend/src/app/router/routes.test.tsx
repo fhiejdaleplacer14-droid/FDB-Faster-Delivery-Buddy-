@@ -1,0 +1,52 @@
+import { screen, waitFor } from '@testing-library/react'
+import { adminApi } from '@/features/admin/api'
+import { sellerApi } from '@/features/sellers/api'
+import { adminUser, makeUser, renderRoute } from '@/test/renderRoute'
+
+describe('routes', () => {
+  it('renders the marketplace home inside the site layout', () => {
+    renderRoute('/')
+    expect(screen.getByRole('link', { name: 'Faster Delivery Buddy home' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Shop from sellers')
+  })
+
+  it('renders a not-found page for unknown paths', () => {
+    renderRoute('/does-not-exist')
+    expect(screen.getByRole('heading', { name: 'We could not find that page' })).toBeInTheDocument()
+  })
+
+  it('sends signed-out visitors to sign in, remembering where they were going', async () => {
+    const { router } = renderRoute('/sell?tab=1')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+    expect(router.state.location.search).toBe(`?next=${encodeURIComponent('/sell?tab=1')}`)
+  })
+
+  it('keeps signed-in users away from the sign-in page', async () => {
+    const { router } = renderRoute('/login', { user: makeUser() })
+    await waitFor(() => expect(router.state.location.pathname).toBe('/'))
+  })
+
+  it('blocks customers from the admin area', () => {
+    const sellers = vi.spyOn(adminApi, 'sellers')
+    renderRoute('/admin/sellers', { user: makeUser() })
+    expect(screen.getByRole('heading', { name: 'You do not have access to this page' })).toBeInTheDocument()
+    expect(sellers).not.toHaveBeenCalled()
+  })
+
+  it('opens the admin area for users with review permission', async () => {
+    vi.spyOn(adminApi, 'sellers').mockResolvedValue({
+      data: [],
+      meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
+    })
+    renderRoute('/admin/sellers', { user: adminUser() })
+    expect(await screen.findByText('No applications here right now.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Admin' })).toBeInTheDocument()
+  })
+
+  it('asks unverified users to verify before applying to sell', async () => {
+    vi.spyOn(sellerApi, 'mine').mockResolvedValue(null)
+    renderRoute('/sell', { user: makeUser({ email_verified: false }) })
+    expect(await screen.findByText(/Verify your email before applying/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Send application' })).not.toBeInTheDocument()
+  })
+})
