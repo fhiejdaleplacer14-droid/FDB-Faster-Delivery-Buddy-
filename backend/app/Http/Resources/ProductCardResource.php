@@ -17,6 +17,7 @@ class ProductCardResource extends JsonResource
             'name' => $this->name,
             'price_from' => $this->price_from,
             'in_stock' => $this->stock_total > 0,
+            'rating' => ['average' => $this->rating_average, 'count' => $this->rating_count],
             'image' => $this->coverImage ? [
                 'url' => $this->coverImage->url(),
                 'width' => $this->coverImage->width,

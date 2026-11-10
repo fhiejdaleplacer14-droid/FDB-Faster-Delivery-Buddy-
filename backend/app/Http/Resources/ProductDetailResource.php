@@ -20,6 +20,7 @@ class ProductDetailResource extends JsonResource
             'description' => $this->description,
             'price_from' => $this->price_from,
             'in_stock' => $this->stock_total > 0,
+            'rating' => ['average' => $this->rating_average, 'count' => $this->rating_count],
             'published_at' => $this->published_at?->toIso8601ZuluString(),
             'images' => $this->images->map(fn (ProductImage $image) => [
                 'id' => $image->id,

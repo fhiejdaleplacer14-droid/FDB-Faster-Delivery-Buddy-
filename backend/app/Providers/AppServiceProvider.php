@@ -41,6 +41,10 @@ class AppServiceProvider extends ServiceProvider
             Limit::perHour(10)->by('email:'.mb_strtolower((string) $request->input('email'))),
         ]);
         RateLimiter::for('product-images', fn (Request $request) => Limit::perHour(120)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('checkout', fn (Request $request) => Limit::perMinute(10)->by($request->user()?->id ?: $request->ip()));
         RateLimiter::for('uploads', fn (Request $request) => Limit::perHour(20)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('support-tickets', fn (Request $request) => Limit::perHour(10)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('messages', fn (Request $request) => Limit::perHour(60)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('reviews', fn (Request $request) => Limit::perHour(30)->by($request->user()?->id ?: $request->ip()));
     }
 }

@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'active' => \App\Http\Middleware\EnsureAccountIsActive::class,
             'seller' => \App\Http\Middleware\EnsureSellerAccount::class,
+            'spa.session' => \App\Http\Middleware\RequireSpaSession::class,
         ]);
         $middleware->trustProxies(at: env('TRUSTED_PROXIES', '127.0.0.1'));
         $middleware->throttleApi();

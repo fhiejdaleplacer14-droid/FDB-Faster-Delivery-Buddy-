@@ -1,5 +1,5 @@
 import { Plus, X } from 'lucide-react'
-import { useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, type SubmitEvent } from 'react'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { SelectField, TextareaField, TextField } from '@/components/ui/Field'
@@ -61,7 +61,7 @@ export function SellerApplicationForm({ existing, onSubmit, submitLabel }: Props
     updateDocument(key, { file: tooBig ? null : file })
   }
 
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault()
     setBusy(true)
     setError(null)

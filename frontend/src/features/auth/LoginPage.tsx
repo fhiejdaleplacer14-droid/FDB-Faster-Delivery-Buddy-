@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
@@ -18,7 +18,7 @@ export function LoginPage() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<ApiError | null>(null)
 
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault()
     setBusy(true)
     setError(null)

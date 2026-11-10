@@ -39,9 +39,34 @@ This file describes the controls that exist in the code today. It is not a compl
 - `seller_id`, `status`, and `price_from` are never accepted from input.
 - Suspended sellers cannot change listings, and their listings disappear from public results immediately.
 
+## Orders and checkout
+
+- Prices, totals, sellers, and statuses are never taken from the client. The server recalculates everything with exact decimal arithmetic.
+- Duplicate checkouts are prevented by a required `Idempotency-Key`, a unique database constraint, and a per-customer row lock. Concurrent duplicates all receive the same order; this was verified on the live stack.
+- Overselling is prevented by locking variant rows during checkout, a conditional stock update, and a CHECK constraint (`stock >= 0`). A live race of two buyers for the last unit produced one order and one 409.
+- Customers see only their own orders; sellers see only their own seller orders. Other IDs or numbers return 404.
+- A delivery address is visible only to the customer and the sellers in that order. Store profiles never show seller contact details.
+- Only the seller can mark payment as received, and that action is written to the audit log.
+
+## Commissions
+
+- Commission figures are visible only to the seller concerned and to admins with `commissions.manage` or `reports.view`. Customers never see them.
+- Rates cannot be backdated, and every order keeps the rate it was placed with.
+- Recording a collection locks the records it covers and refuses any that are not due or belong to another seller, so the same commission cannot be collected twice.
+- Rate changes, adjustments, and collections are written to the audit log.
+
+## Reviews, support, and notifications
+
+- Only the buyer can review, only after delivery, and only once per order line; the database enforces the last rule.
+- Public reviews show a first name and last initial only. Reviewer emails are visible to moderators only.
+- A support ticket is visible to the customer who opened it, the seller of the linked order (order topics only), and staff with `support.manage`. Everyone else gets 404. Sellers never see the customer's email.
+- A message's author role is worked out on the server from the user's relation to the ticket.
+- Notification links are filtered to in-app paths, so a stored notification can never send someone to another site.
+- Ticket, message, and review creation are rate limited per user.
+
 ## Audit log
 
-- Seller decisions, listing moderation, category changes, document views, and admin creation are recorded.
+- Review hiding and restoring, support ticket status changes, seller decisions, listing moderation, category changes, document views, payment confirmations, commission rate changes, adjustments, collections, and admin creation are recorded.
 - The `audit_logs` table is append-only, enforced both by the model and by a PostgreSQL trigger.
 
 ## Secrets

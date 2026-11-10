@@ -27,6 +27,8 @@ class Product extends Model
             'status' => ProductStatus::class,
             'price_from' => 'decimal:2',
             'stock_total' => 'integer',
+            'rating_average' => 'decimal:2',
+            'rating_count' => 'integer',
             'submitted_at' => 'datetime',
             'published_at' => 'datetime',
             'reviewed_at' => 'datetime',
@@ -56,6 +58,11 @@ class Product extends Model
     public function coverImage(): HasOne
     {
         return $this->hasOne(ProductImage::class)->ofMany(['position' => 'min', 'id' => 'min']);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
     }
 
     // Published, from an approved seller whose account is active.

@@ -1,7 +1,8 @@
 import { Search } from 'lucide-react'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type SubmitEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
+import { TableSkeleton } from '@/components/ui/TableSkeleton'
 import { Button } from '@/components/ui/Button'
 import { SellerStatusBadge } from '@/components/ui/StatusBadge'
 import { formatDate } from '@/lib/format'
@@ -54,7 +55,7 @@ export function SellerApplicationsPage() {
     setParams(merged)
   }
 
-  function submitSearch(event: FormEvent) {
+  function submitSearch(event: SubmitEvent) {
     event.preventDefault()
     update({ search: query.trim() })
   }
@@ -109,6 +110,7 @@ export function SellerApplicationsPage() {
         </p>
       )}
 
+      {!result && !error && <TableSkeleton />}
       {result && result.data.length > 0 && (
         <>
           <div className="mt-6 overflow-x-auto">

@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type SubmitEvent } from 'react'
 import { Link, useParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
@@ -119,7 +119,7 @@ function ModerationPanel({ product, onDone }: { product: ManagedProduct; onDone:
     }
   }
 
-  function submitReject(event: FormEvent) {
+  function submitReject(event: SubmitEvent) {
     event.preventDefault()
     void act(() => adminCatalogApi.reject(product.id, reason.trim()))
   }

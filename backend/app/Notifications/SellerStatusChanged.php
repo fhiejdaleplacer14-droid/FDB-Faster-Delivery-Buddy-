@@ -53,6 +53,7 @@ class SellerStatusChanged extends Notification implements ShouldQueue
             'title' => $this->headline(),
             'body' => $this->summary(),
             'reason' => $this->reason,
+            'url' => '/sell',
         ];
     }
 

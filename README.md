@@ -50,7 +50,8 @@ npm run typecheck && npm run lint && npm test && npm run build
 
 ## Troubleshooting
 
-- **Vite ignores a change to `vite.config.ts`.** File-change events do not reach containers through Windows bind mounts. Run `docker compose restart frontend`.
+- **Use http://localhost:5173.** The Docker frontend already runs there, so don't also run `npm run dev` on the host. Vite now refuses to start on another port rather than silently moving to 5174.
+- **Changes don't show up in the browser.** The Docker frontend polls for file changes, because file-change events do not cross Windows bind mounts. After editing `vite.config.ts`, run `docker compose restart frontend`.
 - **`Permission denied` writing `storage/` or `vendor/`.** Rerun `sh scripts/dev-setup.sh`.
 - **Slow first request or test.** Windows bind mounts are slow for PHP. This is expected locally.
 
@@ -78,5 +79,10 @@ scripts/     Developer setup scripts
 - Phase 1 (engineering foundation): done
 - Phase 2 (identity and access): accounts, email verification, password reset, roles and permissions, seller applications, admin review, audit log
 - Phase 3 (marketplace catalog): categories, listings with options, photo processing, search and filters, store pages, listing moderation
+- Phase 4 (cart and orders): saved addresses, server-side cart, duplicate-safe checkout split into one order per seller, stock protection, seller order handling, customer cancellation, admin order view
 
-There is no cart or ordering yet. FDB must not process real transactions until the founders have reviewed the legal and operational launch checklist.
+- Phase 5 (commission and financial records): rate history with per-seller overrides, commission copied into each order at checkout, pending → due → collected tracking, adjustments, batch collections, and a financial report that separates GMV from FDB revenue
+- Phase 6 (seller and admin tools): seller portal and admin console for orders, listings, commissions, and reports
+- Phase 7 (customer trust, part A): in-app notifications with a header bell, verified-buyer reviews with seller replies and moderation, and a help center where customers, sellers, and FDB staff talk in one thread. Disputes are a ticket type with a configurable window. What a dispute's outcome does to money (refunds, commission changes) is not built yet and waits on founder decisions
+
+For a populated local site, run `docker compose exec app php artisan db:seed --class=DemoMarketplaceSeeder`. FDB must not process real transactions until the founders have reviewed the legal and operational launch checklist.

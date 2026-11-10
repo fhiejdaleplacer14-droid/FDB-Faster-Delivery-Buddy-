@@ -22,4 +22,30 @@ return [
         'max_variants' => 20,
     ],
 
+    'orders' => [
+        // Sellers collect payment directly; FDB only records the method chosen. Only these can be selected.
+        'payment_methods' => array_values(array_filter(explode(',', env('FDB_PAYMENT_METHODS', 'cash_on_delivery')))),
+        // Shown at checkout in this order. Methods not enabled above appear as "coming soon" placeholders.
+        'payment_method_labels' => [
+            'cash_on_delivery' => 'Cash on delivery',
+            'gcash' => 'GCash',
+            'maya' => 'Maya',
+            'other' => 'Other e-wallets and bank transfer',
+        ],
+        'max_quantity_per_item' => 99,
+        'max_cart_lines' => 50,
+    ],
+
+    'support' => [
+        // Placeholder policy: how long after delivery a customer may open a dispute.
+        'dispute_window_days' => (int) env('FDB_DISPUTE_WINDOW_DAYS', 7),
+    ],
+
+    'commission' => [
+        // Placeholder: used only to create the first default policy. Admins change rates in the app.
+        'initial_default_rate' => env('FDB_INITIAL_COMMISSION_RATE', '0.0750'),
+        'max_rate_percent' => 50,
+        'collection_methods' => ['cash', 'gcash', 'maya', 'bank_transfer', 'other'],
+    ],
+
 ];

@@ -9,7 +9,7 @@ type FieldShellProps = {
 }
 
 const control =
-  'block w-full rounded-md border bg-white px-3 py-2 text-sm text-ink placeholder:text-slate/70 focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue/20 aria-invalid:border-danger'
+  'block w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-ink shadow-sm transition placeholder:text-slate/70 hover:border-navy/25 focus:border-blue focus:outline-none focus:ring-4 focus:ring-blue/15 aria-invalid:border-danger aria-invalid:ring-danger/10'
 
 function FieldShell({ id, label, hint, error, children }: FieldShellProps) {
   return (

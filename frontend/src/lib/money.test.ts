@@ -1,4 +1,17 @@
-import { formatPeso } from './money'
+import { formatPeso, formatRate } from './money'
+
+describe('formatRate', () => {
+  it.each([
+    ['0.0750', '7.5%'],
+    ['0.1000', '10%'],
+    ['0.0525', '5.25%'],
+    ['0.0000', '0%'],
+    ['0.5000', '50%'],
+    ['0.0005', '0.05%'],
+  ])('formats %s as %s', (input, expected) => {
+    expect(formatRate(input)).toBe(expected)
+  })
+})
 
 describe('formatPeso', () => {
   it.each([

@@ -77,6 +77,78 @@ All require an approved seller account. Suspended sellers can use the read endpo
 | PUT | `/seller/products/{id}/images/order` | `image_ids`: every photo, exactly once, in the new order |
 | DELETE | `/seller/products/{id}/images/{imageId}` | A live listing must keep at least one photo |
 
+## Addresses, cart, and checkout
+
+All require a session. Another customer's address or cart line returns 404.
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET · POST | `/addresses` | `recipient_name, phone, municipality, barangay, street, landmark?, label?, is_default?`. Up to 10 per customer. The first address becomes the default |
+| PUT · DELETE | `/addresses/{id}` | Deleting the default promotes another address |
+| GET | `/cart` | Lines grouped by store, with current prices, `problem` (unavailable, own_store, out_of_stock, not_enough_stock), `total`, and `can_checkout`. `meta.payment_methods` lists the methods customers may choose |
+| POST | `/cart/items` | `variant_id, quantity`. Merges with an existing line. Refuses unavailable products, more than the stock, or the customer's own store |
+| PATCH · DELETE | `/cart/items/{id}` | |
+| POST | `/checkout` | Header `Idempotency-Key: <uuid>` (required). Body `address_id, payment_method, expected_total, note?`. Requires a verified email; 10 per minute |
+
+Checkout responses:
+
+| Status | Meaning |
+| --- | --- |
+| 201 | Order created. The cart is emptied and stock is reduced |
+| 200 | This key was already used: the original order is returned and nothing new happens |
+| 409 `reason: cart_changed` | An item sold out, was removed, or its store closed. Nothing was created |
+| 409 `reason: price_changed` | `expected_total` no longer matches; the response includes the new `total`. Nothing was created |
+| 422 `reason: empty_cart` | |
+
+The client sends `expected_total` only as a safeguard. The server always calculates every amount itself.
+
+## Orders (customer)
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/orders` | The customer's own orders, newest first |
+| GET | `/orders/{number}` | Another customer's order number returns 404 |
+| POST | `/orders/{number}/seller-orders/{sellerOrderNumber}/cancel` | `reason?`. Only while the seller has not confirmed. Stock is returned |
+
+## Seller orders
+
+Require an approved or suspended store (suspended stores can still complete orders already placed). Another seller's order returns 404.
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/seller/orders?status&search&page` | `status` may be `open`. Orders waiting for a decision come first |
+| GET | `/seller/orders/{id}` | Includes the delivery address and the customer's name |
+| POST | `/seller/orders/{id}/status` | `status, note?`. Forward only; steps may be skipped |
+| POST | `/seller/orders/{id}/cancel` | `reason` required. Allowed until the order is out for delivery. Stock is returned |
+| POST | `/seller/orders/{id}/payment-received` | Records that the seller collected payment. Once only; written to the audit log |
+| PUT | `/seller/orders/{id}/delivery` | `delivery_note`, shown to the customer |
+| GET | `/seller/commissions?status&page` | The seller's own commission records, plus `summary` totals for pending, due, and collected |
+
+Seller order responses include `commission { rate, amount, seller_amount }` on seller and admin routes only. Customers never see commission.
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/seller/reviews?unanswered&page` | Reviews of the seller's products, including hidden ones |
+| POST | `/seller/reviews/{id}/reply` | `reply` (2–1000). Replaces any earlier reply |
+| GET | `/seller/support-tickets?status&page` | Requests linked to the seller's orders (order problems, delivery, disputes). Threads open through `/support/tickets/{number}` |
+
+## Reviews, notifications, and support
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/products/{slug}/reviews?page` | Public. Published reviews only, 10 per page, plus `summary { average, count }`. Reviewers appear as first name and last initial |
+| POST | `/orders/{number}/items/{itemId}/review` | `rating` (1–5), `comment?` (≤1000). Only the buyer, only after that seller order is delivered, once per order line. 30 per hour |
+| GET | `/notifications?page&per_page` | The user's own notifications, newest first, with `meta.unread`. `url` is always an in-app path or null |
+| POST | `/notifications/{id}/read` | Marks one notification read. Someone else's ID is a 404 |
+| POST | `/notifications/read-all` | Marks every notification read |
+| GET | `/support/categories` | Public. Topics with `needs_order` and `can_link_order`, plus `dispute_window_days` |
+| GET | `/support/tickets?page` | The customer's own requests |
+| POST | `/support/tickets` | `category, subject, body, seller_order_number?`. The order must be the customer's own. Disputes need a delivered order inside the dispute window, and only one open dispute per order. 10 per hour |
+| GET | `/support/tickets/{number}` | For the customer who opened it, or the seller of the linked order (order topics only). Anyone else gets 404 |
+| POST | `/support/tickets/{number}/messages` | `body` (2–4000). The author's role comes from how they relate to the ticket, never from the request. Closed tickets refuse replies. 60 per hour |
+
+Staff replies are shown to customers and sellers as "FDB Support".
+
 ## Administration
 
 Each endpoint checks a permission, not a role name.
@@ -90,6 +162,22 @@ Each endpoint checks a permission, not a role name.
 | POST | `/admin/sellers/{id}/suspend` | `sellers.manage` | Approved → suspended. Requires `reason` |
 | POST | `/admin/sellers/{id}/reactivate` | `sellers.manage` | Suspended → approved |
 | GET | `/admin/sellers/{id}/documents/{doc}` | `sellers.documents.view` | Private download. Every access is written to the audit log |
+| GET | `/admin/orders?status&search&page` | `orders.view` | Read-only. Search by order number or customer email |
+| GET | `/admin/orders/{number}` | `orders.view` | Includes status history with the people who made each change |
+| GET | `/admin/commission-policies` | `commissions.manage` | Rate history: the default and any per-seller rates |
+| POST | `/admin/commission-policies` | `commissions.manage` | `rate_percent` (0–50, up to 2 decimals), `seller_id?`, `notes?`. Starts now and ends the current rate for the same scope. Never backdated |
+| GET | `/admin/commissions?status&seller_id&page&per_page` | `commissions.manage` | Commission records with adjustments and collection |
+| GET | `/admin/commissions/balances` | `commissions.manage` | Due amount per seller |
+| POST | `/admin/commissions/{id}/adjustments` | `commissions.manage` | `amount` (signed, non-zero), `reason`. Pending or due records only; the net can never go below zero |
+| GET · POST | `/admin/commission-collections` | `commissions.manage` | POST `seller_id, record_ids[], method, reference?, notes?, collected_at?`. Every record must be due and belong to that seller; recording the same records twice is refused |
+| GET | `/admin/reviews?status&rating&search&page` | `reviews.moderate` | Includes the reviewer's email and the store |
+| POST | `/admin/reviews/{id}/hide` | `reviews.moderate` | `reason` required. Removes it from the product page and the rating; written to the audit log |
+| POST | `/admin/reviews/{id}/restore` | `reviews.moderate` | Publishes it again |
+| GET | `/admin/support-tickets?status&category&search&page` | `support.manage` | `status=active` means open or waiting on the user. Open requests come first, oldest activity first |
+| GET | `/admin/support-tickets/{number}` | `support.manage` | Staff see which team member wrote each reply |
+| POST | `/admin/support-tickets/{number}/messages` | `support.manage` | Replies as staff and sets the status to waiting on the user |
+| POST | `/admin/support-tickets/{number}/status` | `support.manage` | `status, resolution?`. Resolving a dispute requires a resolution. Written to the audit log. No money is moved automatically |
+| GET | `/admin/reports/financial?from&to` | `reports.view` | Calendar dates in Philippine time, up to one year. GMV, FDB revenue (commission earned), seller earnings, collections, adjustments, balances, and a per-seller breakdown |
 | GET | `/admin/products?status&search&page` | `products.moderate` | Oldest submission first |
 | GET | `/admin/products/{id}` | `products.moderate` | |
 | POST | `/admin/products/{id}/approve` | `products.moderate` | Pending → published |

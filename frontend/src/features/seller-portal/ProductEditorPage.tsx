@@ -1,5 +1,5 @@
 import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Trash2, Upload, X } from 'lucide-react'
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type SubmitEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
@@ -215,7 +215,7 @@ function DetailsForm({ initial, submitLabel, onSave }: { initial: ProductInput; 
   const setVariant = (index: number, change: Partial<VariantInput>) =>
     setForm((f) => ({ ...f, variants: f.variants.map((v, i) => (i === index ? { ...v, ...change } : v)) }))
 
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault()
     setBusy(true)
     setError(null)

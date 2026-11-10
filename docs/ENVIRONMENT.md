@@ -19,6 +19,10 @@ Frontend variables prefixed with `VITE_` are bundled into public JavaScript. Nev
 | `FDB_LISTING_REQUIRES_REVIEW` | `true` | Listings need FDB approval before customers see them. Content edits to a live listing send it back for review. **Placeholder until the founders decide** |
 | `FDB_MEDIA_DISK` | `media` | Disk for public product photos. Use a public S3-compatible bucket or CDN in production |
 | `MEDIA_URL` | `/storage` | Base URL that product photo links are built from |
+| `FDB_PAYMENT_METHODS` | `cash_on_delivery` | Comma-separated methods customers can actually select. GCash, Maya, and "Other" are always listed at checkout, but show as "Coming soon" and are refused by the server unless enabled here. Sellers collect payment directly; FDB only records the choice |
+| `FDB_DISPUTE_WINDOW_DAYS` | `7` | How many days after delivery a customer may open a dispute. **Placeholder until the founders decide** |
+| `FDB_INITIAL_COMMISSION_RATE` | `0.0750` | Used once, to create the first default commission rate when none exists. After that, admins change rates in the app. **Placeholder until the founders decide** |
+| `DEMO_SELLER_PASSWORD` | unset | Local and staging only: password for the demo seller accounts the demo seeder creates. If unset, a random password is used |
 | `TRUSTED_PROXIES` | `127.0.0.1` | IP addresses or ranges of the load balancer or proxy in front of the app |
 | `DB_*` | `pgsql` on `postgres:5432` | PostgreSQL connection |
 | `REDIS_CLIENT` | `predis` | Redis client library |

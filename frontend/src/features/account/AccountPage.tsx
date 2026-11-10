@@ -1,9 +1,10 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/Field'
 import { authApi } from '@/features/auth/api'
+import { AddressBook } from './AddressBook'
 import { useAuth } from '@/features/auth/AuthContext'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import type { User } from '@/types/api'
@@ -29,6 +30,13 @@ export function AccountPage() {
           Profile
         </h2>
         <ProfileForm user={user} />
+      </section>
+
+      <section aria-labelledby="addresses-heading" className="mt-10 border-t border-line pt-8">
+        <h2 id="addresses-heading" className="text-lg font-semibold text-navy">
+          Delivery addresses
+        </h2>
+        <AddressBook />
       </section>
 
       <section aria-labelledby="password-heading" className="mt-10 border-t border-line pt-8">
@@ -94,7 +102,7 @@ function ProfileForm({ user }: { user: User }) {
   const [saved, setSaved] = useState<string | null>(null)
   const [error, setError] = useState<ApiError | null>(null)
 
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault()
     setBusy(true)
     setError(null)
@@ -139,7 +147,7 @@ function PasswordForm() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<ApiError | null>(null)
 
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault()
     setBusy(true)
     setError(null)

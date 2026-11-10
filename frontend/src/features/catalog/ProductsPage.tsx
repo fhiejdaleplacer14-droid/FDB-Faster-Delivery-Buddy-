@@ -1,5 +1,5 @@
 import { SlidersHorizontal } from 'lucide-react'
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useState, type SubmitEvent, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
@@ -8,7 +8,7 @@ import { serviceAreas } from '@/features/sellers/api'
 import { toApiError, type ApiError } from '@/lib/http'
 import type { Category, Paginated, ProductCard } from '@/types/api'
 import { catalogApi, type ProductQuery } from './api'
-import { ProductGrid } from './ProductGrid'
+import { ProductGrid, ProductGridSkeleton } from './ProductGrid'
 import { SearchBox } from './SearchBox'
 
 const sorts = [
@@ -59,7 +59,7 @@ export function ProductsPage() {
     setParams(merged)
   }
 
-  function applyPrice(event: FormEvent<HTMLFormElement>) {
+  function applyPrice(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
     update({ min_price: String(form.get('min_price') ?? '').trim(), max_price: String(form.get('max_price') ?? '').trim() })
@@ -177,6 +177,7 @@ export function ProductsPage() {
 
         <div className="min-w-0">
           {error && <Alert tone="error">{error.status === 422 ? 'Some filters are not valid. Check the price range.' : error.message}</Alert>}
+          {!result && !error && <ProductGridSkeleton count={8} />}
           {result && result.data.length === 0 && (
             <div className="py-10 text-sm text-slate">
               <p>No products match these filters.</p>

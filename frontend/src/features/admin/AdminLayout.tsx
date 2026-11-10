@@ -1,41 +1,101 @@
-import { NavLink, Outlet } from 'react-router'
+import { BarChart3, FolderTree, LifeBuoy, type LucideIcon, Package, ReceiptText, ShoppingBag, Star, Store } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Navigate, NavLink, Outlet, useLocation } from 'react-router'
 import { can, useAuth } from '@/features/auth/AuthContext'
-import type { PermissionSlug } from '@/types/api'
+import { http } from '@/lib/http'
+import type { PermissionSlug, User } from '@/types/api'
 
-const links: { to: string; label: string; permission: PermissionSlug }[] = [
-  { to: '/admin/sellers', label: 'Seller applications', permission: 'sellers.review' },
-  { to: '/admin/products', label: 'Listings', permission: 'products.moderate' },
-  { to: '/admin/categories', label: 'Categories', permission: 'categories.manage' },
+type Badge = 'sellers' | 'listings' | 'commissions' | 'support'
+
+const links: { to: string; label: string; permission: PermissionSlug; icon: LucideIcon; badge?: Badge }[] = [
+  { to: '/admin/sellers', label: 'Seller applications', permission: 'sellers.review', icon: Store, badge: 'sellers' },
+  { to: '/admin/orders', label: 'Orders', permission: 'orders.view', icon: ShoppingBag },
+  { to: '/admin/support', label: 'Support', permission: 'support.manage', icon: LifeBuoy, badge: 'support' },
+  { to: '/admin/products', label: 'Listings', permission: 'products.moderate', icon: Package, badge: 'listings' },
+  { to: '/admin/reviews', label: 'Reviews', permission: 'reviews.moderate', icon: Star },
+  { to: '/admin/commissions', label: 'Commissions', permission: 'commissions.manage', icon: ReceiptText, badge: 'commissions' },
+  { to: '/admin/reports', label: 'Financial report', permission: 'reports.view', icon: BarChart3 },
+  { to: '/admin/categories', label: 'Categories', permission: 'categories.manage', icon: FolderTree },
 ]
+
+// Work waiting for an admin, refreshed on each page change.
+function useAttention(user: User | null) {
+  const { pathname } = useLocation()
+  const [counts, setCounts] = useState<Partial<Record<Badge, number>>>({})
+
+  useEffect(() => {
+    let current = true
+    const total = (url: string, params: object) =>
+      http.get<{ meta: { total: number } }>(url, { params: { ...params, per_page: 1 } }).then((r) => r.data.meta.total)
+    const jobs: Promise<[Badge, number]>[] = []
+    if (can(user, 'sellers.review')) jobs.push(total('/admin/sellers', { status: 'pending' }).then((n) => ['sellers', n]))
+    if (can(user, 'products.moderate')) jobs.push(total('/admin/products', { status: 'pending_review' }).then((n) => ['listings', n]))
+    if (can(user, 'support.manage')) jobs.push(total('/admin/support-tickets', { status: 'open' }).then((n) => ['support', n]))
+    if (can(user, 'commissions.manage')) {
+      jobs.push(http.get<{ data: unknown[] }>('/admin/commissions/balances').then((r) => ['commissions', r.data.data.length]))
+    }
+    Promise.all(jobs).then(
+      (entries) => current && setCounts(Object.fromEntries(entries)),
+      () => undefined,
+    )
+    return () => {
+      current = false
+    }
+  }, [user, pathname])
+
+  return counts
+}
 
 export function AdminLayout() {
   const { user } = useAuth()
+  const counts = useAttention(user)
+  const { pathname } = useLocation()
   const visible = links.filter((link) => can(user, link.permission))
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col px-4 sm:px-6 lg:flex-row lg:gap-10">
-      <nav aria-label="Administration" className="border-b border-line py-3 lg:w-52 lg:shrink-0 lg:border-r lg:border-b-0 lg:py-10">
-        <p className="hidden text-xs font-semibold tracking-wide text-slate uppercase lg:block">Administration</p>
-        <ul className="flex gap-4 overflow-x-auto lg:mt-3 lg:flex-col lg:gap-1">
-          {visible.map((link) => (
-            <li key={link.to}>
-              <NavLink
-                to={link.to}
-                className={({ isActive }) =>
-                  `block rounded-md px-2 py-1.5 text-sm font-medium whitespace-nowrap ${isActive ? 'bg-blue-soft text-navy' : 'text-slate hover:text-ink'}`
-                }
-              >
-                {link.label}
-              </NavLink>
-            </li>
-          ))}
+      <nav
+        aria-label="Administration"
+        className="border-b border-line py-3 lg:sticky lg:top-16 lg:h-[calc(100dvh-4rem)] lg:w-60 lg:shrink-0 lg:border-r lg:border-b-0 lg:py-8 lg:pr-4"
+      >
+        <p className="hidden px-3 text-xs font-semibold tracking-wide text-slate uppercase lg:block">Administration</p>
+        <ul className="flex gap-1 overflow-x-auto lg:mt-3 lg:flex-col">
+          {visible.map(({ to, label, icon: Icon, badge }) => {
+            const count = badge ? counts[badge] : undefined
+            return (
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                      isActive ? 'bg-navy text-white shadow-md shadow-navy/15' : 'text-slate hover:translate-x-0.5 hover:bg-white hover:text-ink'
+                    }`
+                  }
+                >
+                  <Icon className="size-4 shrink-0" aria-hidden />
+                  <span className="flex-1">{label}</span>
+                  {!!count && (
+                    <span className="min-w-5 animate-scale-in rounded-full bg-amber-400 px-1.5 text-center text-[11px] leading-5 font-bold text-navy" aria-label={`${count} waiting`}>
+                      {count}
+                    </span>
+                  )}
+                </NavLink>
+              </li>
+            )
+          })}
         </ul>
       </nav>
-      <div className="min-w-0 flex-1 py-8 lg:py-10">
+      <div key={pathname} className="min-w-0 flex-1 animate-fade-up py-8 lg:py-10">
         <Outlet />
       </div>
     </div>
   )
+}
+
+// /admin itself opens the first section this admin may use.
+export function AdminHome() {
+  const { user } = useAuth()
+  return <Navigate to={firstAdminPath(user?.permissions ?? []) ?? '/'} replace />
 }
 
 export function firstAdminPath(permissions: PermissionSlug[]): string | null {

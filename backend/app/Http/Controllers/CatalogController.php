@@ -24,6 +24,7 @@ class CatalogController extends Controller
 {
     public function categories(): JsonResponse
     {
+        // Cache plain arrays only: resource objects do not survive serialization into Redis.
         $tree = Cache::remember(Category::TREE_CACHE_KEY, now()->addMinutes(10), fn () => CategoryResource::collection(
             Category::query()
                 ->whereNull('parent_id')
@@ -32,7 +33,7 @@ class CatalogController extends Controller
                 ->orderBy('position')
                 ->orderBy('name')
                 ->get(),
-        )->resolve());
+        )->response()->getData(true)['data']);
 
         return response()->json(['data' => $tree]);
     }

@@ -1,7 +1,9 @@
-import { ImageOff } from 'lucide-react'
+import { CheckCircle2, ImageOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
+import { TableSkeleton } from '@/components/ui/TableSkeleton'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
 import { ProductStatusBadge } from '@/components/ui/ProductStatusBadge'
 import { formatDateTime } from '@/lib/format'
@@ -53,8 +55,13 @@ export function ProductModerationPage() {
           <Alert tone="error">{error.message}</Alert>
         </div>
       )}
-      {result?.data.length === 0 && <p className="mt-10 text-sm text-slate">Nothing here right now.</p>}
+      {result?.data.length === 0 && (
+        <EmptyState icon={CheckCircle2} title={status === 'pending_review' ? 'No listings waiting for review' : 'Nothing here right now'}>
+          New submissions from sellers appear here.
+        </EmptyState>
+      )}
 
+      {!result && !error && <TableSkeleton />}
       {result && result.data.length > 0 && (
         <>
           <div className="mt-4 overflow-x-auto">

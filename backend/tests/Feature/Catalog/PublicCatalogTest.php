@@ -39,10 +39,11 @@ it('filters by category including subcategories, town, price, and stock', functi
     $snacks = Category::factory()->create(['slug' => 'snacks', 'parent_id' => $food->id]);
     $other = Category::factory()->create(['slug' => 'tools']);
     $guihulngan = Seller::factory()->approved()->create(['municipality' => 'guihulngan']);
+    $elsewhere = Seller::factory()->approved()->create(['municipality' => 'vallehermoso']);
 
     $chips = Product::factory()->published()->priced('45.00')->create(['category_id' => $snacks->id, 'seller_id' => $guihulngan->id]);
-    $rice = Product::factory()->published()->priced('1250.00', 0)->create(['category_id' => $food->id]);
-    Product::factory()->published()->priced('300.00')->create(['category_id' => $other->id]);
+    $rice = Product::factory()->published()->priced('1250.00', 0)->create(['category_id' => $food->id, 'seller_id' => $elsewhere->id]);
+    Product::factory()->published()->priced('300.00')->create(['category_id' => $other->id, 'seller_id' => $elsewhere->id]);
 
     $ids = fn (string $query) => collect($this->getJson("/api/v1/products?{$query}")->assertOk()->json('data'))->pluck('id')->sort()->values()->all();
 
@@ -113,4 +114,19 @@ it('lists active categories as a cached tree', function () {
         ->assertJsonPath('data.0.children.0.name', 'Snacks');
 
     expect(Cache::has(Category::TREE_CACHE_KEY))->toBeTrue();
+});
+
+it('caches the category tree as plain data that survives a Redis round trip', function () {
+    $food = Category::factory()->create(['name' => 'Food']);
+    Category::factory()->create(['name' => 'Snacks', 'parent_id' => $food->id]);
+
+    $this->getJson('/api/v1/categories')->assertOk();
+
+    // Redis stores serialized PHP; objects inside would come back as __PHP_Incomplete_Class.
+    $cached = unserialize(serialize(Cache::get(Category::TREE_CACHE_KEY)), ['allowed_classes' => false]);
+    expect($cached[0]['children'])->toBeArray()
+        ->and($cached[0]['children'][0]['name'])->toBe('Snacks');
+
+    Cache::put(Category::TREE_CACHE_KEY, $cached, 600);
+    $this->getJson('/api/v1/categories')->assertJsonPath('data.0.children.0.name', 'Snacks');
 });

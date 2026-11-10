@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type SubmitEvent } from 'react'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
@@ -62,7 +62,7 @@ function NewCategoryForm({ parents, onCreated }: { parents: Category[]; onCreate
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<ApiError | null>(null)
 
-  async function submit(event: FormEvent) {
+  async function submit(event: SubmitEvent) {
     event.preventDefault()
     setBusy(true)
     setError(null)

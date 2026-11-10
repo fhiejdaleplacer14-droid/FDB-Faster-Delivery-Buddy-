@@ -2,8 +2,11 @@ import { MapPin, Store } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
+import { RatingLine } from '@/components/ui/Stars'
 import { toApiError, type ApiError } from '@/lib/http'
 import { formatPeso } from '@/lib/money'
+import { AddToCart } from '@/features/orders/AddToCart'
+import { ProductReviews } from '@/features/reviews/ProductReviews'
 import type { ProductDetail } from '@/types/api'
 import { catalogApi } from './api'
 
@@ -64,8 +67,8 @@ export function ProductPage() {
 
       <div className="mt-4 grid gap-8 lg:grid-cols-2 lg:gap-12">
         <div>
-          <div className="aspect-square overflow-hidden rounded-md bg-blue-soft">
-            {image && <img src={image.url} alt={product.name} width={image.width} height={image.height} className="size-full object-contain" />}
+          <div className="aspect-square animate-scale-in overflow-hidden rounded-2xl bg-blue-soft shadow-sm ring-1 ring-navy/5">
+            {image && <img key={image.url} src={image.url} alt={product.name} width={image.width} height={image.height} className="size-full animate-fade-in object-contain" />}
           </div>
           {product.images.length > 1 && (
             <ul className="mt-3 flex gap-2 overflow-x-auto" aria-label="Photos">
@@ -76,7 +79,7 @@ export function ProductPage() {
                     onClick={() => setImageIndex(i)}
                     aria-label={`Show photo ${i + 1}`}
                     aria-current={i === imageIndex}
-                    className={`block size-16 overflow-hidden rounded border-2 ${i === imageIndex ? 'border-blue' : 'border-transparent'}`}
+                    className={`block size-16 overflow-hidden rounded-lg border-2 transition ${i === imageIndex ? 'border-blue' : 'border-transparent opacity-70 hover:opacity-100'}`}
                   >
                     <img src={img.url} alt="" loading="lazy" className="size-full object-cover" />
                   </button>
@@ -86,10 +89,13 @@ export function ProductPage() {
           )}
         </div>
 
-        <div>
+        <div className="animate-fade-up">
           <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{product.name}</h1>
+          <a href="#reviews-heading" className="mt-2 inline-block rounded transition-opacity hover:opacity-80">
+            <RatingLine rating={product.rating} />
+          </a>
           {variant && (
-            <p className="mt-3 text-2xl font-semibold text-navy tabular">{formatPeso(variant.price)}</p>
+            <p key={variant.id} className="mt-3 animate-fade-in text-3xl font-extrabold text-navy tabular">{formatPeso(variant.price)}</p>
           )}
 
           {product.variants.length > 1 && (
@@ -99,7 +105,7 @@ export function ProductPage() {
                 {product.variants.map((v) => (
                   <label
                     key={v.id}
-                    className={`cursor-pointer rounded-md border px-3 py-2 text-sm has-checked:border-blue has-checked:bg-blue-soft ${v.stock === 0 ? 'text-slate line-through' : 'text-ink'} border-line`}
+                    className={`cursor-pointer rounded-lg border px-3 py-2 text-sm transition hover:border-blue/50 has-checked:border-blue has-checked:bg-blue-soft has-checked:font-semibold ${v.stock === 0 ? 'text-slate line-through' : 'text-ink'} border-line`}
                   >
                     <input type="radio" name="variant" value={v.id} checked={variant?.id === v.id} onChange={() => setVariantId(v.id)} className="sr-only" />
                     {v.name}
@@ -115,9 +121,11 @@ export function ProductPage() {
             </p>
           )}
 
-          <div className="mt-6">
-            <Alert tone="info">Ordering through FDB opens soon. For now you can browse what local sellers offer.</Alert>
-          </div>
+          {variant && (
+            <div className="mt-6">
+              <AddToCart key={variant.id} variantId={variant.id} stock={variant.stock} />
+            </div>
+          )}
 
           <div className="mt-8 border-t border-line pt-6">
             <h2 className="text-sm font-semibold text-ink">About this product</h2>
@@ -139,6 +147,8 @@ export function ProductPage() {
           </div>
         </div>
       </div>
+
+      <ProductReviews slug={product.slug} />
     </div>
   )
 }

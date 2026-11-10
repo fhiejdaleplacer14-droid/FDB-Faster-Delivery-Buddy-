@@ -56,6 +56,28 @@ it('ends the session of an account suspended while signed in', function () {
     $this->assertGuest('web');
 });
 
+it('signs in from any local development port', function () {
+    $user = User::factory()->customer()->create(['email' => 'juan@example.com']);
+
+    $this->withHeader('Referer', 'http://localhost:5174/login')
+        ->postJson('/api/v1/auth/login', ['email' => 'juan@example.com', 'password' => 'password'])
+        ->assertOk();
+
+    $this->assertAuthenticatedAs($user);
+});
+
+it('explains instead of crashing when the web address is not allowed, and creates nothing', function () {
+    $this->withHeader('Referer', 'https://not-fdb.example/register')
+        ->postJson('/api/v1/auth/register', [
+            'name' => 'Someone', 'email' => 'someone@example.com',
+            'password' => 'mangga2026', 'password_confirmation' => 'mangga2026',
+        ])
+        ->assertStatus(419)
+        ->assertJsonPath('message', 'Sign-in is not available from this web address. Open FDB from its usual address and try again.');
+
+    expect(User::where('email', 'someone@example.com')->exists())->toBeFalse();
+});
+
 it('signs out', function () {
     $this->actingAs(User::factory()->customer()->create());
 

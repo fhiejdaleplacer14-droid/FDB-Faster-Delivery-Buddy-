@@ -1,5 +1,5 @@
 import { ArrowLeft, Download } from 'lucide-react'
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useState, type SubmitEvent, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
@@ -165,7 +165,7 @@ function DecisionPanel({ seller, onDecided }: { seller: SellerApplication; onDec
     setError(null)
   }
 
-  async function confirm(event: FormEvent) {
+  async function confirm(event: SubmitEvent) {
     event.preventDefault()
     if (!selected) return
     setBusy(true)

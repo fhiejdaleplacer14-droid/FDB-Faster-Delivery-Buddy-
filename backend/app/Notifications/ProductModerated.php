@@ -48,6 +48,7 @@ class ProductModerated extends Notification implements ShouldQueue
             'title' => $this->title(),
             'body' => $this->body(),
             'reason' => $this->reason,
+            'url' => '/seller/products/'.$this->product->id,
         ];
     }
 

@@ -1,7 +1,9 @@
-import { ImageOff, Plus } from 'lucide-react'
+import { ImageOff, Package, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
+import { TableSkeleton } from '@/components/ui/TableSkeleton'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
 import { ProductStatusBadge } from '@/components/ui/ProductStatusBadge'
 import { useAuth } from '@/features/auth/AuthContext'
@@ -75,22 +77,25 @@ export function SellerProductsPage() {
       )}
 
       {result?.data.length === 0 && (
-        <div className="py-12 text-sm text-slate">
-          {status ? (
-            <p>No listings with this status.</p>
-          ) : (
+        <EmptyState icon={Package} title={status ? 'No listings with this status' : 'No listings yet'}>
+          {!status && (
             <>
-              <p>You have no listings yet.</p>
+              <p>Add your first product with a photo and a price. FDB reviews it before customers see it.</p>
               {!suspended && (
-                <Link to="/seller/products/new" className="mt-2 inline-block font-medium text-blue hover:underline">
+                <Link
+                  to="/seller/products/new"
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-blue/25 transition hover:-translate-y-px hover:bg-blue/90"
+                >
+                  <Plus className="size-4" aria-hidden />
                   Create your first listing
                 </Link>
               )}
             </>
           )}
-        </div>
+        </EmptyState>
       )}
 
+      {!result && !error && <TableSkeleton />}
       {result && result.data.length > 0 && (
         <>
           <div className="mt-4 overflow-x-auto">

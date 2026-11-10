@@ -12,6 +12,7 @@ const card: ProductCard = {
   name: 'Dried Mangoes',
   price_from: '1250.5',
   in_stock: true,
+  rating: { average: null, count: 0 },
   image: null,
   store: { name: 'Aling Rosa', slug: 'aling-rosa', municipality: 'Guihulngan' },
   category: { name: 'Snacks', slug: 'snacks' },
@@ -24,6 +25,7 @@ const detail: ProductDetail = {
   description: 'Sweet and chewy.',
   price_from: '120.00',
   in_stock: true,
+  rating: { average: null, count: 0 },
   published_at: null,
   images: [],
   variants: [
@@ -70,9 +72,9 @@ describe('browsing', () => {
 })
 
 describe('seller portal', () => {
-  it('turns away applicants without an approved store', () => {
+  it('turns away applicants without an approved store', async () => {
     renderRoute('/seller/products', { user: makeUser({ seller: { id: 1, store_name: 'Rosa', status: 'pending' } }) })
-    expect(screen.getByRole('heading', { name: 'You need an approved store first' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'You need an approved store first' })).toBeInTheDocument()
   })
 
   it('creates a listing and opens it to add photos', async () => {
@@ -92,7 +94,7 @@ describe('seller portal', () => {
     } as unknown as ManagedProduct)
     const { router } = renderRoute('/seller/products/new', { user: makeUser({ roles: ['customer', 'seller'], seller: { id: 1, store_name: 'Rosa', status: 'approved' } }) })
 
-    await userEvent.type(screen.getByLabelText('Product name'), 'Banana Chips')
+    await userEvent.type(await screen.findByLabelText('Product name'), 'Banana Chips')
     await userEvent.selectOptions(screen.getByLabelText('Category'), await screen.findByRole('option', { name: 'Snacks' }))
     await userEvent.type(screen.getByLabelText(/Description/), 'Crunchy banana chips.')
     await userEvent.type(screen.getByLabelText('Price (₱)'), '45.50')
