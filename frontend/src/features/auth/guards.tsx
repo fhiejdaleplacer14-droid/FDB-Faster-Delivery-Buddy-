@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation, useSearchParams } from 'react-router'
+import { Link, Navigate, Outlet, useLocation, useSearchParams } from 'react-router'
 import type { PermissionSlug } from '@/types/api'
 import { can, useAuth } from './AuthContext'
 
@@ -51,4 +51,22 @@ export function RedirectIfSignedIn() {
 export function safeNext(next: string | null): string {
   if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) return '/'
   return next
+}
+
+export function RequireSellerAccount() {
+  const { user, ready } = useAuth()
+
+  if (!ready) return <PageLoading />
+  if (user?.seller?.status !== 'approved' && user?.seller?.status !== 'suspended') {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+        <h1 className="text-2xl font-bold text-navy">You need an approved store first</h1>
+        <p className="mt-2 text-slate">Listings can be created once FDB approves your seller application.</p>
+        <Link to="/sell" className="mt-6 inline-block font-medium text-blue hover:underline">
+          View your seller application
+        </Link>
+      </div>
+    )
+  }
+  return <Outlet />
 }

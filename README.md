@@ -48,6 +48,12 @@ cd frontend
 npm run typecheck && npm run lint && npm test && npm run build
 ```
 
+## Troubleshooting
+
+- **Vite ignores a change to `vite.config.ts`.** File-change events do not reach containers through Windows bind mounts. Run `docker compose restart frontend`.
+- **`Permission denied` writing `storage/` or `vendor/`.** Rerun `sh scripts/dev-setup.sh`.
+- **Slow first request or test.** Windows bind mounts are slow for PHP. This is expected locally.
+
 ## Repository layout
 
 ```
@@ -71,5 +77,6 @@ scripts/     Developer setup scripts
 
 - Phase 1 (engineering foundation): done
 - Phase 2 (identity and access): accounts, email verification, password reset, roles and permissions, seller applications, admin review, audit log
+- Phase 3 (marketplace catalog): categories, listings with options, photo processing, search and filters, store pages, listing moderation
 
-No marketplace listings or orders exist yet. FDB must not process real transactions until the founders have reviewed the legal and operational launch checklist.
+There is no cart or ordering yet. FDB must not process real transactions until the founders have reviewed the legal and operational launch checklist.

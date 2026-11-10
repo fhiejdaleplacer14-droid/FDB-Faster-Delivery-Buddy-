@@ -15,7 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
-        $middleware->alias(['active' => \App\Http\Middleware\EnsureAccountIsActive::class]);
+        $middleware->alias([
+            'active' => \App\Http\Middleware\EnsureAccountIsActive::class,
+            'seller' => \App\Http\Middleware\EnsureSellerAccount::class,
+        ]);
         $middleware->trustProxies(at: env('TRUSTED_PROXIES', '127.0.0.1'));
         $middleware->throttleApi();
     })

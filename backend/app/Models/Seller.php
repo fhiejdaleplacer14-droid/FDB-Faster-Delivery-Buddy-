@@ -49,6 +49,11 @@ class Seller extends Model
         return $this->hasMany(SellerDocument::class);
     }
 
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
     public function statusHistory(): HasMany
     {
         return $this->hasMany(SellerStatusHistory::class)->orderBy('created_at')->orderBy('id');

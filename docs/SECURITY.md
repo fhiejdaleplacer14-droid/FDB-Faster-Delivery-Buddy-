@@ -27,9 +27,21 @@ This file describes the controls that exist in the code today. It is not a compl
 - Files are stored under random UUID names on a private disk that is never served directly.
 - Downloads are attachments with `nosniff` and `no-store`, require the `sellers.documents.view` permission, and are written to the audit log.
 
+## Product photos
+
+- Every photo is decoded and re-encoded to WEBP. This removes EXIF and GPS data (phone photos often contain the seller's home location) and anything embedded in the file.
+- The pixel count is checked before decoding (40 megapixels at most) to stop decompression bombs. The long side is reduced to 1600 px.
+- Photos are stored under UUID names and served with `nosniff`.
+
+## Seller isolation in the catalog
+
+- Seller listing endpoints look products up through the signed-in seller's own listings, so another seller's ID returns 404, not 403.
+- `seller_id`, `status`, and `price_from` are never accepted from input.
+- Suspended sellers cannot change listings, and their listings disappear from public results immediately.
+
 ## Audit log
 
-- Seller decisions, document views, and admin creation are recorded.
+- Seller decisions, listing moderation, category changes, document views, and admin creation are recorded.
 - The `audit_logs` table is append-only, enforced both by the model and by a PostgreSQL trigger.
 
 ## Secrets

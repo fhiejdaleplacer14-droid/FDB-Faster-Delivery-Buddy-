@@ -9,6 +9,8 @@ RUN apt-get update \
     && docker-php-ext-install -j"$(nproc)" pdo_pgsql pgsql intl zip bcmath gd pcntl \
     && rm -rf /var/lib/apt/lists/*
 
+RUN docker-php-ext-install exif
+
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/zz-fdb.ini
 

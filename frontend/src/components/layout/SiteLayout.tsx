@@ -2,7 +2,8 @@ import { LogOut, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import { Logo } from '@/components/brand/Logo'
-import { can, useAuth } from '@/features/auth/AuthContext'
+import { firstAdminPath } from '@/features/admin/AdminLayout'
+import { useAuth } from '@/features/auth/AuthContext'
 
 export function SiteLayout() {
   return (
@@ -37,13 +38,22 @@ function SiteHeader() {
   const navLink = ({ isActive }: { isActive: boolean }) =>
     `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'text-navy' : 'text-slate hover:text-ink'}`
 
+  const hasStore = user?.seller?.status === 'approved' || user?.seller?.status === 'suspended'
+  const adminPath = user ? firstAdminPath(user.permissions) : null
+  const browse = (
+    <NavLink to="/products" end className={navLink}>
+      Browse
+    </NavLink>
+  )
+
   const links = user ? (
     <>
-      <NavLink to="/sell" className={navLink}>
-        {user.seller ? 'My store' : 'Sell on FDB'}
+      {browse}
+      <NavLink to={hasStore ? '/seller/products' : '/sell'} className={navLink}>
+        {hasStore ? 'My store' : user.seller ? 'My application' : 'Sell on FDB'}
       </NavLink>
-      {can(user, 'sellers.review') && (
-        <NavLink to="/admin/sellers" className={navLink}>
+      {adminPath && (
+        <NavLink to={adminPath} className={navLink}>
           Admin
         </NavLink>
       )}
@@ -57,6 +67,7 @@ function SiteHeader() {
     </>
   ) : (
     <>
+      {browse}
       <NavLink to="/login" className={navLink}>
         Sign in
       </NavLink>

@@ -8,6 +8,8 @@ enum PermissionSlug: string
     case SellersManage = 'sellers.manage';
     case SellerDocumentsView = 'sellers.documents.view';
     case AuditLogsView = 'audit_logs.view';
+    case ProductsModerate = 'products.moderate';
+    case CategoriesManage = 'categories.manage';
 
     public function label(): string
     {
@@ -16,6 +18,8 @@ enum PermissionSlug: string
             self::SellersManage => 'Suspend and reactivate sellers',
             self::SellerDocumentsView => 'View seller verification documents',
             self::AuditLogsView => 'View audit logs',
+            self::ProductsModerate => 'Approve and remove product listings',
+            self::CategoriesManage => 'Manage product categories',
         };
     }
 }

@@ -12,6 +12,8 @@ export type PermissionSlug =
   | 'sellers.manage'
   | 'sellers.documents.view'
   | 'audit_logs.view'
+  | 'products.moderate'
+  | 'categories.manage'
 
 export type SellerStatus = 'pending' | 'approved' | 'rejected' | 'suspended'
 
@@ -77,4 +79,76 @@ export type SellerApplication = {
   reviewer?: { id: number; name: string } | null
   documents?: SellerDocument[]
   history?: SellerHistoryEntry[]
+}
+
+export type Category = {
+  id: number
+  parent_id: number | null
+  name: string
+  slug: string
+  position: number
+  is_active: boolean
+  products_count?: number
+  children?: Category[]
+}
+
+export type ImageRef = { id?: number; url: string; width: number; height: number }
+
+export type StoreProfile = {
+  name: string
+  slug: string
+  description: string | null
+  municipality: string
+  barangay: string
+  selling_since: string | null
+}
+
+export type ProductCard = {
+  id: number
+  slug: string
+  name: string
+  price_from: string
+  in_stock: boolean
+  image: ImageRef | null
+  store: { name: string; slug: string; municipality: string }
+  category: { name: string; slug: string }
+}
+
+export type ProductDetail = {
+  id: number
+  slug: string
+  name: string
+  description: string
+  price_from: string
+  in_stock: boolean
+  published_at: string | null
+  images: ImageRef[]
+  variants: { id: number; name: string; price: string; stock: number }[]
+  store: StoreProfile
+  category: { name: string; slug: string }
+}
+
+export type ProductStatus = 'draft' | 'pending_review' | 'published' | 'rejected' | 'archived'
+
+export type ManagedVariant = { id: number; name: string; sku: string | null; price: string; stock: number }
+
+export type ManagedProduct = {
+  id: number
+  slug: string
+  name: string
+  description: string
+  status: ProductStatus
+  moderation_reason: string | null
+  category_id: number
+  category?: { id: number; name: string }
+  price_from: string
+  stock_total: number
+  submitted_at: string | null
+  published_at: string | null
+  reviewed_at: string | null
+  updated_at: string
+  cover_image_url?: string | null
+  variants?: ManagedVariant[]
+  images?: ImageRef[]
+  store?: { id: number; name: string; slug: string; status: SellerStatus }
 }
