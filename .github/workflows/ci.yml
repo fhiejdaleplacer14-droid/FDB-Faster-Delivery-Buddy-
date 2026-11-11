@@ -48,7 +48,7 @@ jobs:
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: "8.5"
-          extensions: pdo_pgsql, pgsql, intl, zip, bcmath, gd, pcntl
+          extensions: pdo_pgsql, pgsql, intl, zip, bcmath, gd, pcntl, exif
           coverage: none
 
       - name: Install dependencies
@@ -87,3 +87,15 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+
+  production-images:
+    # Builds the production images and checks the running stack. Nothing is pushed or deployed.
+    needs: [backend, frontend]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build and smoke-test the production stack
+        run: sh scripts/smoke-prod.sh

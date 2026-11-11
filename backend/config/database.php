@@ -97,6 +97,8 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Reuses the connection across requests; a remote database like Neon is slow to connect to.
+            'options' => extension_loaded('pdo_pgsql') ? [PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', false)] : [],
         ],
 
         'sqlsrv' => [

@@ -31,6 +31,7 @@ npm run build
 
 - **Backend:** `composer install`, `composer audit`, then Pest against PostgreSQL 18 and Redis 8 service containers.
 - **Frontend:** `npm ci`, `npm audit --audit-level=high`, type check, lint, tests, and build.
+- **Production images:** after both pass, `scripts/smoke-prod.sh` builds the production images, runs them with random secrets, and checks the site, API, security headers, uploads, and that debug mode is off. Nothing is pushed or deployed.
 
 All third-party actions are pinned to exact commits.
 

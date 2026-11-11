@@ -84,7 +84,8 @@ This file describes the controls that exist in the code today. It is not a compl
 ## Browser protections
 
 - The built SPA carries a strict content security policy (`frontend/vite.config.ts`): scripts, styles, fonts, and API calls from its own origin only, no plugins, and forms may post only to itself. The dev server skips it because hot reload needs inline scripts. Every page was checked in headless Chrome against a production build with no violations.
-- A meta tag cannot set `frame-ancestors`, so the production web server must also send `Content-Security-Policy: frame-ancestors 'none'` and `Strict-Transport-Security` for the SPA. This is part of Phase 9 deployment.
+- A meta tag cannot set `frame-ancestors`, so the production nginx (`docker/nginx/production.conf`) sends `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY`, and `Strict-Transport-Security` with the SPA.
+- Production images contain no `.env` files or secrets (`.dockerignore`); settings come from the environment and config is cached when the container starts. Composer is removed from the final PHP image.
 - API responses get `default-src 'none'; frame-ancestors 'none'`, `X-Frame-Options: DENY`, `nosniff`, a `Permissions-Policy` that turns off camera, microphone, location, and payment, and `Cross-Origin-Opener-Policy: same-origin`. Product photos are additionally sandboxed.
 
 ## Production guard

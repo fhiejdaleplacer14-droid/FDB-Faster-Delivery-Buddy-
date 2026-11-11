@@ -1,6 +1,6 @@
 # Environment variables
 
-The backend reads `backend/.env`. Start from `backend/.env.example`. Never commit `.env` files or put real secrets in documentation.
+The backend reads `backend/.env`. Start from `backend/.env.example`. Production uses `backend/.env.production`, started from `backend/.env.production.example` (see [RELEASE.md](RELEASE.md)). Never commit `.env` files or put real secrets in documentation.
 
 Frontend variables prefixed with `VITE_` are bundled into public JavaScript. Never put secrets in them.
 
@@ -52,3 +52,17 @@ These are read from your shell or a root `.env` file. All are optional.
 | `FDB_DB_PORT` | `5432` | Host port for PostgreSQL (bound to 127.0.0.1 only) |
 
 The PostgreSQL container also creates a `<database>_testing` database on first start, which the backend tests use.
+
+## Using Neon for the database
+
+Neon hosts the PostgreSQL database; the app still runs where you run it. Laravel reads `DB_URL` and `DB_SSLMODE`, so no application code depends on it.
+
+**Current setup (test and demo):** `backend/.env` holds `DB_URL` (Neon's *unpooled* URL), `DB_SSLMODE=require`, and `DB_PERSISTENT=true`. `DB_URL` wins over the local `DB_HOST`, `DB_USERNAME`, and `DB_PASSWORD` lines, which stay only so the tests can reach the local `fdb_testing` database. `phpunit.xml` blanks `DB_URL` and sets `DB_SSLMODE=prefer`, so the tests can never touch Neon.
+
+- Get the URL with `neon login`, then `neon deploy` in the project root. It saves variables to `.env.local` (git-ignored). Use `DATABASE_URL_UNPOOLED`: migrations and the row locks used at checkout need real database sessions.
+- `DB_PERSISTENT=true` keeps connections open between requests. Connecting to Neon from far away takes 1 to 2 seconds, so this matters. Leave it unset for a local database.
+- **Go back to the local database:** copy `backend/.env.localdb` (a git-ignored copy of the old settings) over `backend/.env`, or delete the `DB_URL` line.
+- To run one command against Neon while `.env` points elsewhere, use `--env=neon` with a `backend/.env.neon` file.
+- **Do not run** `migrate:fresh`, `migrate:rollback`, or `DemoMarketplaceSeeder` while `backend/.env` points at Neon. Those delete or replace data. Production already blocks the destructive commands.
+- Product photos are not in the database. They stay in `backend/storage/app/public` (the `media` volume in production).
+- In production, put the same `DB_URL` and `DB_SSLMODE=require` in `backend/.env.production` and remove the `postgres` service from `docker-compose.prod.yml`. Run the app close to Neon's region (this project is in Singapore): each query is a network trip.
