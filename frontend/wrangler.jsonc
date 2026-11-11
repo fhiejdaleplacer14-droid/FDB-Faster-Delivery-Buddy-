@@ -4,6 +4,8 @@
   "name": "fdb-faster-delivery-buddy",
   "main": "worker/index.js",
   "compatibility_date": "2026-11-01",
+  // Builds the app before every deploy, so dist/ always exists even if the dashboard has no build command.
+  "build": { "command": "npm run build" },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
