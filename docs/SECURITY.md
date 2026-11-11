@@ -55,6 +55,13 @@ This file describes the controls that exist in the code today. It is not a compl
 - Recording a collection locks the records it covers and refuses any that are not due or belong to another seller, so the same commission cannot be collected twice.
 - Rate changes, adjustments, and collections are written to the audit log.
 
+## Refunds
+
+- Only the seller of that order or an admin with `refunds.manage` can record a refund; another seller's order is a 404.
+- Refunds need a paid order. The seller order row is locked while recording, and a CHECK keeps `refunded_total` at or below the total. A live race of two simultaneous refunds produced one refund and one refusal.
+- A support ticket can be linked only if it belongs to the same order, so ticket numbers from other orders are never confirmed.
+- Customers see refunds but never their commission effect. Every refund and credit settlement is written to the audit log.
+
 ## Reviews, support, and notifications
 
 - Only the buyer can review, only after delivery, and only once per order line; the database enforces the last rule.
@@ -74,9 +81,22 @@ This file describes the controls that exist in the code today. It is not a compl
 - `.env` files are ignored by git. Frontend `VITE_*` variables are public, so never put secrets there.
 - No default or seeded admin accounts exist. Create admins with `php artisan fdb:create-admin`; for automated setup, read the password from the `FDB_ADMIN_PASSWORD` environment variable.
 
-## Known gaps, planned for Phase 8
+## Browser protections
 
-- No content security policy yet.
+- The built SPA carries a strict content security policy (`frontend/vite.config.ts`): scripts, styles, fonts, and API calls from its own origin only, no plugins, and forms may post only to itself. The dev server skips it because hot reload needs inline scripts. Every page was checked in headless Chrome against a production build with no violations.
+- A meta tag cannot set `frame-ancestors`, so the production web server must also send `Content-Security-Policy: frame-ancestors 'none'` and `Strict-Transport-Security` for the SPA. This is part of Phase 9 deployment.
+- API responses get `default-src 'none'; frame-ancestors 'none'`, `X-Frame-Options: DENY`, `nosniff`, a `Permissions-Policy` that turns off camera, microphone, location, and payment, and `Cross-Origin-Opener-Policy: same-origin`. Product photos are additionally sandboxed.
+
+## Production guard
+
+- The app refuses to start in production with `APP_DEBUG=true`, and always marks session cookies `Secure` and `HttpOnly` and generates `https` links there.
+
+## Dependencies
+
+- `composer audit` and `npm audit` report no known vulnerabilities. The frontend pins `minimatch` to `^11.0.1` through `overrides` because ESLint's own version had a denial-of-service advisory; remove the override once ESLint ships the fix.
+
+## Known gaps
+
 - No virus scanning of uploads.
 - Error monitoring (Sentry) is not connected.
 - No account deletion or data export workflow yet (Data Privacy Act review is pending).

@@ -4,10 +4,13 @@ import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { SelectField, TextareaField } from '@/components/ui/Field'
 import { useToast } from '@/components/ui/Toast'
+import { can, useAuth } from '@/features/auth/AuthContext'
+import { refundApi } from '@/features/refunds/api'
+import { RefundSection } from '@/features/refunds/RefundSection'
 import { adminSupportApi } from '@/features/support/api'
 import { TicketThread } from '@/features/support/TicketThread'
-import { firstError, toApiError, type ApiError } from '@/lib/http'
-import type { Ticket, TicketStatus } from '@/types/api'
+import { firstError, http, toApiError, type ApiError } from '@/lib/http'
+import type { Order, Resource, SellerOrder, Ticket, TicketStatus } from '@/types/api'
 
 export function SupportTicketPage() {
   const { number = '' } = useParams()
@@ -43,9 +46,41 @@ export function SupportTicketPage() {
             >
               <StatusPanel ticket={ticket} onChange={setTicket} />
             </TicketThread>
+            {ticket.seller_order?.order_number && <TicketRefunds orderNumber={ticket.seller_order.order_number} sellerOrderId={ticket.seller_order.id} ticketNumber={ticket.number} />}
           </div>
         </>
       )}
+    </div>
+  )
+}
+
+// Lets staff settle a dispute's money side without leaving the ticket.
+function TicketRefunds({ orderNumber, sellerOrderId, ticketNumber }: { orderNumber: string; sellerOrderId: number; ticketNumber: string }) {
+  const { user } = useAuth()
+  const allowed = can(user, 'refunds.manage') && can(user, 'orders.view')
+  const [sellerOrder, setSellerOrder] = useState<SellerOrder | null>(null)
+
+  useEffect(() => {
+    if (!allowed) return
+    http
+      .get<Resource<Order>>(`/admin/orders/${encodeURIComponent(orderNumber)}`)
+      .then((r) => setSellerOrder(r.data.data.seller_orders.find((so) => so.id === sellerOrderId) ?? null), () => undefined)
+  }, [allowed, orderNumber, sellerOrderId])
+
+  if (!sellerOrder) return null
+
+  return (
+    <div className="mt-8 border-t border-line pt-2 lg:max-w-[calc(100%-20rem)]">
+      {sellerOrder.payment_status === 'unpaid' && (
+        <p className="mt-4 text-sm text-slate">Refunds can be recorded once the seller has marked this order as paid.</p>
+      )}
+      <RefundSection
+        order={sellerOrder}
+        audience="admin"
+        ticketNumber={ticketNumber}
+        submit={(input) => refundApi.recordAsAdmin(sellerOrder.id, input)}
+        onChange={(updated) => setSellerOrder((so) => so && { ...so, ...updated })}
+      />
     </div>
   )
 }

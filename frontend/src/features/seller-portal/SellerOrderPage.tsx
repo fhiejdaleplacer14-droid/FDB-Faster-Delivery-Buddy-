@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/Button'
 import { TextareaField } from '@/components/ui/Field'
 import { OrderStatusBadge, orderStatusLabel, orderSteps } from '@/components/ui/OrderStatusBadge'
 import { AddressLines } from '@/features/orders/AddressForm'
+import { refundApi } from '@/features/refunds/api'
+import { RefundSection } from '@/features/refunds/RefundSection'
+import { PaymentText } from '@/features/refunds/RefundList'
 import { formatDateTime } from '@/lib/format'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import { formatPeso, formatRate } from '@/lib/money'
@@ -53,7 +56,19 @@ export function SellerOrderPage() {
               <dt className="text-slate">Customer pays by</dt>
               <dd className="mt-1 text-ink">
                 {order.order?.payment_method_label} ·{' '}
-                {order.payment_status === 'paid' ? <span className="text-success">received {formatDateTime(order.paid_at)}</span> : 'not yet received'}
+                {order.payment_status === 'unpaid' ? (
+                  'not yet received'
+                ) : (
+                  <>
+                    <span className="text-success">received {formatDateTime(order.paid_at)}</span>
+                    {order.payment_status !== 'paid' && (
+                      <>
+                        {' · '}
+                        <PaymentText status={order.payment_status} />
+                      </>
+                    )}
+                  </>
+                )}
               </dd>
             </div>
             {order.order?.customer_note && (
@@ -96,13 +111,13 @@ export function SellerOrderPage() {
                 <>
                   <tr className="text-slate">
                     <td className="py-1" colSpan={2}>
-                      FDB commission ({formatRate(order.commission.rate)}, due once delivered)
+                      FDB commission ({formatRate(order.commission.rate)}, due once delivered{order.refunds?.length ? ', after refunds' : ''})
                     </td>
                     <td className="py-1 text-right tabular">−{formatPeso(order.commission.amount)}</td>
                   </tr>
                   <tr>
                     <td className="py-1" colSpan={2}>
-                      You keep
+                      You keep{order.refunds?.length ? ' after refunds' : ''}
                     </td>
                     <td className="py-1 text-right tabular">{formatPeso(order.commission.seller_amount)}</td>
                   </tr>
@@ -110,6 +125,8 @@ export function SellerOrderPage() {
               )}
             </tfoot>
           </table>
+
+          <RefundSection order={order} audience="seller" submit={(input) => refundApi.recordAsSeller(order.id, input)} onChange={setOrder} />
 
           <section className="mt-8">
             <h2 className="text-sm font-semibold tracking-wide text-slate uppercase">History</h2>

@@ -48,4 +48,11 @@ return [
         'collection_methods' => ['cash', 'gcash', 'maya', 'bank_transfer', 'other'],
     ],
 
+    'refunds' => [
+        // Placeholder until the founders decide: 'proportional' cuts FDB's commission by the rate times
+        // the refunded item value; 'none' leaves the commission unchanged.
+        'commission_treatment' => env('FDB_REFUND_COMMISSION', 'proportional'),
+        'methods' => ['cash', 'gcash', 'maya', 'bank_transfer', 'other'],
+    ],
+
 ];

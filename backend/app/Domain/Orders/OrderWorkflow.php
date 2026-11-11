@@ -103,7 +103,7 @@ class OrderWorkflow
             if ($sellerOrder->status === SellerOrderStatus::Cancelled) {
                 throw new InvalidOrderTransition('A cancelled order cannot be marked as paid.');
             }
-            if ($sellerOrder->payment_status === PaymentStatus::Paid) {
+            if ($sellerOrder->payment_status->wasPaid()) {
                 throw new InvalidOrderTransition('This order is already marked as paid.');
             }
 

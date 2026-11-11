@@ -1,5 +1,4 @@
-import { AxiosError } from 'axios'
-import { http } from '@/lib/http'
+import { http, httpStatus } from '@/lib/http'
 import type { Resource, SellerApplication, SellerDocumentType, ServiceArea } from '@/types/api'
 
 export type ApplicationDetails = {
@@ -48,7 +47,7 @@ export const sellerApi = {
     try {
       return (await http.get<Resource<SellerApplication>>('/seller-application')).data.data
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.status === 404) return null
+      if (httpStatus(error) === 404) return null
       throw error
     }
   },

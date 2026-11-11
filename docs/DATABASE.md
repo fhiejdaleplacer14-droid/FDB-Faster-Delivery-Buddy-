@@ -68,7 +68,8 @@ archived ◄─archive── rejected ◄──take down── pending_review
 | `addresses` | Customer delivery addresses | At most one default per customer (partial unique index) |
 | `cart_items` | Server-side cart | One line per variant per customer; quantity 1–99 |
 | `orders` | One checkout | Unique `(user_id, idempotency_key)`. The delivery address is copied in. `grand_total = items_total + delivery_fee_total` (CHECK). `status` is derived from the seller orders: in_progress, completed, cancelled |
-| `seller_orders` | One store's part of a checkout | Own status, payment status (unpaid or paid, confirmed by the seller), totals, delivery note, and cancellation details. `total = items_total + delivery_fee` (CHECK) |
+| `seller_orders` | One store's part of a checkout | Own status, payment status (`unpaid`, `paid`, `partially_refunded`, `refunded`; CHECK), totals, `refunded_total`, delivery note, and cancellation details. `total = items_total + delivery_fee` and `0 <= refunded_total <= total` (CHECK) |
+| `refunds` | Money a seller returned to the customer, outside FDB | `amount > 0` (CHECK), method, reference, reason, who recorded it (`recorded_as` seller or admin), optional support ticket. `commission_reduction` is what was taken off an uncollected commission; `commission_credit` is what FDB owes back on a commission it already collected, until `credit_settled_at` is set. Amounts are never edited |
 | `order_items` | Snapshot of each purchased line | Product and option names, unit price, quantity, and `line_total = unit_price * quantity` (CHECK). Never changes when the product changes |
 | `order_status_histories` | Every seller-order status change, with who made it and any note | Append-only |
 

@@ -6,6 +6,7 @@ use App\Domain\Orders\SellerOrderStatus;
 use App\Models\CommissionAdjustment;
 use App\Models\CommissionCollection;
 use App\Models\CommissionRecord;
+use App\Models\Refund;
 use App\Models\SellerOrder;
 use App\Support\Money;
 use Illuminate\Support\Carbon;
@@ -75,6 +76,9 @@ class FinancialReport
             'commission_adjustments' => $this->sum(CommissionAdjustment::query()->whereBetween('created_at', [$from, $to]), 'amount'),
             // Balances as of now, not limited to the period.
             'commission_outstanding' => $this->sum(CommissionRecord::query()->where('status', CommissionStatus::Due), DB::raw($net)),
+            'commission_credits_owed' => $this->sum(Refund::query()->where('commission_credit', '>', 0)->whereNull('credit_settled_at'), 'commission_credit'),
+            // Sellers return refunds outside FDB; GMV and seller earnings above are before refunds.
+            'refunds_recorded' => $this->sum(Refund::query()->whereBetween('refunded_at', [$from, $to]), 'amount'),
             'commission_pending' => $this->sum(CommissionRecord::query()->where('status', CommissionStatus::Pending), DB::raw($net)),
             'sellers' => $perSeller,
         ];

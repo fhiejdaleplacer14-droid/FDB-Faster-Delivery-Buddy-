@@ -25,6 +25,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SupportTicketController;
+use App\Http\Controllers\Admin\RefundController as AdminRefundController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SupportTicketController as AdminSupportTicketController;
 use App\Http\Controllers\Seller\ReviewController as SellerReviewController;
@@ -104,6 +105,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
             Route::post('/orders/{sellerOrderId}/cancel', [SellerOrderController::class, 'cancel'])->name('orders.cancel');
             Route::post('/orders/{sellerOrderId}/payment-received', [SellerOrderController::class, 'paymentReceived'])->name('orders.payment');
             Route::put('/orders/{sellerOrderId}/delivery', [SellerOrderController::class, 'delivery'])->name('orders.delivery');
+            Route::post('/orders/{sellerOrderId}/refunds', [SellerOrderController::class, 'refund'])->middleware('throttle:refunds')->name('orders.refunds.store');
             Route::get('/commissions', SellerCommissionController::class)->name('commissions.index');
             Route::get('/reviews', [SellerReviewController::class, 'index'])->name('reviews.index');
             Route::post('/reviews/{reviewId}/reply', [SellerReviewController::class, 'reply'])->middleware('throttle:messages')->name('reviews.reply');
@@ -144,6 +146,10 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{number}', [AdminOrderController::class, 'show'])->name('orders.show');
+
+        Route::get('/refunds', [AdminRefundController::class, 'index'])->name('refunds.index');
+        Route::post('/seller-orders/{sellerOrderId}/refunds', [AdminRefundController::class, 'store'])->whereNumber('sellerOrderId')->middleware('throttle:refunds')->name('refunds.store');
+        Route::post('/refunds/{refundId}/settle-credit', [AdminRefundController::class, 'settleCredit'])->whereNumber('refundId')->name('refunds.settle-credit');
 
         Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
         Route::post('/reviews/{reviewId}/hide', [AdminReviewController::class, 'hide'])->whereNumber('reviewId')->name('reviews.hide');

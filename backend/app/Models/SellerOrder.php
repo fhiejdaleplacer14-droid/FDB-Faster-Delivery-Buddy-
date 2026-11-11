@@ -7,6 +7,7 @@ use App\Domain\Orders\SellerOrderStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class SellerOrder extends Model
 {
@@ -18,6 +19,7 @@ class SellerOrder extends Model
             'items_total' => 'decimal:2',
             'delivery_fee' => 'decimal:2',
             'total' => 'decimal:2',
+            'refunded_total' => 'decimal:2',
             'confirmed_at' => 'datetime',
             'delivered_at' => 'datetime',
             'cancelled_at' => 'datetime',
@@ -38,6 +40,16 @@ class SellerOrder extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class)->orderBy('id');
+    }
+
+    public function commissionRecord(): HasOne
+    {
+        return $this->hasOne(CommissionRecord::class);
+    }
+
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(Refund::class)->orderBy('refunded_at')->orderBy('id');
     }
 
     public function history(): HasMany

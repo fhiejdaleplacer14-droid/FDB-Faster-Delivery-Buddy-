@@ -22,12 +22,10 @@ class SellerOrderResource extends JsonResource
             'items_total' => $this->items_total,
             'delivery_fee' => $this->delivery_fee,
             'total' => $this->total,
+            'refunded_total' => $this->refunded_total,
+            'refunds' => $this->whenLoaded('refunds', fn () => RefundResource::collection($this->refunds)->resolve($request)),
             // Commission is between FDB and the seller; customers never see it.
-            'commission' => $this->when($request->routeIs('seller.*', 'admin.*') && $this->commission_rate !== null, fn () => [
-                'rate' => $this->commission_rate,
-                'amount' => $this->commission_amount,
-                'seller_amount' => Money::subtract($this->items_total, $this->commission_amount),
-            ]),
+            'commission' => $this->when($request->routeIs('seller.*', 'admin.*') && $this->commission_rate !== null, fn () => $this->commissionSummary()),
             'delivery_note' => $this->delivery_note,
             'cancel_reason' => $this->cancel_reason,
             'cancelled_by' => $this->cancelled_by,
@@ -74,6 +72,27 @@ class SellerOrderResource extends JsonResource
                     'landmark' => $this->order->landmark,
                 ],
             ]),
+        ];
+    }
+
+    // After refunds, the seller keeps the item value not refunded, minus the commission that still applies.
+    private function commissionSummary(): array
+    {
+        $commission = $this->commission_amount;
+        $itemsKept = $this->items_total;
+
+        if ($this->relationLoaded('refunds') && $this->refunds->isNotEmpty()) {
+            foreach ($this->refunds as $refund) {
+                $commission = Money::subtract($commission, Money::add($refund->commission_reduction, $refund->commission_credit));
+            }
+            $refundedItems = bccomp($this->refunded_total, $this->items_total, 2) < 0 ? $this->refunded_total : $this->items_total;
+            $itemsKept = Money::subtract($this->items_total, $refundedItems);
+        }
+
+        return [
+            'rate' => $this->commission_rate,
+            'amount' => $commission,
+            'seller_amount' => Money::subtract($itemsKept, $commission),
         ];
     }
 }

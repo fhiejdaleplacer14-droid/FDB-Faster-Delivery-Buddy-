@@ -24,7 +24,14 @@ FROM base AS development
 USER www-data
 
 FROM base AS production
-COPY --chown=www-data:www-data backend/ /var/www/html/
-RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+COPY backend/ /var/www/html/
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --classmap-authoritative \
+    && rm /usr/bin/composer \
+    && mkdir -p storage/app/private storage/app/public storage/app/seller-documents \
+        storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
 COPY docker/php/php.prod.ini /usr/local/etc/php/conf.d/zz-fdb-prod.ini
+COPY --chmod=755 docker/php/entrypoint.prod.sh /usr/local/bin/fdb-entrypoint
 USER www-data
+ENTRYPOINT ["fdb-entrypoint"]
+CMD ["php-fpm"]

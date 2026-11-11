@@ -45,7 +45,7 @@ class OrderController extends Controller
 
         $order = Order::query()
             ->where('number', $number)
-            ->with(['user', 'sellerOrders.seller', 'sellerOrders.items', 'sellerOrders.history.actor'])
+            ->with(['user', 'sellerOrders.seller', 'sellerOrders.items', 'sellerOrders.history.actor', 'sellerOrders.refunds.recorder', 'sellerOrders.refunds.ticket'])
             ->firstOrFail();
 
         return new OrderResource($order);

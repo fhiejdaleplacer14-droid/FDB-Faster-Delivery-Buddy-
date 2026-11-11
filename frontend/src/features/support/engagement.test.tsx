@@ -14,6 +14,7 @@ const delivered: SellerOrder = {
   payment_status: 'paid',
   items_total: '120.00',
   delivery_fee: '0.00',
+  refunded_total: '0.00',
   total: '120.00',
   delivery_note: null,
   cancel_reason: null,

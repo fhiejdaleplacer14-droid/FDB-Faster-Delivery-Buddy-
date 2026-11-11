@@ -19,7 +19,7 @@ Browser ──► Vite dev server (5173) ──/api, /sanctum──► nginx (80
 The SPA uses Laravel Sanctum's cookie-based session authentication. The browser talks to a single origin: in development the Vite dev server proxies `/api` and `/sanctum` to nginx; in production the same web server should serve the built SPA and route `/api` and `/sanctum` to Laravel.
 
 - No tokens are stored in `localStorage`.
-- CSRF protection comes from the `XSRF-TOKEN` cookie, which Axios sends back as `X-XSRF-TOKEN`.
+- CSRF protection comes from the `XSRF-TOKEN` cookie, which the fetch client in `frontend/src/lib/http.ts` sends back as `X-XSRF-TOKEN`.
 - CORS is restricted to `FRONTEND_URL` as a fallback if the SPA is ever hosted on a separate subdomain.
 
 ### API versioning

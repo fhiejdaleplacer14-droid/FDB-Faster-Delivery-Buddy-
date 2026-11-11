@@ -142,3 +142,62 @@ describe('moderation', () => {
     expect(await screen.findByText('Needs changes')).toBeInTheDocument()
   })
 })
+
+describe('product filters', () => {
+  const pantry = {
+    id: 2,
+    parent_id: null,
+    name: 'Pantry',
+    slug: 'pantry',
+    position: 1,
+    is_active: true,
+    children: [{ id: 3, parent_id: 2, name: 'Rice', slug: 'rice', position: 0, is_active: true }],
+  }
+
+  beforeEach(() => {
+    vi.spyOn(catalogApi, 'categories').mockResolvedValue([pantry])
+  })
+
+  it('shows active filters as chips that remove themselves, and keeps the search on clear all', async () => {
+    vi.spyOn(catalogApi, 'products').mockResolvedValue(page([card]))
+    const { router } = renderRoute('/products?search=bigas&category=rice&municipality=guihulngan&min_price=50&in_stock=1')
+
+    expect(await screen.findByRole('button', { name: 'Remove filter: Rice' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove filter: From ₱50.00' })).toBeInTheDocument()
+    // The selected subcategory keeps its parent open.
+    expect(screen.getByRole('button', { name: 'Rice', pressed: true })).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Remove filter: Guihulngan' }))
+    await waitFor(() => expect(router.state.location.search).toBe('?search=bigas&category=rice&min_price=50&in_stock=1'))
+
+    await userEvent.click(screen.getByRole('button', { name: 'Clear all' }))
+    await waitFor(() => expect(router.state.location.search).toBe('?search=bigas'))
+  })
+
+  it('opens subcategories under their parent and applies a price range only on request', async () => {
+    vi.spyOn(catalogApi, 'products').mockResolvedValue(page([card]))
+    const { router } = renderRoute('/products')
+
+    expect(await screen.findByRole('button', { name: 'Pantry' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Rice' })).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Pantry' }))
+    expect(await screen.findByRole('button', { name: 'Rice' })).toBeInTheDocument()
+
+    expect(screen.queryByRole('button', { name: 'Apply price' })).not.toBeInTheDocument()
+    await userEvent.type(screen.getByLabelText('Maximum price'), '200')
+    await userEvent.click(screen.getByRole('button', { name: 'Apply price' }))
+    await waitFor(() => expect(router.state.location.search).toBe('?category=pantry&max_price=200'))
+  })
+
+  it('shows filters in a closable sheet on small screens', async () => {
+    vi.spyOn(catalogApi, 'products').mockResolvedValue(page([card]))
+    renderRoute('/products')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Filters' }))
+    const sheet = screen.getByRole('dialog', { name: 'Filters' })
+    expect(sheet).toHaveTextContent('Show 1 product')
+
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog', { name: 'Filters' })).not.toBeInTheDocument()
+  })
+})

@@ -17,6 +17,8 @@ const report: FinancialSummary = {
   commission_adjustments: '0.00',
   commission_outstanding: '15.00',
   commission_pending: '6.00',
+  commission_credits_owed: '0.00',
+  refunds_recorded: '0.00',
   sellers: [],
 }
 
@@ -87,6 +89,7 @@ describe('seller order commission', () => {
       payment_status: 'unpaid',
       items_total: '500.00',
       delivery_fee: '0.00',
+      refunded_total: '0.00',
       total: '500.00',
       commission: { rate: '0.0750', amount: '37.50', seller_amount: '462.50' },
       delivery_note: null,

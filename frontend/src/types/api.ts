@@ -19,6 +19,7 @@ export type PermissionSlug =
   | 'reports.view'
   | 'reviews.moderate'
   | 'support.manage'
+  | 'refunds.manage'
 
 export type SellerStatus = 'pending' | 'approved' | 'rejected' | 'suspended'
 
@@ -218,14 +219,38 @@ export type DeliveryDetails = {
   landmark: string | null
 }
 
+export type PaymentStatus = 'unpaid' | 'paid' | 'partially_refunded' | 'refunded'
+
+export type RefundMethod = 'cash' | 'gcash' | 'maya' | 'bank_transfer' | 'other'
+
+export type Refund = {
+  id: number
+  amount: string
+  method: RefundMethod
+  method_label: string
+  reference: string | null
+  reason: string
+  recorded_as: 'seller' | 'admin'
+  refunded_at: string
+  recorded_by?: string | null
+  commission_reduction?: string
+  commission_credit?: string
+  credit_settled_at?: string | null
+  ticket_number?: string | null
+  seller_order?: { id: number; number: string; order_number: string | null }
+  store?: { id: number; name: string }
+}
+
 export type SellerOrder = {
   id: number
   number: string
   status: SellerOrderStatus
-  payment_status: 'unpaid' | 'paid'
+  payment_status: PaymentStatus
   items_total: string
   delivery_fee: string
   total: string
+  refunded_total: string
+  refunds?: Refund[]
   commission?: { rate: string; amount: string; seller_amount: string }
   delivery_note: string | null
   cancel_reason: string | null
@@ -317,6 +342,8 @@ export type FinancialSummary = {
   commission_adjustments: string
   commission_outstanding: string
   commission_pending: string
+  commission_credits_owed: string
+  refunds_recorded: string
   sellers: {
     seller_id: number
     store_name: string

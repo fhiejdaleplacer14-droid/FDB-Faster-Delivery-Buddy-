@@ -2,7 +2,6 @@ import type { ComponentType } from 'react'
 import { Navigate, type RouteObject } from 'react-router'
 import { RouteError } from '@/components/layout/RouteError'
 import { SiteLayout } from '@/components/layout/SiteLayout'
-import { AccountPage } from '@/features/account/AccountPage'
 import { AdminHome, AdminLayout } from '@/features/admin/AdminLayout'
 import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage'
 import { RedirectIfSignedIn, RequireAuth, RequirePermission, RequireSellerAccount } from '@/features/auth/guards'
@@ -20,13 +19,8 @@ import { CheckoutPage } from '@/features/orders/CheckoutPage'
 import { OrderDetailPage } from '@/features/orders/OrderDetailPage'
 import { OrdersPage } from '@/features/orders/OrdersPage'
 import { SellerLayout } from '@/features/seller-portal/SellerLayout'
-import { SellPage } from '@/features/sellers/SellPage'
-import { NotificationsPage } from '@/features/notifications/NotificationsPage'
-import { NewTicketPage } from '@/features/support/NewTicketPage'
-import { SupportPage } from '@/features/support/SupportPage'
-import { TicketPage } from '@/features/support/TicketPage'
 
-// Seller and admin screens load on demand so shoppers never download them.
+// Screens most shoppers never open load on demand.
 function page<M extends Record<string, unknown>>(load: () => Promise<M>, name: keyof M) {
   return async () => ({ Component: (await load())[name] as ComponentType })
 }
@@ -53,16 +47,16 @@ export const routes: RouteObject[] = [
       {
         element: <RequireAuth />,
         children: [
-          { path: 'account', element: <AccountPage /> },
+          { path: 'account', lazy: page(() => import('@/features/account/AccountPage'), 'AccountPage') },
           { path: 'cart', element: <CartPage /> },
           { path: 'checkout', element: <CheckoutPage /> },
           { path: 'orders', element: <OrdersPage /> },
           { path: 'orders/:number', element: <OrderDetailPage /> },
-          { path: 'sell', element: <SellPage /> },
-          { path: 'notifications', element: <NotificationsPage /> },
-          { path: 'support', element: <SupportPage /> },
-          { path: 'support/new', element: <NewTicketPage /> },
-          { path: 'support/:number', element: <TicketPage /> },
+          { path: 'sell', lazy: page(() => import('@/features/sellers/SellPage'), 'SellPage') },
+          { path: 'notifications', lazy: page(() => import('@/features/notifications/NotificationsPage'), 'NotificationsPage') },
+          { path: 'support', lazy: page(() => import('@/features/support/SupportPage'), 'SupportPage') },
+          { path: 'support/new', lazy: page(() => import('@/features/support/NewTicketPage'), 'NewTicketPage') },
+          { path: 'support/:number', lazy: page(() => import('@/features/support/TicketPage'), 'TicketPage') },
           {
             path: 'seller',
             element: <RequireSellerAccount />,
@@ -124,6 +118,10 @@ export const routes: RouteObject[] = [
                   { path: 'support', lazy: page(() => import('@/features/admin/SupportQueuePage'), 'SupportQueuePage') },
                   { path: 'support/:number', lazy: page(() => import('@/features/admin/SupportTicketPage'), 'SupportTicketPage') },
                 ],
+              },
+              {
+                element: <RequirePermission permission="refunds.manage" />,
+                children: [{ path: 'refunds', lazy: page(() => import('@/features/admin/RefundsPage'), 'RefundsPage') }],
               },
               {
                 element: <RequirePermission permission="reviews.moderate" />,

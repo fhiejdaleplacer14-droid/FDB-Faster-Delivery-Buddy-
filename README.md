@@ -83,6 +83,8 @@ scripts/     Developer setup scripts
 
 - Phase 5 (commission and financial records): rate history with per-seller overrides, commission copied into each order at checkout, pending → due → collected tracking, adjustments, batch collections, and a financial report that separates GMV from FDB revenue
 - Phase 6 (seller and admin tools): seller portal and admin console for orders, listings, commissions, and reports
-- Phase 7 (customer trust, part A): in-app notifications with a header bell, verified-buyer reviews with seller replies and moderation, and a help center where customers, sellers, and FDB staff talk in one thread. Disputes are a ticket type with a configurable window. What a dispute's outcome does to money (refunds, commission changes) is not built yet and waits on founder decisions
+- Phase 7 (customer trust, part A): in-app notifications with a header bell, verified-buyer reviews with seller replies and moderation, and a help center where customers, sellers, and FDB staff talk in one thread. Disputes are a ticket type with a configurable window.
+- Phase 7 (part B, refunds): sellers and FDB admins record refunds on paid orders, optionally linked to a support request. Payment status shows partly refunded or refunded. FDB commission drops in proportion (configurable placeholder); if FDB already collected it, the difference is tracked as a credit owed to the seller until an admin marks it settled. The financial report shows refunds and credits owed
+- Phase 8 (hardening, in progress): axios replaced by a small fetch client, rarely used pages load on demand, strict content security policy and security headers, a production guard against debug mode and insecure cookies, clean dependency audits
 
 For a populated local site, run `docker compose exec app php artisan db:seed --class=DemoMarketplaceSeeder`. FDB must not process real transactions until the founders have reviewed the legal and operational launch checklist.

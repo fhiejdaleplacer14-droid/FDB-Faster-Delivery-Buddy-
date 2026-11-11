@@ -1,4 +1,4 @@
-import { formatPeso, formatRate } from './money'
+import { compareMoney, formatPeso, formatRate, subtractMoney } from './money'
 
 describe('formatRate', () => {
   it.each([
@@ -28,5 +28,23 @@ describe('formatPeso', () => {
 
   it('keeps exact cents that floats would round', () => {
     expect(formatPeso('9007199254740993.99')).toBe('₱9,007,199,254,740,993.99')
+  })
+})
+
+describe('subtractMoney and compareMoney', () => {
+  it.each([
+    ['500.00', '100.00', '400.00'],
+    ['0.30', '0.10', '0.20'],
+    ['100', '0.01', '99.99'],
+    ['5.5', '7.25', '-1.75'],
+    ['9007199254740993.99', '0.99', '9007199254740993.00'],
+  ])('%s - %s = %s', (a, b, expected) => {
+    expect(subtractMoney(a, b)).toBe(expected)
+  })
+
+  it('compares without floating point', () => {
+    expect(compareMoney('0.30', '0.3')).toBe(0)
+    expect(compareMoney('100.01', '100.00')).toBe(1)
+    expect(compareMoney('99.99', '100')).toBe(-1)
   })
 })

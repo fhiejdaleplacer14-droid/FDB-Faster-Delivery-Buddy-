@@ -8,8 +8,12 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { useCart } from '@/features/orders/CartContext'
 
+// Sign-in screens stay focused on the form, so they skip the footer.
+const focusedPages = ['/login', '/register', '/forgot-password', '/reset-password']
+
 export function SiteLayout() {
   const { pathname } = useLocation()
+  const focused = focusedPages.includes(pathname)
 
   return (
     <ToastProvider>
@@ -19,7 +23,7 @@ export function SiteLayout() {
         <main key={pathname} className="flex-1 animate-fade-in">
           <Outlet />
         </main>
-        <SiteFooter />
+        {!focused && <SiteFooter />}
       </div>
     </ToastProvider>
   )

@@ -1,0 +1,25 @@
+# Keep secrets, local state, and host-built dependencies out of images.
+.git
+.github
+.idea
+.vscode
+docs
+backups
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules
+**/*.log
+
+backend/vendor
+backend/bootstrap/cache/*.php
+backend/storage/app/*
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/logs/*
+backend/.phpunit.result.cache
+backend/tests
+
+frontend/dist
+frontend/coverage

@@ -1,8 +1,8 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { AxiosError, AxiosHeaders, type AxiosResponse } from 'axios'
 import { catalogApi } from '@/features/catalog/api'
 import { sellerOrdersApi } from '@/features/seller-portal/ordersApi'
+import { HttpError } from '@/lib/http'
 import { makeUser, renderRoute } from '@/test/renderRoute'
 import type { Address, CartResponse, Order, ProductDetail, SellerOrder } from '@/types/api'
 import { addressApi, cartApi, orderApi } from './api'
@@ -55,8 +55,7 @@ const address: Address = {
 }
 
 function apiError(status: number, data: object) {
-  const response = { status, data, statusText: '', headers: {}, config: { headers: new AxiosHeaders() } }
-  return new AxiosError('failed', 'ERR', undefined, undefined, response as AxiosResponse)
+  return new HttpError(status, data)
 }
 
 describe('checkout', () => {
@@ -68,7 +67,7 @@ describe('checkout', () => {
   it('sends the server total and reuses one idempotency key when retrying', async () => {
     const checkout = vi
       .spyOn(orderApi, 'checkout')
-      .mockRejectedValueOnce(new AxiosError('Network Error', 'ERR_NETWORK'))
+      .mockRejectedValueOnce(new HttpError(null))
       .mockResolvedValueOnce({ number: 'FDB-261110-ABCDEF' } as Order)
     vi.spyOn(orderApi, 'get').mockResolvedValue({ number: 'FDB-261110-ABCDEF', seller_orders: [] } as unknown as Order)
     const { router } = renderRoute('/checkout', { user: makeUser() })
@@ -157,6 +156,7 @@ describe('seller orders', () => {
     payment_status: 'unpaid',
     items_total: '99.99',
     delivery_fee: '0.00',
+    refunded_total: '0.00',
     total: '99.99',
     delivery_note: null,
     cancel_reason: null,

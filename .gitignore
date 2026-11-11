@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+!.env.production.example
 node_modules/
 vendor/
 dist/
@@ -9,3 +10,4 @@ coverage/
 .idea/
 .vscode/
 *.log
+backups/

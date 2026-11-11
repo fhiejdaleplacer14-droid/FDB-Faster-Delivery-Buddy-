@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class OrderController extends Controller
 {
-    private const DETAIL = ['sellerOrders.seller', 'sellerOrders.items.product', 'sellerOrders.items.review', 'sellerOrders.history'];
+    private const DETAIL = ['sellerOrders.seller', 'sellerOrders.items.product', 'sellerOrders.items.review', 'sellerOrders.history', 'sellerOrders.refunds'];
 
     public function index(Request $request): AnonymousResourceCollection
     {

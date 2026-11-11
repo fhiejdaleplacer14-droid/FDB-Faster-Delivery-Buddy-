@@ -15,6 +15,7 @@ enum PermissionSlug: string
     case ReportsView = 'reports.view';
     case ReviewsModerate = 'reviews.moderate';
     case SupportManage = 'support.manage';
+    case RefundsManage = 'refunds.manage';
 
     public function label(): string
     {
@@ -30,6 +31,7 @@ enum PermissionSlug: string
             self::ReportsView => 'View financial reports',
             self::ReviewsModerate => 'Hide and restore product reviews',
             self::SupportManage => 'Answer support tickets and settle disputes',
+            self::RefundsManage => 'Record refunds and settle commission credits',
         };
     }
 }

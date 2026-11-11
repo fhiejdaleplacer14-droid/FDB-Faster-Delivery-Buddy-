@@ -10,6 +10,7 @@ import { formatDateTime } from '@/lib/format'
 import { toApiError, type ApiError } from '@/lib/http'
 import { formatPeso } from '@/lib/money'
 import type { Paginated, SellerOrder } from '@/types/api'
+import { PaymentText } from '@/features/refunds/RefundList'
 import { sellerOrdersApi } from './ordersApi'
 
 const filters = [
@@ -86,7 +87,9 @@ export function SellerOrdersPage() {
                     <td className="py-3 pr-4 text-slate tabular">{formatDateTime(so.created_at)}</td>
                     <td className="py-3 pr-4 text-ink">{so.items?.reduce((n, i) => n + i.quantity, 0)}</td>
                     <td className="py-3 pr-4 text-right tabular">{formatPeso(so.total)}</td>
-                    <td className="py-3 pr-4">{so.payment_status === 'paid' ? <span className="text-success">Paid</span> : <span className="text-slate">Unpaid</span>}</td>
+                    <td className="py-3 pr-4">
+                      <PaymentText status={so.payment_status} />
+                    </td>
                     <td className="py-3">
                       <OrderStatusBadge status={so.status} />
                     </td>

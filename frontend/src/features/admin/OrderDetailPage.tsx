@@ -3,16 +3,24 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { OrderStatusBadge, orderStatusLabel } from '@/components/ui/OrderStatusBadge'
+import { can, useAuth } from '@/features/auth/AuthContext'
 import { AddressLines } from '@/features/orders/AddressForm'
+import { refundApi } from '@/features/refunds/api'
+import { PaymentText, RefundList } from '@/features/refunds/RefundList'
+import { RefundSection } from '@/features/refunds/RefundSection'
 import { formatDateTime } from '@/lib/format'
 import { http, toApiError, type ApiError } from '@/lib/http'
 import { formatPeso } from '@/lib/money'
-import type { Order, Resource } from '@/types/api'
+import type { Order, Resource, SellerOrder } from '@/types/api'
 
 export function AdminOrderDetailPage() {
   const { number = '' } = useParams()
   const [order, setOrder] = useState<Order | null>(null)
   const [error, setError] = useState<ApiError | null>(null)
+  const { user } = useAuth()
+  const canRefund = can(user, 'refunds.manage')
+
+  const replace = (updated: SellerOrder) => setOrder((o) => o && { ...o, seller_orders: o.seller_orders.map((so) => (so.id === updated.id ? { ...so, ...updated } : so)) })
 
   useEffect(() => {
     http.get<Resource<Order>>(`/admin/orders/${encodeURIComponent(number)}`).then((r) => setOrder(r.data.data), (e: unknown) => setError(toApiError(e)))
@@ -46,7 +54,7 @@ export function AdminOrderDetailPage() {
                 <h2 className="font-semibold text-ink">{so.store?.name}</h2>
                 <OrderStatusBadge status={so.status} />
                 <span className="text-sm text-slate">
-                  {so.number} · {formatPeso(so.total)} · {so.payment_status === 'paid' ? 'paid' : 'unpaid'}
+                  {so.number} · {formatPeso(so.total)} · <PaymentText status={so.payment_status} />
                 </span>
               </div>
               <ul className="mt-3 text-sm">
@@ -68,6 +76,11 @@ export function AdminOrderDetailPage() {
                   </li>
                 ))}
               </ol>
+              {canRefund ? (
+                <RefundSection order={so} audience="admin" submit={(input) => refundApi.recordAsAdmin(so.id, input)} onChange={replace} />
+              ) : (
+                <RefundList refunds={so.refunds ?? []} />
+              )}
             </section>
           ))}
         </>

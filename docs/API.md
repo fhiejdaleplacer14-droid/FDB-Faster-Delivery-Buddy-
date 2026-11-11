@@ -1,6 +1,6 @@
 # API
 
-Base path: `/api/v1`. All responses are JSON. The SPA authenticates with Sanctum session cookies: call `GET /sanctum/csrf-cookie` once, then send the `X-XSRF-TOKEN` header on every write request. Axios does this automatically (`frontend/src/lib/http.ts`).
+Base path: `/api/v1`. All responses are JSON. The SPA authenticates with Sanctum session cookies: call `GET /sanctum/csrf-cookie` once, then send the `X-XSRF-TOKEN` header on every write request. The frontend's fetch client in `frontend/src/lib/http.ts` does this automatically, and retries once after refreshing the cookie if a write returns 419.
 
 ## Errors
 
@@ -121,6 +121,7 @@ Require an approved or suspended store (suspended stores can still complete orde
 | POST | `/seller/orders/{id}/status` | `status, note?`. Forward only; steps may be skipped |
 | POST | `/seller/orders/{id}/cancel` | `reason` required. Allowed until the order is out for delivery. Stock is returned |
 | POST | `/seller/orders/{id}/payment-received` | Records that the seller collected payment. Once only; written to the audit log |
+| POST | `/seller/orders/{id}/refunds` | `amount, method, reason, reference?, refunded_at?, support_ticket_number?`. Paid orders only; the total refunded can never exceed the order total. Returns the updated seller order. 30 per hour |
 | PUT | `/seller/orders/{id}/delivery` | `delivery_note`, shown to the customer |
 | GET | `/seller/commissions?status&page` | The seller's own commission records, plus `summary` totals for pending, due, and collected |
 
@@ -170,6 +171,9 @@ Each endpoint checks a permission, not a role name.
 | GET | `/admin/commissions/balances` | `commissions.manage` | Due amount per seller |
 | POST | `/admin/commissions/{id}/adjustments` | `commissions.manage` | `amount` (signed, non-zero), `reason`. Pending or due records only; the net can never go below zero |
 | GET · POST | `/admin/commission-collections` | `commissions.manage` | POST `seller_id, record_ids[], method, reference?, notes?, collected_at?`. Every record must be due and belong to that seller; recording the same records twice is refused |
+| POST | `/admin/seller-orders/{id}/refunds` | `refunds.manage` | Same body and rules as the seller endpoint. The seller is notified |
+| GET | `/admin/refunds?credit=owed\|settled&seller_id&page` | `refunds.manage` | With `summary { credit_owed, total }` |
+| POST | `/admin/refunds/{id}/settle-credit` | `refunds.manage` | Marks a commission credit as paid back to the seller. Once only; written to the audit log |
 | GET | `/admin/reviews?status&rating&search&page` | `reviews.moderate` | Includes the reviewer's email and the store |
 | POST | `/admin/reviews/{id}/hide` | `reviews.moderate` | `reason` required. Removes it from the product page and the rating; written to the audit log |
 | POST | `/admin/reviews/{id}/restore` | `reviews.moderate` | Publishes it again |

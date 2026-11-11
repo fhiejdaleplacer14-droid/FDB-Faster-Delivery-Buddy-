@@ -1,11 +1,10 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { AxiosError, AxiosHeaders, type AxiosResponse } from 'axios'
+import { HttpError } from '@/lib/http'
 import { makeUser, renderRoute } from '@/test/renderRoute'
 
 function validationError(errors: Record<string, string[]>) {
-  const response = { status: 422, data: { message: 'Invalid', errors }, statusText: '', headers: {}, config: { headers: new AxiosHeaders() } }
-  return new AxiosError('Invalid', 'ERR_BAD_REQUEST', undefined, undefined, response as AxiosResponse)
+  return new HttpError(422, { message: 'Invalid', errors })
 }
 
 describe('LoginPage', () => {

@@ -87,7 +87,8 @@ export function FinancialReportPage() {
               <Row label="GMV, delivered" help={`${plural(report.orders_delivered, 'seller order')} delivered. Product totals only; the money goes to sellers.`}>
                 {formatPeso(report.gmv_delivered)}
               </Row>
-              <Row label="Seller earnings" help="Delivered GMV minus FDB commission.">{formatPeso(report.seller_earnings)}</Row>
+              <Row label="Seller earnings" help="Delivered GMV minus FDB commission, before refunds.">{formatPeso(report.seller_earnings)}</Row>
+              <Row label="Refunds recorded" help="Money sellers returned to customers in this period.">{formatPeso(report.refunds_recorded)}</Row>
               <Row label="GMV, placed" help={`${plural(report.orders_placed, 'seller order')} placed and not cancelled, delivered or not.`}>
                 {formatPeso(report.gmv_placed)}
               </Row>
@@ -101,6 +102,7 @@ export function FinancialReportPage() {
             <dl className="mt-3 divide-y divide-line border-y border-line">
               <Row label="Commission due" help="Earned but not yet paid by sellers.">{formatPeso(report.commission_outstanding)}</Row>
               <Row label="Not yet earned" help="Commission on orders still on their way. Becomes due on delivery.">{formatPeso(report.commission_pending)}</Row>
+              <Row label="Commission credit owed to sellers" help="Commission FDB collected on amounts that were later refunded.">{formatPeso(report.commission_credits_owed)}</Row>
             </dl>
           </section>
 

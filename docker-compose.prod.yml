@@ -1,0 +1,95 @@
+# Production stack. Secrets come from backend/.env.production (never committed); see docs/RELEASE.md.
+# Run with: docker compose -f docker-compose.prod.yml --env-file backend/.env.production up -d
+name: fdb-prod
+
+x-php: &php
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+    target: production
+  image: fdb-php:${FDB_RELEASE:-latest}
+  env_file: ${FDB_ENV_FILE:-backend/.env.production}
+  restart: unless-stopped
+  volumes:
+    - media:/var/www/html/storage/app/public
+    - seller_documents:/var/www/html/storage/app/seller-documents
+    - logs:/var/www/html/storage/logs
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  app:
+    <<: *php
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 9000) ? 0 : 1);"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  queue:
+    <<: *php
+    command: php artisan queue:work redis --sleep=1 --tries=3 --max-time=3600
+
+  scheduler:
+    <<: *php
+    command: php artisan schedule:work
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+      args:
+        VITE_MEDIA_ORIGIN: ${VITE_MEDIA_ORIGIN:-}
+    image: fdb-web:${FDB_RELEASE:-latest}
+    restart: unless-stopped
+    ports:
+      - "${FDB_HTTP_PORT:-80}:80"
+    volumes:
+      - media:/var/www/media:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/api/v1/health >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  postgres:
+    image: postgres:18.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:?Set DB_DATABASE in backend/.env.production}
+      POSTGRES_USER: ${DB_USERNAME:?Set DB_USERNAME in backend/.env.production}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in backend/.env.production}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8.10.3-alpine
+    restart: unless-stopped
+    command: ["sh", "-c", 'exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"']
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD in backend/.env.production}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", 'redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres_data:
+  redis_data:
+  media:
+  seller_documents:
+  logs:

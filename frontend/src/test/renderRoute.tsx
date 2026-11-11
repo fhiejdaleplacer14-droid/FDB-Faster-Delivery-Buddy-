@@ -43,7 +43,7 @@ export const adminUser = () =>
     id: 99,
     name: 'Admin',
     roles: ['admin'],
-    permissions: ['sellers.review', 'sellers.manage', 'sellers.documents.view', 'audit_logs.view', 'products.moderate', 'categories.manage', 'orders.view', 'commissions.manage', 'reports.view', 'reviews.moderate', 'support.manage'],
+    permissions: ['sellers.review', 'sellers.manage', 'sellers.documents.view', 'audit_logs.view', 'products.moderate', 'categories.manage', 'orders.view', 'commissions.manage', 'reports.view', 'reviews.moderate', 'support.manage', 'refunds.manage'],
   })
 
 type Overrides = Partial<Pick<AuthState, 'login' | 'register' | 'logout' | 'refresh'>>

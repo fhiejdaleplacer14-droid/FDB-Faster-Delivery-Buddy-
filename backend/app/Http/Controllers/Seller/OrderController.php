@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Domain\Orders\OrderWorkflow;
+use App\Domain\Orders\RefundService;
+use App\Http\Requests\Orders\RecordRefundRequest;
 use App\Domain\Orders\SellerOrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SellerOrderResource;
@@ -15,7 +17,7 @@ use Illuminate\Validation\Rule;
 // Suspended sellers keep access here so customers already waiting still get their orders.
 class OrderController extends Controller
 {
-    private const DETAIL = ['items.product', 'history', 'order.user'];
+    private const DETAIL = ['items.product', 'history', 'order.user', 'refunds.ticket'];
 
     public function __construct(private readonly OrderWorkflow $workflow) {}
 
@@ -78,6 +80,14 @@ class OrderController extends Controller
         $data = $request->validate(['delivery_note' => ['nullable', 'string', 'max:500']]);
 
         return $this->resource($this->workflow->updateDeliveryNote($this->owned($request, $sellerOrderId), $data['delivery_note'] ?? null));
+    }
+
+    public function refund(RecordRefundRequest $request, int $sellerOrderId, RefundService $refunds): SellerOrderResource
+    {
+        $order = $this->owned($request, $sellerOrderId);
+        $request->record($refunds, $order, $request->user(), 'seller');
+
+        return $this->resource($order);
     }
 
     private function seller(Request $request): Seller

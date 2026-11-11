@@ -2,7 +2,31 @@
 import { fileURLToPath, URL } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
+
+// Built pages get a strict CSP; dev is left alone because Vite's hot reload needs inline scripts.
+// frame-ancestors can't be set from a meta tag, so the production web server must send it as a header.
+export function contentSecurityPolicy(mediaOrigin = ''): string {
+  return [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self'",
+    `img-src 'self' data:${mediaOrigin ? ` ${mediaOrigin}` : ''}`,
+    "font-src 'self'",
+    "connect-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join('; ')
+}
+
+function cspMeta(mediaOrigin: string): Plugin {
+  return {
+    name: 'fdb-csp-meta',
+    apply: 'build',
+    transformIndexHtml: () => [{ tag: 'meta', attrs: { 'http-equiv': 'Content-Security-Policy', content: contentSecurityPolicy(mediaOrigin) }, injectTo: 'head-prepend' }],
+  }
+}
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -10,7 +34,7 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_PROXY_TARGET ?? 'http://localhost:8000'
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), cspMeta(env.VITE_MEDIA_ORIGIN ?? '')],
     resolve: {
       alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
     },

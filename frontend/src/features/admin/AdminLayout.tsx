@@ -1,11 +1,11 @@
-import { BarChart3, FolderTree, LifeBuoy, type LucideIcon, Package, ReceiptText, ShoppingBag, Star, Store } from 'lucide-react'
+import { BarChart3, FolderTree, LifeBuoy, type LucideIcon, Package, ReceiptText, RotateCcw, ShoppingBag, Star, Store } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Navigate, NavLink, Outlet, useLocation } from 'react-router'
 import { can, useAuth } from '@/features/auth/AuthContext'
 import { http } from '@/lib/http'
 import type { PermissionSlug, User } from '@/types/api'
 
-type Badge = 'sellers' | 'listings' | 'commissions' | 'support'
+type Badge = 'sellers' | 'listings' | 'commissions' | 'support' | 'refunds'
 
 const links: { to: string; label: string; permission: PermissionSlug; icon: LucideIcon; badge?: Badge }[] = [
   { to: '/admin/sellers', label: 'Seller applications', permission: 'sellers.review', icon: Store, badge: 'sellers' },
@@ -14,6 +14,7 @@ const links: { to: string; label: string; permission: PermissionSlug; icon: Luci
   { to: '/admin/products', label: 'Listings', permission: 'products.moderate', icon: Package, badge: 'listings' },
   { to: '/admin/reviews', label: 'Reviews', permission: 'reviews.moderate', icon: Star },
   { to: '/admin/commissions', label: 'Commissions', permission: 'commissions.manage', icon: ReceiptText, badge: 'commissions' },
+  { to: '/admin/refunds', label: 'Refunds', permission: 'refunds.manage', icon: RotateCcw, badge: 'refunds' },
   { to: '/admin/reports', label: 'Financial report', permission: 'reports.view', icon: BarChart3 },
   { to: '/admin/categories', label: 'Categories', permission: 'categories.manage', icon: FolderTree },
 ]
@@ -31,6 +32,7 @@ function useAttention(user: User | null) {
     if (can(user, 'sellers.review')) jobs.push(total('/admin/sellers', { status: 'pending' }).then((n) => ['sellers', n]))
     if (can(user, 'products.moderate')) jobs.push(total('/admin/products', { status: 'pending_review' }).then((n) => ['listings', n]))
     if (can(user, 'support.manage')) jobs.push(total('/admin/support-tickets', { status: 'open' }).then((n) => ['support', n]))
+    if (can(user, 'refunds.manage')) jobs.push(total('/admin/refunds', { credit: 'owed' }).then((n) => ['refunds', n]))
     if (can(user, 'commissions.manage')) {
       jobs.push(http.get<{ data: unknown[] }>('/admin/commissions/balances').then((r) => ['commissions', r.data.data.length]))
     }
