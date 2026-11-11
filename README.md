@@ -73,6 +73,7 @@ scripts/     Developer setup scripts
 - [Security](docs/SECURITY.md)
 - [Environment variables](docs/ENVIRONMENT.md)
 - [Testing](docs/TESTING.md)
+- [Hosting the website on Cloudflare](docs/CLOUDFLARE.md): Worker settings, backend settings, and exposing the backend
 - [Release and operations](docs/RELEASE.md): production setup, updates, backups, and the pre-launch checklist
 
 ## Status

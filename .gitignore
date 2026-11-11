@@ -12,3 +12,7 @@ coverage/
 *.log
 backups/
 .neon
+
+# Cloudflare Worker local settings and build output
+.dev.vars
+.wrangler/

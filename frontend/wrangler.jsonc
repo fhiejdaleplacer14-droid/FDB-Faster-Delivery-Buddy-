@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Must match the name of the Worker already in the Cloudflare dashboard.
+  "name": "fdb-faster-delivery-buddy",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Refreshing /products or /orders/123 returns the app instead of a 404.
+    "not_found_handling": "single-page-application",
+    // Only these paths run the Worker, which forwards them to the backend.
+    "run_worker_first": ["/api/*", "/sanctum/*", "/storage/*"]
+  },
+  // BACKEND_ORIGIN (the backend's public https address) is set in the dashboard under
+  // Settings > Variables and Secrets, so deploys never overwrite it.
+  "keep_vars": true
+}
