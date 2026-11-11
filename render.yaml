@@ -1,0 +1,83 @@
+# Render blueprint for the FDB backend (API only). The website is served by Cloudflare.
+# Values marked sync: false are typed into Render's dashboard and never stored in git.
+# See docs/RENDER.md.
+services:
+  - type: web
+    name: fdb-api
+    runtime: docker
+    dockerfilePath: ./docker/render/Dockerfile
+    dockerContext: .
+    region: singapore # next to the Neon database
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: APP_NAME
+        value: Faster Delivery Buddy
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL # the public website address, e.g. https://name.workers.dev
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: SANCTUM_STATEFUL_DOMAINS # the same address without https://
+        sync: false
+      - key: APP_DISPLAY_TIMEZONE
+        value: Asia/Manila
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: info
+      - key: TRUSTED_PROXIES
+        value: "*"
+
+      # Neon database (use the unpooled URL)
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL
+        sync: false
+      - key: DB_SSLMODE
+        value: require
+
+      # No Redis or worker on the free plan: sessions, cache, and queue use the database.
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_ENCRYPT
+        value: "true"
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: SESSION_DOMAIN
+        value: "null"
+      - key: SESSION_SAME_SITE
+        value: lax
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+
+      # Placeholder business policies (see docs/RELEASE.md)
+      - key: FDB_SELLER_REQUIRED_DOCUMENTS
+        value: government_id
+      - key: FDB_LISTING_REQUIRES_REVIEW
+        value: "true"
+      - key: FDB_PAYMENT_METHODS
+        value: cash_on_delivery
+      - key: FDB_INITIAL_COMMISSION_RATE
+        value: "0.0750"
+      - key: FDB_DISPUTE_WINDOW_DAYS
+        value: "7"
+      - key: FDB_REFUND_COMMISSION
+        value: proportional
+      - key: FDB_MEDIA_DISK
+        value: media
+      - key: MEDIA_URL
+        value: /storage
+
+      # Email is not connected yet: messages go to the log.
+      - key: MAIL_MAILER
+        value: log
+      - key: BCRYPT_ROUNDS
+        value: "12"

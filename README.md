@@ -74,6 +74,7 @@ scripts/     Developer setup scripts
 - [Environment variables](docs/ENVIRONMENT.md)
 - [Testing](docs/TESTING.md)
 - [Hosting the website on Cloudflare](docs/CLOUDFLARE.md): Worker settings, backend settings, and exposing the backend
+- [Backend on Render with Neon](docs/RENDER.md): the free-tier setup, step by step, and what to expect
 - [Release and operations](docs/RELEASE.md): production setup, updates, backups, and the pre-launch checklist
 
 ## Status
