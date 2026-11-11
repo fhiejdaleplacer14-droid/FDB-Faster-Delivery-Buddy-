@@ -3,6 +3,7 @@
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FinancialReportController;
 use App\Http\Controllers\Seller\CommissionController as SellerCommissionController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
@@ -143,6 +144,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::get('/commission-collections', [AdminCommissionController::class, 'collections'])->name('commission-collections.index');
         Route::post('/commission-collections', [AdminCommissionController::class, 'collect'])->name('commission-collections.store');
         Route::get('/reports/financial', FinancialReportController::class)->name('reports.financial');
+        Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
 
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{number}', [AdminOrderController::class, 'show'])->name('orders.show');

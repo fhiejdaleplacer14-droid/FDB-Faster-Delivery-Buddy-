@@ -1,5 +1,5 @@
-import { BarChart3, FolderTree, LifeBuoy, type LucideIcon, Package, ReceiptText, RotateCcw, ShoppingBag, Star, Store } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { BarChart3, FolderTree, LayoutDashboard, LifeBuoy, type LucideIcon, Package, ReceiptText, RotateCcw, ShoppingBag, Star, Store } from 'lucide-react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Navigate, NavLink, Outlet, useLocation } from 'react-router'
 import { can, useAuth } from '@/features/auth/AuthContext'
 import { http } from '@/lib/http'
@@ -7,7 +7,13 @@ import type { PermissionSlug, User } from '@/types/api'
 
 type Badge = 'sellers' | 'listings' | 'commissions' | 'support' | 'refunds'
 
+// The dashboard is loaded only when opened, like the other admin screens.
+const DashboardPage = lazy(async () => ({ default: (await import('./dashboard/DashboardPage')).DashboardPage }))
+
+const DASHBOARD = '/admin'
+
 const links: { to: string; label: string; permission: PermissionSlug; icon: LucideIcon; badge?: Badge }[] = [
+  { to: DASHBOARD, label: 'Dashboard', permission: 'reports.view', icon: LayoutDashboard },
   { to: '/admin/sellers', label: 'Seller applications', permission: 'sellers.review', icon: Store, badge: 'sellers' },
   { to: '/admin/orders', label: 'Orders', permission: 'orders.view', icon: ShoppingBag },
   { to: '/admin/support', label: 'Support', permission: 'support.manage', icon: LifeBuoy, badge: 'support' },
@@ -68,6 +74,7 @@ export function AdminLayout() {
               <li key={to}>
                 <NavLink
                   to={to}
+                  end={to === DASHBOARD}
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                       isActive ? 'bg-navy text-white shadow-md shadow-navy/15' : 'text-slate hover:translate-x-0.5 hover:bg-white hover:text-ink'
@@ -94,10 +101,18 @@ export function AdminLayout() {
   )
 }
 
-// /admin itself opens the first section this admin may use.
+// /admin shows the dashboard to admins who can see reports; others go to their first section.
 export function AdminHome() {
   const { user } = useAuth()
-  return <Navigate to={firstAdminPath(user?.permissions ?? []) ?? '/'} replace />
+  if (can(user, 'reports.view')) {
+    return (
+      <Suspense fallback={<div className="h-96 skeleton rounded-2xl" aria-busy="true" />}>
+        <DashboardPage />
+      </Suspense>
+    )
+  }
+  const first = links.find((link) => link.to !== DASHBOARD && can(user, link.permission))?.to
+  return <Navigate to={first ?? '/'} replace />
 }
 
 export function firstAdminPath(permissions: PermissionSlug[]): string | null {
