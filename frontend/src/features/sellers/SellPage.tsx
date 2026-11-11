@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { SellerStatusBadge, sellerStatusLabel } from '@/components/ui/StatusBadge'
-import { useAuth } from '@/features/auth/AuthContext'
+import { mustVerifyEmail, useAuth } from '@/features/auth/AuthContext'
 import { formatDateTime, formatFileSize } from '@/lib/format'
 import { toApiError, type ApiError } from '@/lib/http'
 import type { SellerApplication } from '@/types/api'
@@ -48,7 +48,7 @@ export function SellPage() {
             Open a store and reach customers in your town. You set your own prices, keep your own stock, and deliver
             orders yourself. FDB reviews every application before a store goes live.
           </p>
-          {user && !user.email_verified ? (
+          {mustVerifyEmail(user) ? (
             <div className="mt-8">
               <Alert tone="warning">
                 Verify your email before applying.{' '}

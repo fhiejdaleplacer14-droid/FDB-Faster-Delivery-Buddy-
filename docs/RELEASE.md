@@ -106,6 +106,7 @@ These run on placeholder values. Each one is a setting in `backend/.env.producti
 
 Deliberately left for last:
 
+- **Email verification is off on the test site** (`FDB_REQUIRE_EMAIL_VERIFICATION=false`). Set it to `true` once email works, so accounts prove they own their address before ordering or applying to sell.
 - **Email.** Messages (verification, password reset, order updates) are written to the log until a provider is chosen. Customers cannot verify their email or reset passwords until this is connected, so it is required before launch.
 - **Photo storage.** Photos are on the server's disk (`media` volume). A bucket or CDN is recommended; set `VITE_MEDIA_ORIGIN` when building so the security policy allows it.
 - **Virus scanning** of uploaded seller documents.

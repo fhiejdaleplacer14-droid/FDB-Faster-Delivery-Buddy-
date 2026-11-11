@@ -198,3 +198,12 @@ it('requires a verified email to check out', function () {
 
     checkout($this, ['expected_total' => '1.00'])->assertForbidden();
 });
+
+it('lets unverified customers check out when verification is turned off', function () {
+    config(['fdb.accounts.require_email_verification' => false]);
+    $this->customer->forceFill(['email_verified_at' => null])->save();
+    addToCart($this->customer, Product::factory()->published()->priced('100.00', 5)->create(), 1);
+
+    checkout($this, ['expected_total' => '100.00'])->assertCreated();
+    expect(Order::count())->toBe(1);
+});

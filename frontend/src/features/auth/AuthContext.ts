@@ -26,3 +26,8 @@ export function useAuth(): AuthState {
 export function can(user: User | null, permission: PermissionSlug): boolean {
   return user?.permissions.includes(permission) ?? false
 }
+
+// True when the site requires a verified email and this user has not verified yet.
+export function mustVerifyEmail(user: User | null): boolean {
+  return !!user && user.email_verification_required && !user.email_verified
+}

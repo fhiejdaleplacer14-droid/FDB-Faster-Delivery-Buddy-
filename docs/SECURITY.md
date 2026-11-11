@@ -55,6 +55,15 @@ This file describes the controls that exist in the code today. It is not a compl
 - Recording a collection locks the records it covers and refuses any that are not due or belong to another seller, so the same commission cannot be collected twice.
 - Rate changes, adjustments, and collections are written to the audit log.
 
+## Email verification
+
+- `FDB_REQUIRE_EMAIL_VERIFICATION` (default on) gates checkout and seller applications. With it off, anyone can register with any address, including one that is not theirs, and order or apply. Seller applications still need admin approval, and sign-up is rate limited. Use off only for a test site, and turn it back on before launch.
+
+## Database access
+
+- The app uses a limited database login (`fdb_app`), not the database owner. If its credentials leak, an attacker can read and change rows but cannot drop tables, add columns, create logins, or switch off the append-only audit trigger. It can add and read audit-log entries but never change or remove them. This was tested directly against the live database.
+- Rotate credentials by resetting the role's password in the Neon console, then updating `DB_URL` on Render and in `backend/.env`.
+
 ## File storage
 
 - With object storage, seller documents are in a private bucket: an anonymous request is refused (HTTP 403, tested) and admins download them only through the backend, which logs every access.

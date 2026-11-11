@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'active' => \App\Http\Middleware\EnsureAccountIsActive::class,
             'seller' => \App\Http\Middleware\EnsureSellerAccount::class,
             'spa.session' => \App\Http\Middleware\RequireSpaSession::class,
+            'verified' => \App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired::class,
         ]);
         $middleware->trustProxies(at: env('TRUSTED_PROXIES', '127.0.0.1'));
         $middleware->throttleApi();

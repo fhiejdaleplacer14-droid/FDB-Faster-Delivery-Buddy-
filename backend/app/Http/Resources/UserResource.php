@@ -16,6 +16,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'email_verified' => $this->hasVerifiedEmail(),
+            'email_verification_required' => (bool) config('fdb.accounts.require_email_verification'),
             'status' => $this->status->value,
             'roles' => $this->roleSlugs(),
             'permissions' => $this->permissionSlugs(),

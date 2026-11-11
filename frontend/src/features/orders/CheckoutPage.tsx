@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { TextareaField } from '@/components/ui/Field'
-import { useAuth } from '@/features/auth/AuthContext'
+import { mustVerifyEmail, useAuth } from '@/features/auth/AuthContext'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import { formatPeso } from '@/lib/money'
 import type { Address } from '@/types/api'
@@ -41,7 +41,7 @@ export function CheckoutPage() {
   const methods = cart?.meta.payment_methods ?? []
   const chosenMethod = paymentMethod || methods.find((m) => m.available)?.value || ''
 
-  if (user && !user.email_verified) {
+  if (mustVerifyEmail(user)) {
     return (
       <Page>
         <Alert tone="warning">

@@ -2,6 +2,12 @@
 
 return [
 
+    'accounts' => [
+        // A verified email is needed to check out and to apply as a seller. Turn off only on test
+        // sites that cannot send email yet; seller applications still need admin approval either way.
+        'require_email_verification' => (bool) env('FDB_REQUIRE_EMAIL_VERIFICATION', true),
+    ],
+
     'sellers' => [
         // Placeholder policy until the founders confirm the verification requirements.
         'required_documents' => array_filter(explode(',', env('FDB_SELLER_REQUIRED_DOCUMENTS', 'government_id'))),

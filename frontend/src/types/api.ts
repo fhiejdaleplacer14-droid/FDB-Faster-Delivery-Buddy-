@@ -28,6 +28,7 @@ export type User = {
   name: string
   email: string
   email_verified: boolean
+  email_verification_required: boolean
   status: 'active' | 'suspended'
   roles: RoleSlug[]
   permissions: PermissionSlug[]

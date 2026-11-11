@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/Field'
 import { authApi } from '@/features/auth/api'
 import { AddressBook } from './AddressBook'
-import { useAuth } from '@/features/auth/AuthContext'
+import { mustVerifyEmail, useAuth } from '@/features/auth/AuthContext'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import type { User } from '@/types/api'
 
@@ -23,7 +23,7 @@ export function AccountPage() {
           <Alert tone="success">Welcome to FDB, {user.name}. Your account is ready.</Alert>
         </div>
       )}
-      {!user.email_verified && <VerifyEmailNotice />}
+      {mustVerifyEmail(user) && <VerifyEmailNotice />}
 
       <section aria-labelledby="profile-heading" className="mt-10 border-t border-line pt-8">
         <h2 id="profile-heading" className="text-lg font-semibold text-navy">

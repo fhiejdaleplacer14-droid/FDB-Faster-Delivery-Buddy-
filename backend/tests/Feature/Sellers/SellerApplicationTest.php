@@ -40,6 +40,17 @@ it('requires a verified email before applying', function () {
     expect(Seller::count())->toBe(0);
 });
 
+it('accepts applications from unverified accounts when verification is turned off, still pending admin approval', function () {
+    config(['fdb.accounts.require_email_verification' => false]);
+    $user = User::factory()->unverified()->customer()->create();
+
+    $this->actingAs($user)->post('/api/v1/seller-application', sellerApplicationPayload(), ['Accept' => 'application/json'])
+        ->assertCreated()
+        ->assertJsonPath('data.status', 'pending');
+
+    $this->actingAs($user)->getJson('/api/v1/user')->assertJsonPath('data.email_verification_required', false);
+});
+
 it('requires the configured verification documents', function () {
     $user = User::factory()->customer()->create();
 

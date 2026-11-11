@@ -61,6 +61,11 @@ services:
       - key: QUEUE_CONNECTION
         value: sync
 
+      # Test site: email is not connected, so checkout and seller applications do not wait for a
+      # verified email. Set back to "true" once email works (docs/RELEASE.md).
+      - key: FDB_REQUIRE_EMAIL_VERIFICATION
+        value: "false"
+
       # Placeholder business policies (see docs/RELEASE.md)
       - key: FDB_SELLER_REQUIRED_DOCUMENTS
         value: government_id

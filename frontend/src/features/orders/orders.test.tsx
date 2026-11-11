@@ -109,6 +109,18 @@ describe('checkout', () => {
     renderRoute('/checkout', { user: makeUser({ email_verified: false }) })
     expect(screen.getByText(/Verify your email before placing an order/)).toBeInTheDocument()
   })
+
+  it('lets unverified customers check out when the site does not require verification', async () => {
+    renderRoute('/checkout', { user: makeUser({ email_verified: false, email_verification_required: false }) })
+    expect(await screen.findByRole('button', { name: 'Place order' })).toBeInTheDocument()
+    expect(screen.queryByText(/Verify your email/)).not.toBeInTheDocument()
+  })
+
+  it('lets unverified accounts open the seller application when verification is off', async () => {
+    renderRoute('/sell', { user: makeUser({ email_verified: false, email_verification_required: false }) })
+    expect(await screen.findByRole('heading', { name: /sell/i })).toBeInTheDocument()
+    expect(screen.queryByText(/Verify your email before applying/)).not.toBeInTheDocument()
+  })
 })
 
 describe('add to cart', () => {

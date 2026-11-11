@@ -30,6 +30,7 @@ export function makeUser(overrides: Partial<User> = {}): User {
     name: 'Maria Santos',
     email: 'maria@example.com',
     email_verified: true,
+    email_verification_required: true,
     status: 'active',
     roles: ['customer'],
     permissions: [],
