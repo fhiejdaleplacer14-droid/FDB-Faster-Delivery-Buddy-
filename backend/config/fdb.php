@@ -10,6 +10,8 @@ return [
 
     'sellers' => [
         // Placeholder policy until the founders confirm the verification requirements.
+        // Default for the admin switch (Admin > Settings). When off, sellers apply without uploading documents.
+        'documents_required' => (bool) env('FDB_SELLER_DOCUMENTS_REQUIRED', true),
         'required_documents' => array_filter(explode(',', env('FDB_SELLER_REQUIRED_DOCUMENTS', 'government_id'))),
         'documents_disk' => env('FDB_SELLER_DOCUMENTS_DISK', 'seller_documents'),
         'document_max_kb' => 5120,

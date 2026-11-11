@@ -1,6 +1,6 @@
 import { Link, Navigate, Outlet, useLocation, useSearchParams } from 'react-router'
 import type { PermissionSlug } from '@/types/api'
-import { can, useAuth } from './AuthContext'
+import { can, isAdmin, useAuth } from './AuthContext'
 
 function PageLoading() {
   return (
@@ -19,6 +19,13 @@ export function RequireAuth() {
     const next = encodeURIComponent(location.pathname + location.search)
     return <Navigate to={`/login?next=${next}`} replace />
   }
+  return <Outlet />
+}
+
+// Shopping and selling pages: admin accounts go to their dashboard instead.
+export function ShopperOnly() {
+  const { user } = useAuth()
+  if (isAdmin(user)) return <Navigate to="/admin" replace />
   return <Outlet />
 }
 

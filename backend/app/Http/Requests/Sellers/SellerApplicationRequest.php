@@ -5,6 +5,7 @@ namespace App\Http\Requests\Sellers;
 use App\Domain\Sellers\BusinessType;
 use App\Domain\Sellers\SellerDocumentType;
 use App\Domain\Sellers\ServiceArea;
+use App\Domain\Settings\SiteSettings;
 use App\Models\Seller;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
@@ -68,6 +69,10 @@ class SellerApplicationRequest extends FormRequest
             $provided = collect($this->input('documents', []))->pluck('type');
             if ($existing) {
                 $provided = $provided->merge($existing->documents()->toBase()->pluck('type'));
+            }
+
+            if (! app(SiteSettings::class)->sellerDocumentsRequired()) {
+                return;
             }
 
             foreach (config('fdb.sellers.required_documents') as $required) {

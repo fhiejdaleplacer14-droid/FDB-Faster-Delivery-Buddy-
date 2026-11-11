@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'active' => \App\Http\Middleware\EnsureAccountIsActive::class,
             'seller' => \App\Http\Middleware\EnsureSellerAccount::class,
+            'shopper' => \App\Http\Middleware\EnsureNotAdmin::class,
             'spa.session' => \App\Http\Middleware\RequireSpaSession::class,
             'verified' => \App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired::class,
         ]);

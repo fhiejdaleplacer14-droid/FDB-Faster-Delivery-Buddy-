@@ -4,7 +4,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import { Logo } from '@/components/brand/Logo'
 import { ToastProvider } from '@/components/ui/Toast'
 import { firstAdminPath } from '@/features/admin/AdminLayout'
-import { useAuth } from '@/features/auth/AuthContext'
+import { isAdmin, useAuth } from '@/features/auth/AuthContext'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { ThemeMenu } from './ThemeMenu'
 import { useCart } from '@/features/orders/CartContext'
@@ -14,7 +14,8 @@ const focusedPages = ['/login', '/register', '/forgot-password', '/reset-passwor
 
 export function SiteLayout() {
   const { pathname } = useLocation()
-  const focused = focusedPages.includes(pathname)
+  const { user } = useAuth()
+  const focused = focusedPages.includes(pathname) || isAdmin(user)
 
   return (
     <ToastProvider>
@@ -76,7 +77,27 @@ function SiteHeader() {
     </NavLink>
   )
 
-  const links = user ? (
+  const signOutButton = (
+    <button type="button" onClick={signOut} className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-slate transition-colors hover:text-ink">
+      <LogOut className="size-4" aria-hidden />
+      Sign out
+    </button>
+  )
+
+  const admin = isAdmin(user)
+  const links = admin ? (
+    <>
+      <NavLink to="/admin" className={navLink}>
+        Admin
+        {underline}
+      </NavLink>
+      <NavLink to="/account" className={navLink}>
+        Account
+        {underline}
+      </NavLink>
+      {signOutButton}
+    </>
+  ) : user ? (
     <>
       {browse}
       <NavLink to="/orders" className={navLink}>
@@ -101,10 +122,7 @@ function SiteHeader() {
         Account
         {underline}
       </NavLink>
-      <button type="button" onClick={signOut} className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-slate transition-colors hover:text-ink">
-        <LogOut className="size-4" aria-hidden />
-        Sign out
-      </button>
+      {signOutButton}
     </>
   ) : (
     <>
@@ -125,7 +143,7 @@ function SiteHeader() {
   return (
     <header className={`sticky top-0 z-40 border-b bg-surface/95 backdrop-blur-sm transition-shadow duration-300 ${scrolled ? 'border-transparent shadow-md shadow-navy/5' : 'border-line'}`}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link to="/" aria-label="Faster Delivery Buddy home" className="transition-opacity hover:opacity-80">
+        <Link to={admin ? '/admin' : '/'} aria-label={admin ? 'FDB admin dashboard' : 'Faster Delivery Buddy home'} className="transition-opacity hover:opacity-80">
           <Logo />
         </Link>
         {ready && (
@@ -135,7 +153,7 @@ function SiteHeader() {
             </nav>
             <ThemeMenu />
             {user && <NotificationBell />}
-            {user && (
+            {user && !admin && (
               <Link to="/cart" className="relative rounded-md p-2 text-ink transition-colors hover:bg-ink/5" aria-label={count ? `Cart, ${count} items` : 'Cart'}>
                 <ShoppingCart className="size-5" aria-hidden />
                 {count > 0 && (

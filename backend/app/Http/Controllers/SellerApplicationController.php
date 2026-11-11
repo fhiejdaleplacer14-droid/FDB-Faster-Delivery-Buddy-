@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Sellers\SellerApplicationService;
+use App\Domain\Settings\SiteSettings;
 use App\Http\Requests\Sellers\ResubmitSellerApplicationRequest;
 use App\Http\Requests\Sellers\SellerApplicationRequest;
 use App\Http\Resources\SellerApplicationResource;
@@ -24,6 +25,17 @@ class SellerApplicationController extends Controller
         }
 
         return new SellerApplicationResource($seller->load('documents', 'statusHistory'));
+    }
+
+    // What the application form must ask for right now (the documents switch is set by admins).
+    public function requirements(SiteSettings $settings): JsonResponse
+    {
+        $required = $settings->sellerDocumentsRequired();
+
+        return response()->json(['data' => [
+            'documents_required' => $required,
+            'required_documents' => $required ? array_values(config('fdb.sellers.required_documents')) : [],
+        ]]);
     }
 
     public function store(SellerApplicationRequest $request): JsonResponse

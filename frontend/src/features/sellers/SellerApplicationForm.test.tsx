@@ -22,6 +22,18 @@ describe('SellerApplicationForm', () => {
     expect(screen.getByLabelText('Document type')).toHaveValue('government_id')
   })
 
+  it('skips the documents step when admins switched it off', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
+    render(<SellerApplicationForm submitLabel="Send application" onSubmit={onSubmit} documentsRequired={false} />)
+
+    expect(screen.queryByLabelText('Document type')).not.toBeInTheDocument()
+    expect(screen.getByText(/No documents needed right now/)).toBeInTheDocument()
+    await fillRequired()
+    await userEvent.click(screen.getByRole('button', { name: 'Send application' }))
+
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ store_name: 'Aling Rosa' }), [])
+  })
+
   it('rejects files over 5 MB before uploading', async () => {
     render(<SellerApplicationForm submitLabel="Send application" onSubmit={vi.fn()} />)
 

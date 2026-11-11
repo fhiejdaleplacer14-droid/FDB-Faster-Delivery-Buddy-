@@ -42,6 +42,19 @@ describe('routes', () => {
     renderRoute('/admin/sellers', { user: adminUser() })
     expect(await screen.findByText('No applications here right now.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Admin' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'FDB admin dashboard' })).toHaveAttribute('href', '/admin')
+    expect(screen.queryByRole('link', { name: /Cart/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Browse' })).not.toBeInTheDocument()
+  })
+
+  it('keeps admin accounts on the admin side: shop and sell pages send them to the dashboard', async () => {
+    vi.spyOn(adminApi, 'sellers').mockResolvedValue({ data: [], meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 } })
+    const admin = makeUser({ roles: ['admin'], permissions: ['sellers.review'] })
+    for (const path of ['/', '/products', '/cart', '/checkout', '/orders', '/sell', '/support']) {
+      const { router } = renderRoute(path, { user: admin })
+      await waitFor(() => expect(router.state.location.pathname.startsWith('/admin')).toBe(true))
+      cleanup()
+    }
   })
 
   it('opens the seller and admin areas at their first page', async () => {

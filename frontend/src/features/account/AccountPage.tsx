@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/Field'
 import { authApi } from '@/features/auth/api'
 import { AddressBook } from './AddressBook'
-import { mustVerifyEmail, useAuth } from '@/features/auth/AuthContext'
+import { isAdmin, mustVerifyEmail, useAuth } from '@/features/auth/AuthContext'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import type { User } from '@/types/api'
 
@@ -32,12 +32,14 @@ export function AccountPage() {
         <ProfileForm user={user} />
       </section>
 
-      <section aria-labelledby="addresses-heading" className="mt-10 border-t border-line pt-8">
-        <h2 id="addresses-heading" className="text-lg font-semibold text-heading">
-          Delivery addresses
-        </h2>
-        <AddressBook />
-      </section>
+      {!isAdmin(user) && (
+        <section aria-labelledby="addresses-heading" className="mt-10 border-t border-line pt-8">
+          <h2 id="addresses-heading" className="text-lg font-semibold text-heading">
+            Delivery addresses
+          </h2>
+          <AddressBook />
+        </section>
+      )}
 
       <section aria-labelledby="password-heading" className="mt-10 border-t border-line pt-8">
         <h2 id="password-heading" className="text-lg font-semibold text-heading">
@@ -46,19 +48,21 @@ export function AccountPage() {
         <PasswordForm />
       </section>
 
-      <section aria-labelledby="selling-heading" className="mt-10 border-t border-line pt-8">
-        <h2 id="selling-heading" className="text-lg font-semibold text-heading">
-          Selling on FDB
-        </h2>
-        <p className="mt-2 text-sm text-slate">
-          {user.seller
-            ? `Your store, ${user.seller.store_name}, is on FDB.`
-            : 'Have products to sell? Apply to open a store on FDB.'}
-        </p>
-        <Link to="/sell" className="mt-3 inline-block text-sm font-semibold text-link hover:underline">
-          {user.seller ? 'View your seller application' : 'Apply to sell'}
-        </Link>
-      </section>
+      {!isAdmin(user) && (
+        <section aria-labelledby="selling-heading" className="mt-10 border-t border-line pt-8">
+          <h2 id="selling-heading" className="text-lg font-semibold text-heading">
+            Selling on FDB
+          </h2>
+          <p className="mt-2 text-sm text-slate">
+            {user.seller
+              ? `Your store, ${user.seller.store_name}, is on FDB.`
+              : 'Have products to sell? Apply to open a store on FDB.'}
+          </p>
+          <Link to="/sell" className="mt-3 inline-block text-sm font-semibold text-link hover:underline">
+            {user.seller ? 'View your seller application' : 'Apply to sell'}
+          </Link>
+        </section>
+      )}
     </div>
   )
 }

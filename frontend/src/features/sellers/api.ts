@@ -42,7 +42,12 @@ function toFormData(details: ApplicationDetails, documents: DocumentUpload[]) {
   return data
 }
 
+export type ApplicationRequirements = { documents_required: boolean; required_documents: SellerDocumentType[] }
+
 export const sellerApi = {
+  async requirements(): Promise<ApplicationRequirements> {
+    return (await http.get<Resource<ApplicationRequirements>>('/seller-application/requirements')).data.data
+  },
   async mine(): Promise<SellerApplication | null> {
     try {
       return (await http.get<Resource<SellerApplication>>('/seller-application')).data.data

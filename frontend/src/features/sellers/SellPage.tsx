@@ -16,8 +16,10 @@ export function SellPage() {
   const { user, refresh } = useAuth()
   const [load, setLoad] = useState<Load>({ kind: 'loading' })
   const [editing, setEditing] = useState(false)
+  const [documentsRequired, setDocumentsRequired] = useState(true)
 
   useEffect(() => {
+    sellerApi.requirements().then((r) => setDocumentsRequired(r.documents_required), () => undefined)
     sellerApi
       .mine()
       .then((application) => setLoad({ kind: 'ready', application }))
@@ -62,6 +64,7 @@ export function SellPage() {
             <div className="mt-10">
               <SellerApplicationForm
                 submitLabel="Send application"
+                documentsRequired={documentsRequired}
                 onSubmit={async (details, documents) => saved(await sellerApi.submit(details, documents))}
               />
             </div>
@@ -85,6 +88,7 @@ export function SellPage() {
               <SellerApplicationForm
                 existing={load.application}
                 submitLabel="Send updated application"
+                documentsRequired={documentsRequired}
                 onSubmit={async (details, documents) => saved(await sellerApi.resubmit(details, documents))}
               />
             </section>

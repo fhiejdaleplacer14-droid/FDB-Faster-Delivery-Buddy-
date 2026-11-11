@@ -15,6 +15,8 @@ type Props = {
   existing?: SellerApplication | undefined
   onSubmit: (details: ApplicationDetails, documents: DocumentUpload[]) => Promise<void>
   submitLabel: string
+  // Set by admins (Admin > Settings). When off, the form skips the documents step.
+  documentsRequired?: boolean
 }
 
 function initialDetails(existing?: SellerApplication): ApplicationDetails {
@@ -31,7 +33,7 @@ function initialDetails(existing?: SellerApplication): ApplicationDetails {
   }
 }
 
-export function SellerApplicationForm({ existing, onSubmit, submitLabel }: Props) {
+export function SellerApplicationForm({ existing, onSubmit, submitLabel, documentsRequired = true }: Props) {
   const nextKey = useRef(1)
   const [details, setDetails] = useState<ApplicationDetails>(() => initialDetails(existing))
   const [documents, setDocuments] = useState<DocumentUpload[]>(() =>
@@ -66,7 +68,7 @@ export function SellerApplicationForm({ existing, onSubmit, submitLabel }: Props
     setBusy(true)
     setError(null)
     try {
-      await onSubmit(details, documents)
+      await onSubmit(details, documentsRequired ? documents : [])
     } catch (e) {
       setError(toApiError(e))
       setBusy(false)
@@ -167,56 +169,60 @@ export function SellerApplicationForm({ existing, onSubmit, submitLabel }: Props
         )}
       </fieldset>
 
-      <fieldset>
-        <legend className="text-lg font-semibold text-heading">Verification documents</legend>
-        <p className="mt-1 text-sm text-slate">
-          {existing
-            ? 'Your earlier documents are kept. Add new ones only if the reviewer asked for them.'
-            : 'A government-issued ID is required. JPG, PNG, WEBP, or PDF, up to 5 MB each. Only FDB administrators can see these files.'}
-        </p>
-        {err('documents') && <p className="mt-2 text-sm text-danger">{err('documents')}</p>}
+      {documentsRequired ? (
+        <fieldset>
+          <legend className="text-lg font-semibold text-heading">Verification documents</legend>
+          <p className="mt-1 text-sm text-slate">
+            {existing
+              ? 'Your earlier documents are kept. Add new ones only if the reviewer asked for them.'
+              : 'A government-issued ID is required. JPG, PNG, WEBP, or PDF, up to 5 MB each. Only FDB administrators can see these files.'}
+          </p>
+          {err('documents') && <p className="mt-2 text-sm text-danger">{err('documents')}</p>}
 
-        <ul className="mt-4 divide-y divide-line border-y border-line">
-          {documents.map((doc, index) => (
-            <li key={doc.key} className="grid gap-3 py-4 sm:grid-cols-[14rem_1fr_auto] sm:items-start">
-              <SelectField
-                label="Document type"
-                value={doc.type}
-                onChange={(e) => updateDocument(doc.key, { type: e.target.value as SellerDocumentType })}
-                error={err(`documents.${index}.type`)}
-              >
-                {documentTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </SelectField>
-              <TextField
-                label="File"
-                type="file"
-                accept={ACCEPT}
-                onChange={(e) => chooseFile(doc.key, e.target.files?.[0] ?? null)}
-                error={fileErrors[doc.key] ?? err(`documents.${index}.file`)}
-                className="file:mr-3 file:rounded file:border-0 file:bg-blue-soft file:px-3 file:py-1 file:text-sm file:font-medium file:text-heading"
-              />
-              <Button
-                variant="ghost"
-                className="sm:mt-6"
-                aria-label={`Remove document ${index + 1}`}
-                onClick={() => setDocuments((docs) => docs.filter((d) => d.key !== doc.key))}
-              >
-                <X className="size-4" aria-hidden />
-              </Button>
-            </li>
-          ))}
-        </ul>
-        {documents.length < MAX_DOCUMENTS && (
-          <Button variant="secondary" className="mt-4" onClick={addDocument}>
-            <Plus className="size-4" aria-hidden />
-            Add a document
-          </Button>
-        )}
-      </fieldset>
+          <ul className="mt-4 divide-y divide-line border-y border-line">
+            {documents.map((doc, index) => (
+              <li key={doc.key} className="grid gap-3 py-4 sm:grid-cols-[14rem_1fr_auto] sm:items-start">
+                <SelectField
+                  label="Document type"
+                  value={doc.type}
+                  onChange={(e) => updateDocument(doc.key, { type: e.target.value as SellerDocumentType })}
+                  error={err(`documents.${index}.type`)}
+                >
+                  {documentTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </SelectField>
+                <TextField
+                  label="File"
+                  type="file"
+                  accept={ACCEPT}
+                  onChange={(e) => chooseFile(doc.key, e.target.files?.[0] ?? null)}
+                  error={fileErrors[doc.key] ?? err(`documents.${index}.file`)}
+                  className="file:mr-3 file:rounded file:border-0 file:bg-blue-soft file:px-3 file:py-1 file:text-sm file:font-medium file:text-heading"
+                />
+                <Button
+                  variant="ghost"
+                  className="sm:mt-6"
+                  aria-label={`Remove document ${index + 1}`}
+                  onClick={() => setDocuments((docs) => docs.filter((d) => d.key !== doc.key))}
+                >
+                  <X className="size-4" aria-hidden />
+                </Button>
+              </li>
+            ))}
+          </ul>
+          {documents.length < MAX_DOCUMENTS && (
+            <Button variant="secondary" className="mt-4" onClick={addDocument}>
+              <Plus className="size-4" aria-hidden />
+              Add a document
+            </Button>
+          )}
+        </fieldset>
+      ) : (
+        <p className="rounded-lg bg-blue-soft px-4 py-3 text-sm text-ink">No documents needed right now. FDB reviews your details and approves your store.</p>
+      )}
 
       <div className="border-t border-line pt-6">
         <Button type="submit" busy={busy}>

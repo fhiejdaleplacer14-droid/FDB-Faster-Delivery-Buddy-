@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FinancialReportController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Seller\CommissionController as SellerCommissionController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\CartController;
@@ -66,37 +67,44 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::patch('/user', [CurrentUserController::class, 'update'])->name('user.update');
     Route::put('/user/password', [CurrentUserController::class, 'updatePassword'])->name('user.password');
 
-    Route::get('/seller-application', [SellerApplicationController::class, 'show'])->name('seller-application.show');
-    Route::middleware(['verified', 'throttle:uploads'])->group(function () {
-        Route::post('/seller-application', [SellerApplicationController::class, 'store'])->name('seller-application.store');
-        Route::post('/seller-application/resubmit', [SellerApplicationController::class, 'resubmit'])->name('seller-application.resubmit');
+    Route::get('/seller-application/requirements', [SellerApplicationController::class, 'requirements'])->name('seller-application.requirements');
+
+    // Shopping and selling: customer accounts only, never admin accounts.
+    Route::middleware('shopper')->group(function () {
+        Route::get('/seller-application', [SellerApplicationController::class, 'show'])->name('seller-application.show');
+        Route::middleware(['verified', 'throttle:uploads'])->group(function () {
+            Route::post('/seller-application', [SellerApplicationController::class, 'store'])->name('seller-application.store');
+            Route::post('/seller-application/resubmit', [SellerApplicationController::class, 'resubmit'])->name('seller-application.resubmit');
+        });
+
+        Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
+        Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
+        Route::put('/addresses/{addressId}', [AddressController::class, 'update'])->whereNumber('addressId')->name('addresses.update');
+        Route::delete('/addresses/{addressId}', [AddressController::class, 'destroy'])->whereNumber('addressId')->name('addresses.destroy');
+
+        Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+        Route::post('/cart/items', [CartController::class, 'store'])->name('cart.items.store');
+        Route::patch('/cart/items/{itemId}', [CartController::class, 'update'])->whereNumber('itemId')->name('cart.items.update');
+        Route::delete('/cart/items/{itemId}', [CartController::class, 'destroy'])->whereNumber('itemId')->name('cart.items.destroy');
+
+        Route::post('/checkout', CheckoutController::class)->middleware(['verified', 'throttle:checkout'])->name('checkout');
+
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{number}', [OrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders/{number}/seller-orders/{sellerOrderNumber}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+        Route::post('/orders/{number}/items/{itemId}/review', [ReviewController::class, 'store'])->whereNumber('itemId')->middleware('throttle:reviews')->name('orders.items.review');
     });
-
-    Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
-    Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
-    Route::put('/addresses/{addressId}', [AddressController::class, 'update'])->whereNumber('addressId')->name('addresses.update');
-    Route::delete('/addresses/{addressId}', [AddressController::class, 'destroy'])->whereNumber('addressId')->name('addresses.destroy');
-
-    Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
-    Route::post('/cart/items', [CartController::class, 'store'])->name('cart.items.store');
-    Route::patch('/cart/items/{itemId}', [CartController::class, 'update'])->whereNumber('itemId')->name('cart.items.update');
-    Route::delete('/cart/items/{itemId}', [CartController::class, 'destroy'])->whereNumber('itemId')->name('cart.items.destroy');
-
-    Route::post('/checkout', CheckoutController::class)->middleware(['verified', 'throttle:checkout'])->name('checkout');
-
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{number}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{number}/seller-orders/{sellerOrderNumber}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-    Route::post('/orders/{number}/items/{itemId}/review', [ReviewController::class, 'store'])->whereNumber('itemId')->middleware('throttle:reviews')->name('orders.items.review');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'read'])->whereUuid('id')->name('notifications.read');
 
-    Route::get('/support/tickets', [SupportTicketController::class, 'index'])->name('support.index');
-    Route::post('/support/tickets', [SupportTicketController::class, 'store'])->middleware('throttle:support-tickets')->name('support.store');
-    Route::get('/support/tickets/{number}', [SupportTicketController::class, 'show'])->name('support.show');
-    Route::post('/support/tickets/{number}/messages', [SupportTicketController::class, 'reply'])->middleware('throttle:messages')->name('support.reply');
+    Route::middleware('shopper')->group(function () {
+        Route::get('/support/tickets', [SupportTicketController::class, 'index'])->name('support.index');
+        Route::post('/support/tickets', [SupportTicketController::class, 'store'])->middleware('throttle:support-tickets')->name('support.store');
+        Route::get('/support/tickets/{number}', [SupportTicketController::class, 'show'])->name('support.show');
+        Route::post('/support/tickets/{number}/messages', [SupportTicketController::class, 'reply'])->middleware('throttle:messages')->name('support.reply');
+    });
 
     Route::prefix('seller')->name('seller.')->whereNumber(['productId', 'imageId', 'sellerOrderId', 'reviewId'])->group(function () {
         Route::middleware('seller')->group(function () {
@@ -145,6 +153,8 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::post('/commission-collections', [AdminCommissionController::class, 'collect'])->name('commission-collections.store');
         Route::get('/reports/financial', FinancialReportController::class)->name('reports.financial');
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
+        Route::get('/settings', [AdminSettingsController::class, 'show'])->name('settings.show');
+        Route::put('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
 
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{number}', [AdminOrderController::class, 'show'])->name('orders.show');

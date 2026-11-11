@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { useAuth } from '@/features/auth/AuthContext'
+import { isAdmin, useAuth } from '@/features/auth/AuthContext'
 import { toApiError } from '@/lib/http'
 import { cartApi } from './api'
 import { useCart } from './CartContext'
@@ -26,6 +26,10 @@ export function AddToCart({ variantId, stock }: { variantId: number; stock: numb
         Sign in to order
       </Link>
     )
+  }
+
+  if (isAdmin(user)) {
+    return <p className="text-sm text-slate">Admin accounts cannot place orders. Use a customer account to shop.</p>
   }
 
   const max = Math.min(stock, 99)

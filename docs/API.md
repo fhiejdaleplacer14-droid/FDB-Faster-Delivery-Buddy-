@@ -57,6 +57,7 @@ All require a session. Submitting also requires a verified email, and uploads ar
 
 | Method | Path | Notes |
 | --- | --- | --- |
+| GET | `/seller-application/requirements` | `documents_required` and `required_documents` right now (admins switch documents on or off) |
 | GET | `/seller-application` | The signed-in user's own application, or 404 |
 | POST | `/seller-application` | Multipart form. Store details plus `documents[n][type]` and `documents[n][file]` (JPG, PNG, WEBP, or PDF; 5 MB maximum; checked by file content, not extension). 409 if the user has already applied |
 | POST | `/seller-application/resubmit` | Only when the status is `rejected`. Earlier documents are kept |
@@ -182,6 +183,7 @@ Each endpoint checks a permission, not a role name.
 | POST | `/admin/support-tickets/{number}/messages` | `support.manage` | Replies as staff and sets the status to waiting on the user |
 | POST | `/admin/support-tickets/{number}/status` | `support.manage` | `status, resolution?`. Resolving a dispute requires a resolution. Written to the audit log. No money is moved automatically |
 | GET | `/admin/dashboard?days=7\|30\|90` | `reports.view` | The admin home: sales delivered, commission, orders, average order and new accounts for the period vs the previous one (`change_pct`, half-up to one decimal, null when there is nothing to compare); daily sales and orders in Philippine days; order status; top stores; sales by category (top five plus Other); work waiting; latest orders. Money totals come from the financial report, so both always agree |
+| GET, PUT | `/admin/settings` | `sellers.manage` | `seller_documents_required` (boolean). When off, seller applications need no documents. Each change is audit-logged (`settings.updated`) |
 | GET | `/admin/reports/financial?from&to` | `reports.view` | Calendar dates in Philippine time, up to one year. GMV, FDB revenue (commission earned), seller earnings, collections, adjustments, balances, and a per-seller breakdown |
 | GET | `/admin/products?status&search&page` | `products.moderate` | Oldest submission first |
 | GET | `/admin/products/{id}` | `products.moderate` | |

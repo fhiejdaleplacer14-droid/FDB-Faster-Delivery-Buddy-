@@ -4,7 +4,7 @@ import { RouteError } from '@/components/layout/RouteError'
 import { SiteLayout } from '@/components/layout/SiteLayout'
 import { AdminHome, AdminLayout } from '@/features/admin/AdminLayout'
 import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage'
-import { RedirectIfSignedIn, RequireAuth, RequirePermission, RequireSellerAccount } from '@/features/auth/guards'
+import { RedirectIfSignedIn, RequireAuth, RequirePermission, RequireSellerAccount, ShopperOnly } from '@/features/auth/guards'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage'
@@ -30,10 +30,16 @@ export const routes: RouteObject[] = [
     element: <SiteLayout />,
     errorElement: <RouteError />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: 'products', element: <ProductsPage /> },
+      {
+        element: <ShopperOnly />,
+        children: [
+          { index: true, element: <HomePage /> },
+          { path: 'products', element: <ProductsPage /> },
+          { path: 'stores/:slug', element: <StorePage /> },
+        ],
+      },
+      // Admins may open a single listing (for example from a review they are moderating).
       { path: 'products/:slug', element: <ProductPage /> },
-      { path: 'stores/:slug', element: <StorePage /> },
       {
         element: <RedirectIfSignedIn />,
         children: [
@@ -48,32 +54,37 @@ export const routes: RouteObject[] = [
         element: <RequireAuth />,
         children: [
           { path: 'account', lazy: page(() => import('@/features/account/AccountPage'), 'AccountPage') },
-          { path: 'cart', element: <CartPage /> },
-          { path: 'checkout', element: <CheckoutPage /> },
-          { path: 'orders', element: <OrdersPage /> },
-          { path: 'orders/:number', element: <OrderDetailPage /> },
-          { path: 'sell', lazy: page(() => import('@/features/sellers/SellPage'), 'SellPage') },
           { path: 'notifications', lazy: page(() => import('@/features/notifications/NotificationsPage'), 'NotificationsPage') },
-          { path: 'support', lazy: page(() => import('@/features/support/SupportPage'), 'SupportPage') },
-          { path: 'support/new', lazy: page(() => import('@/features/support/NewTicketPage'), 'NewTicketPage') },
-          { path: 'support/:number', lazy: page(() => import('@/features/support/TicketPage'), 'TicketPage') },
           {
-            path: 'seller',
-            element: <RequireSellerAccount />,
+            element: <ShopperOnly />,
             children: [
+              { path: 'cart', element: <CartPage /> },
+              { path: 'checkout', element: <CheckoutPage /> },
+              { path: 'orders', element: <OrdersPage /> },
+              { path: 'orders/:number', element: <OrderDetailPage /> },
+              { path: 'sell', lazy: page(() => import('@/features/sellers/SellPage'), 'SellPage') },
+              { path: 'support', lazy: page(() => import('@/features/support/SupportPage'), 'SupportPage') },
+              { path: 'support/new', lazy: page(() => import('@/features/support/NewTicketPage'), 'NewTicketPage') },
+              { path: 'support/:number', lazy: page(() => import('@/features/support/TicketPage'), 'TicketPage') },
               {
-                element: <SellerLayout />,
+                path: 'seller',
+                element: <RequireSellerAccount />,
                 children: [
-                  { index: true, element: <Navigate to="orders" replace /> },
-                  { path: 'orders', lazy: page(() => import('@/features/seller-portal/SellerOrdersPage'), 'SellerOrdersPage') },
-                  { path: 'orders/:id', lazy: page(() => import('@/features/seller-portal/SellerOrderPage'), 'SellerOrderPage') },
-                  { path: 'products', lazy: page(() => import('@/features/seller-portal/SellerProductsPage'), 'SellerProductsPage') },
-                  { path: 'products/new', lazy: page(() => import('@/features/seller-portal/ProductEditorPage'), 'ProductEditorPage') },
-                  { path: 'products/:id', lazy: page(() => import('@/features/seller-portal/ProductEditorPage'), 'ProductEditorPage') },
-                  { path: 'commissions', lazy: page(() => import('@/features/seller-portal/SellerCommissionsPage'), 'SellerCommissionsPage') },
-                  { path: 'reviews', lazy: page(() => import('@/features/seller-portal/SellerReviewsPage'), 'SellerReviewsPage') },
-                  { path: 'support', lazy: page(() => import('@/features/seller-portal/SellerSupportPage'), 'SellerSupportPage') },
-                  { path: 'support/:number', lazy: page(() => import('@/features/support/TicketPage'), 'SellerTicketPage') },
+                  {
+                    element: <SellerLayout />,
+                    children: [
+                      { index: true, element: <Navigate to="orders" replace /> },
+                      { path: 'orders', lazy: page(() => import('@/features/seller-portal/SellerOrdersPage'), 'SellerOrdersPage') },
+                      { path: 'orders/:id', lazy: page(() => import('@/features/seller-portal/SellerOrderPage'), 'SellerOrderPage') },
+                      { path: 'products', lazy: page(() => import('@/features/seller-portal/SellerProductsPage'), 'SellerProductsPage') },
+                      { path: 'products/new', lazy: page(() => import('@/features/seller-portal/ProductEditorPage'), 'ProductEditorPage') },
+                      { path: 'products/:id', lazy: page(() => import('@/features/seller-portal/ProductEditorPage'), 'ProductEditorPage') },
+                      { path: 'commissions', lazy: page(() => import('@/features/seller-portal/SellerCommissionsPage'), 'SellerCommissionsPage') },
+                      { path: 'reviews', lazy: page(() => import('@/features/seller-portal/SellerReviewsPage'), 'SellerReviewsPage') },
+                      { path: 'support', lazy: page(() => import('@/features/seller-portal/SellerSupportPage'), 'SellerSupportPage') },
+                      { path: 'support/:number', lazy: page(() => import('@/features/support/TicketPage'), 'SellerTicketPage') },
+                    ],
+                  },
                 ],
               },
             ],
@@ -130,6 +141,10 @@ export const routes: RouteObject[] = [
               {
                 element: <RequirePermission permission="categories.manage" />,
                 children: [{ path: 'categories', lazy: page(() => import('@/features/admin/CategoriesPage'), 'CategoriesPage') }],
+              },
+              {
+                element: <RequirePermission permission="sellers.manage" />,
+                children: [{ path: 'settings', lazy: page(() => import('@/features/admin/SettingsPage'), 'SettingsPage') }],
               },
             ],
           },

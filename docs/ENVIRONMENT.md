@@ -20,6 +20,7 @@ Frontend variables prefixed with `VITE_` are bundled into public JavaScript. Nev
 | `FRONTEND_URL` | `http://localhost:5173` | Allowed CORS origin |
 | `APP_DISPLAY_TIMEZONE` | `Asia/Manila` | Timezone for showing times to people. Storage is always UTC |
 | `FDB_SELLER_REQUIRED_DOCUMENTS` | `government_id` | Document types every seller application must include (comma-separated). **Placeholder until the founders decide** |
+| `FDB_SELLER_DOCUMENTS_REQUIRED` | `true` | Starting value of the **Admin > Settings** switch. Once an admin flips it, the saved value in the database wins |
 | `FDB_SELLER_DOCUMENTS_DISK` | `seller_documents` | Private disk for verification files. Point it at a private S3 bucket in production |
 | `FDB_LISTING_REQUIRES_REVIEW` | `true` | Listings need FDB approval before customers see them. Content edits to a live listing send it back for review. **Placeholder until the founders decide** |
 | `FDB_MEDIA_DISK` | `media` | Disk for public product photos. Use a public S3-compatible bucket or CDN in production |

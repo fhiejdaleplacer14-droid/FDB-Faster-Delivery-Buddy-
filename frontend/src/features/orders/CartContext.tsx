@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { useAuth } from '@/features/auth/AuthContext'
+import { isAdmin, useAuth } from '@/features/auth/AuthContext'
 import type { CartResponse } from '@/types/api'
 import { cartApi } from './api'
 
@@ -15,7 +15,8 @@ const CartContext = createContext<CartState | null>(null)
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
   const [cart, setCart] = useState<CartResponse | null>(null)
-  const userId = user?.id ?? null
+  // Admin accounts cannot shop, so they never load a cart.
+  const userId = user && !isAdmin(user) ? user.id : null
 
   const reload = useCallback(async () => {
     setCart(await cartApi.get())

@@ -1,4 +1,4 @@
-import { BarChart3, FolderTree, LayoutDashboard, LifeBuoy, type LucideIcon, Package, ReceiptText, RotateCcw, ShoppingBag, Star, Store } from 'lucide-react'
+import { BarChart3, FolderTree, LayoutDashboard, LifeBuoy, type LucideIcon, Package, ReceiptText, RotateCcw, Settings, ShoppingBag, Star, Store } from 'lucide-react'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Navigate, NavLink, Outlet, useLocation } from 'react-router'
 import { can, useAuth } from '@/features/auth/AuthContext'
@@ -23,6 +23,7 @@ const links: { to: string; label: string; permission: PermissionSlug; icon: Luci
   { to: '/admin/refunds', label: 'Refunds', permission: 'refunds.manage', icon: RotateCcw, badge: 'refunds' },
   { to: '/admin/reports', label: 'Financial report', permission: 'reports.view', icon: BarChart3 },
   { to: '/admin/categories', label: 'Categories', permission: 'categories.manage', icon: FolderTree },
+  { to: '/admin/settings', label: 'Settings', permission: 'sellers.manage', icon: Settings },
 ]
 
 // Work waiting for an admin, refreshed on each page change.
