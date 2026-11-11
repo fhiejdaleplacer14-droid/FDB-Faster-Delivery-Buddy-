@@ -39,14 +39,14 @@ export function AdminOrderDetailPage() {
       )}
       {order && (
         <>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-navy">{order.number}</h1>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight text-heading">{order.number}</h1>
           <p className="mt-1 text-sm text-slate">
             {order.customer?.name} ({order.customer?.email}) · {formatDateTime(order.placed_at)} · {order.payment_method_label}
           </p>
           <div className="mt-4 text-sm">
             <AddressLines address={order.delivery} />
           </div>
-          <p className="mt-4 text-lg font-semibold text-navy tabular">Total {formatPeso(order.grand_total)}</p>
+          <p className="mt-4 text-lg font-semibold text-heading tabular">Total {formatPeso(order.grand_total)}</p>
 
           {order.seller_orders.map((so) => (
             <section key={so.id} className="mt-8 border-t border-line pt-6">

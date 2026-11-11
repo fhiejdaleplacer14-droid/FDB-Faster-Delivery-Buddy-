@@ -28,7 +28,7 @@ export function SellerReviewsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Reviews</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Reviews</h1>
       <p className="mt-1 text-sm text-slate">What customers say about your products. Your reply appears under their review on the product page.</p>
 
       <div role="group" aria-label="Filter reviews" className="mt-6 flex gap-1 border-b border-line">
@@ -41,7 +41,7 @@ export function SellerReviewsPage() {
             type="button"
             aria-pressed={unanswered === (f.value === 'unanswered')}
             onClick={() => setParams({ filter: f.value })}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${unanswered === (f.value === 'unanswered') ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${unanswered === (f.value === 'unanswered') ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
           >
             {f.label}
           </button>
@@ -94,12 +94,12 @@ function SellerReviewCard({ review, onChange }: { review: Review; onChange: (r: 
   }
 
   return (
-    <li className={`rounded-xl bg-white p-5 shadow-sm ring-1 ${review.status === 'hidden' ? 'opacity-70 ring-line' : 'ring-line'}`}>
+    <li className={`rounded-xl bg-surface p-5 shadow-sm ring-1 ${review.status === 'hidden' ? 'opacity-70 ring-line' : 'ring-line'}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="flex items-center gap-2" aria-label={`${review.rating} out of 5 stars`}>
           <Stars value={review.rating} />
           {review.product && (
-            <Link to={`/products/${review.product.slug}`} className="text-sm font-medium text-blue hover:underline">
+            <Link to={`/products/${review.product.slug}`} className="text-sm font-medium text-link hover:underline">
               {review.product.name}
             </Link>
           )}
@@ -113,7 +113,7 @@ function SellerReviewCard({ review, onChange }: { review: Review; onChange: (r: 
 
       {review.seller_reply && !open && (
         <div className="mt-4 rounded-lg border-l-4 border-blue bg-paper px-3 py-2 text-sm">
-          <p className="text-xs font-semibold text-navy">Your reply</p>
+          <p className="text-xs font-semibold text-heading">Your reply</p>
           <p className="mt-1 whitespace-pre-line text-ink">{review.seller_reply}</p>
         </div>
       )}

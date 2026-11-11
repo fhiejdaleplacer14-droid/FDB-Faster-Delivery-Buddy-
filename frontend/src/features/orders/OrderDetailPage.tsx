@@ -37,7 +37,7 @@ export function OrderDetailPage() {
       )}
       {order && (
         <>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy">Order {order.number}</h1>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-heading">Order {order.number}</h1>
           <p className="mt-1 text-sm text-slate">Placed {formatDateTime(order.placed_at)}</p>
           {params.get('placed') && (
             <div className="mt-4">
@@ -58,7 +58,7 @@ export function OrderDetailPage() {
             </div>
             <div>
               <dt className="text-slate">Total</dt>
-              <dd className="mt-1 text-lg font-semibold text-navy tabular">{formatPeso(order.grand_total)}</dd>
+              <dd className="mt-1 text-lg font-semibold text-heading tabular">{formatPeso(order.grand_total)}</dd>
             </div>
           </dl>
 
@@ -141,7 +141,7 @@ function SellerOrderSection({ order, sellerOrder, onChange }: { order: Order; se
           </div>
           <ol className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs" aria-label="Progress">
             {orderSteps.map((step, i) => (
-              <li key={step} className={`flex items-center gap-1 ${i <= reached ? 'font-semibold text-navy' : 'text-slate'}`} aria-current={i === reached ? 'step' : undefined}>
+              <li key={step} className={`flex items-center gap-1 ${i <= reached ? 'font-semibold text-heading' : 'text-slate'}`} aria-current={i === reached ? 'step' : undefined}>
                 {i <= reached && <Check className="size-3.5" aria-hidden />}
                 {orderStatusLabel(step)}
               </li>
@@ -158,7 +158,7 @@ function SellerOrderSection({ order, sellerOrder, onChange }: { order: Order; se
             <div className="flex justify-between gap-4">
               <span>
                 {item.product_slug ? (
-                  <Link to={`/products/${item.product_slug}`} className="text-ink hover:text-blue">
+                  <Link to={`/products/${item.product_slug}`} className="text-ink hover:text-link">
                     {item.product_name}
                   </Link>
                 ) : (
@@ -183,7 +183,7 @@ function SellerOrderSection({ order, sellerOrder, onChange }: { order: Order; se
                 <button
                   type="button"
                   onClick={() => setReviewing(item.id)}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-200 transition hover:-translate-y-px hover:bg-amber-100"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-200 transition hover:-translate-y-px hover:bg-amber-100 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/30 dark:hover:bg-amber-400/20"
                 >
                   <Star className="size-3.5 fill-amber-400 text-amber-400" aria-hidden />
                   Rate this item
@@ -204,7 +204,7 @@ function SellerOrderSection({ order, sellerOrder, onChange }: { order: Order; se
         <span className="tabular">{formatPeso(sellerOrder.total)}</span>
       </p>
       <RefundList refunds={sellerOrder.refunds ?? []} />
-      <Link to={`/support/new?order=${encodeURIComponent(sellerOrder.number)}`} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-slate transition-colors hover:text-blue">
+      <Link to={`/support/new?order=${encodeURIComponent(sellerOrder.number)}`} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-slate transition-colors hover:text-link">
         <LifeBuoy className="size-4" aria-hidden />
         Problem with this part of the order?
       </Link>

@@ -50,7 +50,7 @@ export function VerifyEmailPage() {
         </>
       )}
       {state.kind !== 'working' && (
-        <Link to={user ? '/account' : '/login'} className="mt-6 inline-block font-medium text-blue hover:underline">
+        <Link to={user ? '/account' : '/login'} className="mt-6 inline-block font-medium text-link hover:underline">
           {user ? 'Go to your account' : 'Sign in'}
         </Link>
       )}

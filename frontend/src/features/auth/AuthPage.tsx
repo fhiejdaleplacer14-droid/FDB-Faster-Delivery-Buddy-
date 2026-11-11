@@ -31,8 +31,8 @@ export function AuthPage({ title, intro, children }: { title: string; intro?: st
       </aside>
 
       <div className="mx-auto w-full max-w-sm animate-fade-up lg:max-w-none">
-        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-line sm:p-8">
-          <h1 className="text-2xl font-bold tracking-tight text-navy">{title}</h1>
+        <div className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-line sm:p-8">
+          <h1 className="text-2xl font-bold tracking-tight text-heading">{title}</h1>
           {intro && <p className="mt-2 text-sm text-slate">{intro}</p>}
           <div className="mt-7">{children}</div>
         </div>

@@ -65,7 +65,7 @@ export function TicketThread({ ticket, viewer, onReply, onChange, orderLink, chi
           <p className="mt-8 rounded-lg bg-paper px-4 py-3 text-sm text-slate">
             This request is closed.{' '}
             {viewer === 'customer' && (
-              <Link to="/support/new" className="font-medium text-blue hover:underline">
+              <Link to="/support/new" className="font-medium text-link hover:underline">
                 Open a new one
               </Link>
             )}{' '}
@@ -92,7 +92,7 @@ export function TicketThread({ ticket, viewer, onReply, onChange, orderLink, chi
       </div>
 
       <aside className="space-y-4 text-sm lg:sticky lg:top-24 lg:self-start">
-        <dl className="space-y-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-line">
+        <dl className="space-y-3 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
           <div>
             <dt className="text-xs text-slate">Status</dt>
             <dd className="mt-1">
@@ -117,7 +117,7 @@ export function TicketThread({ ticket, viewer, onReply, onChange, orderLink, chi
               <dt className="text-xs text-slate">Order</dt>
               <dd className="mt-0.5 space-y-1">
                 {orderLink ? (
-                  <Link to={orderLink} className="font-medium text-blue hover:underline">
+                  <Link to={orderLink} className="font-medium text-link hover:underline">
                     {ticket.seller_order.number}
                   </Link>
                 ) : (
@@ -144,13 +144,13 @@ export function TicketThread({ ticket, viewer, onReply, onChange, orderLink, chi
 
 function Bubble({ message, mine }: { message: TicketMessage; mine: boolean }) {
   const Icon = roleIcon[message.role]
-  const tone = message.role === 'staff' ? 'bg-navy text-white' : mine ? 'bg-blue-soft text-ink' : 'bg-white text-ink ring-1 ring-line'
+  const tone = message.role === 'staff' ? 'bg-navy text-white' : mine ? 'bg-blue-soft text-ink' : 'bg-surface text-ink ring-1 ring-line'
 
   return (
     <li className={`flex gap-3 ${mine ? 'flex-row-reverse' : ''}`}>
       <span
         aria-hidden
-        className={`flex size-9 shrink-0 items-center justify-center rounded-full ${message.role === 'staff' ? 'bg-blue text-white' : message.role === 'seller' ? 'bg-amber-100 text-amber-800' : 'bg-blue-soft text-blue'}`}
+        className={`flex size-9 shrink-0 items-center justify-center rounded-full ${message.role === 'staff' ? 'bg-blue text-white' : message.role === 'seller' ? 'bg-amber-100 text-amber-800 dark:bg-amber-400/15 dark:text-amber-300' : 'bg-blue-soft text-link'}`}
       >
         <Icon className="size-4" />
       </span>

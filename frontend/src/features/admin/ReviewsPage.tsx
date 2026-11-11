@@ -50,7 +50,7 @@ export function ReviewsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Reviews</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Reviews</h1>
       <p className="mt-1 text-sm text-slate">Reviews go live right away. Hide ones that break the rules; hidden reviews stop counting towards the rating.</p>
 
       <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -62,7 +62,7 @@ export function ReviewsPage() {
                 type="button"
                 aria-pressed={status === f.value}
                 onClick={() => update({ status: f.value })}
-                className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+                className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
               >
                 {f.label}
               </button>
@@ -70,7 +70,7 @@ export function ReviewsPage() {
           </div>
           <label className="text-sm text-slate">
             <span className="sr-only">Filter by rating</span>
-            <select value={rating} onChange={(e) => update({ rating: e.target.value })} className="rounded-md border border-line bg-white px-2 py-2 text-sm text-ink">
+            <select value={rating} onChange={(e) => update({ rating: e.target.value })} className="rounded-md border border-line bg-surface px-2 py-2 text-sm text-ink">
               <option value="">Any rating</option>
               {[1, 2, 3, 4, 5].map((n) => (
                 <option key={n} value={n}>
@@ -90,7 +90,7 @@ export function ReviewsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Text or product name"
-            className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm lg:w-64"
+            className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm lg:w-64"
           />
           <Button type="submit" variant="secondary" aria-label="Search">
             <Search className="size-4" aria-hidden />
@@ -152,7 +152,7 @@ function ModeratedReview({ review, onChange }: { review: Review; onChange: (r: R
   }
 
   return (
-    <li className={`rounded-xl p-5 ring-1 transition ${hidden ? 'bg-paper ring-line' : 'bg-white shadow-sm ring-line'}`}>
+    <li className={`rounded-xl p-5 ring-1 transition ${hidden ? 'bg-paper ring-line' : 'bg-surface shadow-sm ring-line'}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2">
@@ -160,7 +160,7 @@ function ModeratedReview({ review, onChange }: { review: Review; onChange: (r: R
               <Stars value={review.rating} />
             </span>
             {review.product && (
-              <Link to={`/products/${review.product.slug}`} className="text-sm font-medium text-blue hover:underline">
+              <Link to={`/products/${review.product.slug}`} className="text-sm font-medium text-link hover:underline">
                 {review.product.name}
               </Link>
             )}

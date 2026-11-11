@@ -4,7 +4,7 @@ type Viewer = 'customer' | 'seller' | 'staff'
 
 const className: Record<TicketStatus, string> = {
   open: 'bg-warning/10 text-warning',
-  waiting_on_user: 'bg-blue/10 text-blue',
+  waiting_on_user: 'bg-blue/10 text-link',
   resolved: 'bg-success/10 text-success',
   closed: 'bg-ink/10 text-ink',
 }

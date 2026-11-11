@@ -30,8 +30,8 @@ export function StorePage() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         {error.status === 404 ? (
           <>
-            <h1 className="text-2xl font-bold text-navy">This store is not available</h1>
-            <Link to="/products" className="mt-6 inline-block font-medium text-blue hover:underline">
+            <h1 className="text-2xl font-bold text-heading">This store is not available</h1>
+            <Link to="/products" className="mt-6 inline-block font-medium text-link hover:underline">
               Browse products
             </Link>
           </>
@@ -46,7 +46,7 @@ export function StorePage() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       {store && (
         <header className="border-b border-line pb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{store.name}</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">{store.name}</h1>
           <p className="mt-1 flex items-center gap-1 text-sm text-slate">
             <MapPin className="size-3.5" aria-hidden />
             {store.barangay}, {store.municipality}

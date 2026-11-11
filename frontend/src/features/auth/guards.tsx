@@ -29,7 +29,7 @@ export function RequirePermission({ permission }: { permission: PermissionSlug }
   if (!can(user, permission)) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <h1 className="text-2xl font-bold text-navy">You do not have access to this page</h1>
+        <h1 className="text-2xl font-bold text-heading">You do not have access to this page</h1>
         <p className="mt-2 text-slate">Ask an FDB administrator if you think you should.</p>
       </div>
     )
@@ -60,9 +60,9 @@ export function RequireSellerAccount() {
   if (user?.seller?.status !== 'approved' && user?.seller?.status !== 'suspended') {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <h1 className="text-2xl font-bold text-navy">You need an approved store first</h1>
+        <h1 className="text-2xl font-bold text-heading">You need an approved store first</h1>
         <p className="mt-2 text-slate">Listings can be created once FDB approves your seller application.</p>
-        <Link to="/sell" className="mt-6 inline-block font-medium text-blue hover:underline">
+        <Link to="/sell" className="mt-6 inline-block font-medium text-link hover:underline">
           View your seller application
         </Link>
       </div>

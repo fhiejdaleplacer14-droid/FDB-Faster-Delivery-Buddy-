@@ -22,7 +22,7 @@ export function SellerCommissionsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Commissions</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Commissions</h1>
       <p className="mt-1 max-w-2xl text-sm text-slate">
         FDB earns a commission on each delivered order, worked out on the product total. You collect payment from customers yourself and pay the commission to FDB.
       </p>
@@ -38,7 +38,7 @@ export function SellerCommissionsPage() {
           <dl className="mt-6 grid gap-6 border-y border-line py-5 sm:grid-cols-3">
             <div>
               <dt className="text-sm text-slate">Due to FDB now</dt>
-              <dd className="mt-1 text-2xl font-semibold text-navy tabular">{formatPeso(result.summary.due)}</dd>
+              <dd className="mt-1 text-2xl font-semibold text-heading tabular">{formatPeso(result.summary.due)}</dd>
             </div>
             <div>
               <dt className="text-sm text-slate">On orders not yet delivered</dt>
@@ -71,7 +71,7 @@ export function SellerCommissionsPage() {
                       <tr key={r.id}>
                         <td className="py-3 pr-4">
                           {r.seller_order && (
-                            <Link to={`/seller/orders/${r.seller_order.id}`} className="font-medium text-blue hover:underline">
+                            <Link to={`/seller/orders/${r.seller_order.id}`} className="font-medium text-link hover:underline">
                               {r.seller_order.number}
                             </Link>
                           )}

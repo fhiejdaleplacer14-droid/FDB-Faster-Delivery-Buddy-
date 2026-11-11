@@ -36,7 +36,7 @@ export function ProductReviewPage() {
       {product && (
         <>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-navy">{product.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-heading">{product.name}</h1>
             <ProductStatusBadge status={product.status} />
           </div>
           <p className="mt-1 text-sm text-slate">

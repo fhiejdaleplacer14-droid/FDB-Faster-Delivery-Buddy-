@@ -20,7 +20,7 @@ export function CategoriesPage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Categories</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Categories</h1>
       <p className="mt-1 text-sm text-slate">Two levels: main categories and subcategories. Turning a category off hides its listings from customers.</p>
 
       <NewCategoryForm parents={parents} onCreated={reload} />
@@ -89,7 +89,7 @@ function NewCategoryForm({ parents, onCreated }: { parents: Category[]; onCreate
           maxLength={60}
           onChange={(e) => setName(e.target.value)}
           aria-invalid={firstError(error, 'name') ? true : undefined}
-          className="mt-1.5 h-10 w-full rounded-md border border-line bg-white px-3 text-sm"
+          className="mt-1.5 h-10 w-full rounded-md border border-line bg-surface px-3 text-sm"
         />
         {firstError(error, 'name') && <p className="mt-1 text-sm text-danger">{firstError(error, 'name')}</p>}
       </div>
@@ -97,7 +97,7 @@ function NewCategoryForm({ parents, onCreated }: { parents: Category[]; onCreate
         <label htmlFor="new-category-parent" className="block text-sm font-medium text-ink">
           Inside
         </label>
-        <select id="new-category-parent" value={parentId} onChange={(e) => setParentId(e.target.value)} className="mt-1.5 h-10 w-full rounded-md border border-line bg-white px-3 text-sm sm:w-48">
+        <select id="new-category-parent" value={parentId} onChange={(e) => setParentId(e.target.value)} className="mt-1.5 h-10 w-full rounded-md border border-line bg-surface px-3 text-sm sm:w-48">
           <option value="">Main category</option>
           {parents.map((p) => (
             <option key={p.id} value={p.id}>
@@ -184,7 +184,7 @@ function CategoryRow({ category, onChanged, indent = false }: { category: Catego
       </td>
       <td className="py-2 text-right whitespace-nowrap">
         {!editing && (
-          <button type="button" onClick={() => setEditing(true)} className="px-2 text-sm font-medium text-blue hover:underline">
+          <button type="button" onClick={() => setEditing(true)} className="px-2 text-sm font-medium text-link hover:underline">
             Rename
           </button>
         )}

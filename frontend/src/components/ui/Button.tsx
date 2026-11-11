@@ -5,10 +5,10 @@ type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'success'
 
 const variants: Record<Variant, string> = {
   primary: 'bg-blue text-white shadow-sm shadow-blue/25 hover:bg-blue/90 hover:shadow-md hover:shadow-blue/25 disabled:bg-blue/50 disabled:shadow-none',
-  secondary: 'border border-line bg-white text-ink shadow-sm hover:border-navy/20 hover:bg-paper disabled:text-slate',
-  danger: 'bg-danger text-white shadow-sm shadow-danger/20 hover:bg-danger/90 disabled:bg-danger/50',
+  secondary: 'border border-line bg-surface text-ink shadow-sm hover:border-slate/40 hover:bg-paper disabled:text-slate',
+  danger: 'bg-danger-solid text-white shadow-sm shadow-danger-solid/20 hover:bg-danger-solid/90 disabled:bg-danger-solid/50',
   ghost: 'text-ink hover:bg-ink/5 disabled:text-slate',
-  success: 'bg-success text-white shadow-sm shadow-success/25',
+  success: 'bg-success-solid text-white shadow-sm shadow-success-solid/25',
 }
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {

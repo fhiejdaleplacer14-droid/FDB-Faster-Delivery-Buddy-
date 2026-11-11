@@ -46,7 +46,7 @@ export function NotificationsPage() {
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy">Notifications</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-heading">Notifications</h1>
           {result && <p className="mt-1 text-sm text-slate">{result.meta.unread ? `${result.meta.unread} unread` : 'All caught up'}</p>}
         </div>
         {!!result?.meta.unread && (
@@ -77,11 +77,11 @@ export function NotificationsPage() {
                 <button
                   type="button"
                   onClick={() => open(n)}
-                  className={`flex w-full gap-4 rounded-xl px-4 py-3 text-left ring-1 transition hover:-translate-y-px hover:shadow-md hover:shadow-navy/5 ${n.read ? 'bg-white ring-line' : 'bg-blue-soft/50 ring-blue/20'}`}
+                  className={`flex w-full gap-4 rounded-xl px-4 py-3 text-left ring-1 transition hover:-translate-y-px hover:shadow-md hover:shadow-navy/5 ${n.read ? 'bg-surface ring-line' : 'bg-blue-soft/50 ring-blue/20'}`}
                 >
                   <span aria-hidden className={`mt-2 size-2 shrink-0 rounded-full ${n.read ? 'bg-line' : 'animate-pulse bg-blue'}`} />
                   <span className="min-w-0 flex-1">
-                    <span className={`block ${n.read ? 'text-ink' : 'font-semibold text-navy'}`}>{n.title}</span>
+                    <span className={`block ${n.read ? 'text-ink' : 'font-semibold text-heading'}`}>{n.title}</span>
                     {n.body && <span className="mt-0.5 block text-sm text-slate">{n.body}</span>}
                   </span>
                   <time dateTime={n.created_at} title={formatDateTime(n.created_at)} className="shrink-0 text-xs text-slate">

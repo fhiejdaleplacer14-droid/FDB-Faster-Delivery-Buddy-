@@ -6,7 +6,7 @@ type LogoProps = {
 
 // Interim vector built from the brand sheet. Replace with the designer's SVG exports when available.
 export function Logo({ variant = 'horizontal', tone = 'light', className }: LogoProps) {
-  const fd = tone === 'light' ? 'var(--color-navy)' : 'var(--color-white)'
+  const fd = tone === 'light' ? 'var(--color-heading)' : 'var(--color-white)'
 
   return (
     <span className={`inline-flex items-center gap-2.5 ${className ?? ''}`}>
@@ -33,7 +33,7 @@ export function Logo({ variant = 'horizontal', tone = 'light', className }: Logo
       {variant === 'horizontal' && (
         <span className="hidden leading-tight sm:block">
           <span
-            className={`block text-sm font-extrabold tracking-wide uppercase ${tone === 'light' ? 'text-navy' : 'text-white'}`}
+            className={`block text-sm font-extrabold tracking-wide uppercase ${tone === 'light' ? 'text-heading' : 'text-white'}`}
           >
             Faster Delivery Buddy
           </span>

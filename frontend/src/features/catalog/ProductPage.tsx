@@ -33,9 +33,9 @@ export function ProductPage() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         {error.status === 404 ? (
           <>
-            <h1 className="text-2xl font-bold text-navy">This product is not available</h1>
+            <h1 className="text-2xl font-bold text-heading">This product is not available</h1>
             <p className="mt-2 text-slate">It may have sold out for good or been removed by the seller.</p>
-            <Link to="/products" className="mt-6 inline-block font-medium text-blue hover:underline">
+            <Link to="/products" className="mt-6 inline-block font-medium text-link hover:underline">
               Browse other products
             </Link>
           </>
@@ -95,7 +95,7 @@ export function ProductPage() {
             <RatingLine rating={product.rating} />
           </a>
           {variant && (
-            <p key={variant.id} className="mt-3 animate-fade-in text-3xl font-extrabold text-navy tabular">{formatPeso(variant.price)}</p>
+            <p key={variant.id} className="mt-3 animate-fade-in text-3xl font-extrabold text-heading tabular">{formatPeso(variant.price)}</p>
           )}
 
           {product.variants.length > 1 && (
@@ -136,7 +136,7 @@ export function ProductPage() {
             <Link to={`/stores/${product.store.slug}`} className="group flex items-start gap-3">
               <Store className="mt-0.5 size-5 text-slate" aria-hidden />
               <div>
-                <p className="font-semibold text-ink group-hover:text-blue">{product.store.name}</p>
+                <p className="font-semibold text-ink group-hover:text-link">{product.store.name}</p>
                 <p className="flex items-center gap-1 text-sm text-slate">
                   <MapPin className="size-3.5" aria-hidden />
                   {product.store.barangay}, {product.store.municipality}

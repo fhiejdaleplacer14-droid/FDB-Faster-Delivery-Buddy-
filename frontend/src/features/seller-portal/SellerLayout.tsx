@@ -97,7 +97,7 @@ export function SellerLayout() {
                   <NavLink
                     to={to}
                     className={({ isActive }) =>
-                      `group relative flex items-center gap-2 rounded-t-lg px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${isActive ? 'bg-paper text-navy' : 'text-white/70 hover:bg-white/5 hover:text-white'}`
+                      `group relative flex items-center gap-2 rounded-t-lg px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${isActive ? 'bg-paper text-heading' : 'text-white/70 hover:bg-white/5 hover:text-white'}`
                     }
                   >
                     <Icon className="size-4" aria-hidden />

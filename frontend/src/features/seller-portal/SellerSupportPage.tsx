@@ -31,7 +31,7 @@ export function SellerSupportPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Customer requests</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Customer requests</h1>
       <p className="mt-1 text-sm text-slate">Problems customers raised about your orders. Replying quickly usually settles things before FDB needs to step in.</p>
 
       <div role="group" aria-label="Filter by status" className="mt-6 flex gap-1 overflow-x-auto border-b border-line">
@@ -41,7 +41,7 @@ export function SellerSupportPage() {
             type="button"
             aria-pressed={status === f.value}
             onClick={() => setParams({ status: f.value })}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
           >
             {f.label}
           </button>
@@ -66,7 +66,7 @@ export function SellerSupportPage() {
               <li key={t.number}>
                 <Link
                   to={`/seller/support/${t.number}`}
-                  className={`flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl px-4 py-3 ring-1 transition hover:-translate-y-px hover:shadow-md hover:shadow-navy/5 ${t.category.value === 'dispute' ? 'bg-danger/5 ring-danger/20' : 'bg-white ring-line'}`}
+                  className={`flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl px-4 py-3 ring-1 transition hover:-translate-y-px hover:shadow-md hover:shadow-navy/5 ${t.category.value === 'dispute' ? 'bg-danger/5 ring-danger/20' : 'bg-surface ring-line'}`}
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium text-ink">{t.subject}</span>

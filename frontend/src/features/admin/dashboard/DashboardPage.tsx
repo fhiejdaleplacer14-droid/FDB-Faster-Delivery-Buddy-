@@ -42,17 +42,17 @@ export function DashboardPage() {
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy">Dashboard</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-heading">Dashboard</h1>
           <p className="mt-1 text-sm text-slate">{data ? `${shortDay(data.period.from)} – ${shortDay(data.period.to)}, Philippine time` : 'How FDB is doing'}</p>
         </div>
-        <div role="group" aria-label="Date range" className="inline-flex rounded-lg bg-white p-1 shadow-sm ring-1 ring-line">
+        <div role="group" aria-label="Date range" className="inline-flex rounded-lg bg-surface p-1 shadow-sm ring-1 ring-line">
           {RANGES.map((r) => (
             <button
               key={r}
               type="button"
               aria-pressed={days === r}
               onClick={() => setParams(r === 30 ? {} : { days: String(r) })}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${days === r ? 'bg-navy text-white shadow-sm' : 'text-slate hover:text-ink'}`}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${days === r ? 'bg-navy text-white shadow-sm dark:bg-blue' : 'text-slate hover:text-ink'}`}
             >
               Last {r} days
             </button>
@@ -85,7 +85,7 @@ function DashboardBody({ data, days, dimmed }: { data: Dashboard; days: number; 
           subtitle="Product totals sellers delivered. The money goes to sellers; FDB earns the commission."
           lead={
             <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-1">
-              <p className="text-5xl font-bold tracking-tight text-navy">{formatPeso(kpis.gmv_delivered.value)}</p>
+              <p className="text-5xl font-bold tracking-tight text-heading">{formatPeso(kpis.gmv_delivered.value)}</p>
               <Delta kpi={kpis.gmv_delivered} days={days} />
             </div>
           }
@@ -98,7 +98,7 @@ function DashboardBody({ data, days, dimmed }: { data: Dashboard; days: number; 
           />
         </ChartCard>
 
-        <section aria-labelledby="attention-heading" className="min-w-0 animate-fade-up rounded-2xl bg-white p-5 shadow-sm ring-1 ring-line">
+        <section aria-labelledby="attention-heading" className="min-w-0 animate-fade-up rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
           <h2 id="attention-heading" className="text-sm font-semibold text-ink">
             Needs attention
           </h2>
@@ -172,12 +172,12 @@ function DashboardBody({ data, days, dimmed }: { data: Dashboard; days: number; 
         </ChartCard>
       </div>
 
-      <section aria-labelledby="recent-heading" className="animate-fade-up rounded-2xl bg-white p-5 shadow-sm ring-1 ring-line">
+      <section aria-labelledby="recent-heading" className="animate-fade-up rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
         <div className="flex items-center justify-between gap-3">
           <h2 id="recent-heading" className="text-sm font-semibold text-ink">
             Latest orders
           </h2>
-          <Link to="/admin/orders" className="inline-flex items-center gap-1 text-xs font-medium text-blue hover:underline">
+          <Link to="/admin/orders" className="inline-flex items-center gap-1 text-xs font-medium text-link hover:underline">
             All orders
             <ArrowRight className="size-3.5" aria-hidden />
           </Link>
@@ -200,7 +200,7 @@ function DashboardBody({ data, days, dimmed }: { data: Dashboard; days: number; 
                 {data.recent_orders.map((o) => (
                   <tr key={o.number}>
                     <td className="py-2.5 pr-4">
-                      <Link to={`/admin/orders/${o.number}`} className="font-medium text-blue hover:underline">
+                      <Link to={`/admin/orders/${o.number}`} className="font-medium text-link hover:underline">
                         {o.number}
                       </Link>
                     </td>
@@ -238,7 +238,7 @@ function Delta({ kpi, days, short = false }: { kpi: Kpi; days: number; short?: b
 
 function StatTile({ label, value, kpi, days, trend }: { label: string; value: string; kpi: Kpi; days: number; trend?: number[] }) {
   return (
-    <div className="flex min-w-0 flex-col rounded-2xl bg-white p-4 shadow-sm ring-1 ring-line">
+    <div className="flex min-w-0 flex-col rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-line">
       <p className="text-xs font-medium text-slate">{label}</p>
       <p className="mt-1 text-2xl font-semibold tracking-tight text-ink">{value}</p>
       <div className="mt-1">
@@ -257,7 +257,7 @@ function AttentionItem({ to, icon: Icon, label, value, waiting }: { to: string; 
   return (
     <li>
       <Link to={to} className="group -mx-2 flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-paper">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-soft text-blue">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-soft text-link">
           <Icon className="size-4" aria-hidden />
         </span>
         <span className="min-w-0 flex-1">
@@ -288,7 +288,7 @@ function StatusLine({ waiting }: { waiting: boolean }): ReactNode {
 
 function OrderState({ status }: { status: Dashboard['recent_orders'][number]['status'] }) {
   const map = {
-    in_progress: { label: 'In progress', cls: 'bg-blue/10 text-blue' },
+    in_progress: { label: 'In progress', cls: 'bg-blue/10 text-link' },
     completed: { label: 'Completed', cls: 'bg-success/10 text-success' },
     cancelled: { label: 'Cancelled', cls: 'bg-ink/10 text-ink' },
   } as const

@@ -6,6 +6,7 @@ import { ToastProvider } from '@/components/ui/Toast'
 import { firstAdminPath } from '@/features/admin/AdminLayout'
 import { useAuth } from '@/features/auth/AuthContext'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
+import { ThemeMenu } from './ThemeMenu'
 import { useCart } from '@/features/orders/CartContext'
 
 // Sign-in screens stay focused on the form, so they skip the footer.
@@ -57,7 +58,7 @@ function SiteHeader() {
   }
 
   const navLink = ({ isActive }: { isActive: boolean }) =>
-    `group relative block rounded-md px-3 py-2 text-sm font-medium transition-colors ${isActive ? 'text-navy' : 'text-slate hover:text-ink'}`
+    `group relative block rounded-md px-3 py-2 text-sm font-medium transition-colors ${isActive ? 'text-heading' : 'text-slate hover:text-ink'}`
 
   const underline = (
     <span
@@ -122,7 +123,7 @@ function SiteHeader() {
   )
 
   return (
-    <header className={`sticky top-0 z-40 border-b bg-white/95 backdrop-blur-sm transition-shadow duration-300 ${scrolled ? 'border-transparent shadow-md shadow-navy/5' : 'border-line'}`}>
+    <header className={`sticky top-0 z-40 border-b bg-surface/95 backdrop-blur-sm transition-shadow duration-300 ${scrolled ? 'border-transparent shadow-md shadow-navy/5' : 'border-line'}`}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" aria-label="Faster Delivery Buddy home" className="transition-opacity hover:opacity-80">
           <Logo />
@@ -132,6 +133,7 @@ function SiteHeader() {
             <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
               {links}
             </nav>
+            <ThemeMenu />
             {user && <NotificationBell />}
             {user && (
               <Link to="/cart" className="relative rounded-md p-2 text-ink transition-colors hover:bg-ink/5" aria-label={count ? `Cart, ${count} items` : 'Cart'}>

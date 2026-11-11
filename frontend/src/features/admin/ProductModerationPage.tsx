@@ -34,7 +34,7 @@ export function ProductModerationPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Listings</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Listings</h1>
 
       <div role="group" aria-label="Filter by status" className="mt-6 flex gap-1 overflow-x-auto border-b border-line">
         {filters.map((f) => (
@@ -43,7 +43,7 @@ export function ProductModerationPage() {
             type="button"
             aria-pressed={status === f.value}
             onClick={() => setParams({ status: f.value })}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
           >
             {f.label}
           </button>
@@ -79,7 +79,7 @@ export function ProductModerationPage() {
                 {result.data.map((p) => (
                   <tr key={p.id}>
                     <td className="py-3 pr-4">
-                      <Link to={`/admin/products/${p.id}`} className="flex items-center gap-3 font-medium text-blue hover:underline">
+                      <Link to={`/admin/products/${p.id}`} className="flex items-center gap-3 font-medium text-link hover:underline">
                         <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded bg-blue-soft">
                           {p.cover_image_url ? <img src={p.cover_image_url} alt="" className="size-full object-cover" /> : <ImageOff className="size-4 text-slate" aria-hidden />}
                         </span>

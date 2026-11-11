@@ -1,15 +1,16 @@
 import { useCallback, useId, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 
-// Categorical slots in fixed order, validated for colour-blind safety on the white card surface.
+// Categorical slots in fixed order, validated for colour-blind safety on each theme's card surface (see styles.css).
 // Never cycle or generate more: past five, fold into "Other".
-export const SERIES = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4'] as const
+export const SERIES = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'] as const
 // Text set inside a filled block: white, except near-black on yellow.
 const INK_ON = ['#ffffff', '#ffffff', '#ffffff', '#0b0b0b', '#ffffff'] as const
-const GRID = '#e5e7eb'
-const BASELINE = '#cbd5e1'
-const AXIS_TEXT = '#64748b'
-const SURFACE = '#ffffff'
-const DEEMPHASIS = '#cbd5e1'
+const GRID = 'var(--chart-grid)'
+const BASELINE = 'var(--chart-baseline)'
+const AXIS_TEXT = 'var(--chart-axis)'
+const SURFACE = 'var(--color-surface)'
+const DEEMPHASIS = 'var(--chart-baseline)'
+const LABEL = 'var(--color-ink)'
 
 // Chart geometry uses plain numbers; every value a person reads is formatted from the exact API string.
 // Charts draw nothing until their box is measured, so a chart never props its card wider than the screen.
@@ -77,7 +78,7 @@ function Tooltip({ value, label, color, x, y, width }: { value: string; label: s
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg bg-white px-3 py-2 text-xs whitespace-nowrap shadow-lg ring-1 ring-black/10"
+      className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg bg-surface px-3 py-2 text-xs whitespace-nowrap shadow-lg ring-1 ring-line"
       style={{ left, top: y - 10 }}
     >
       <div className="flex items-center gap-2">
@@ -174,7 +175,7 @@ export function TrendChart({ points, summary, prefix = '', height = 240 }: { poi
             textAnchor={x(peakIndex) + 50 > width - m.right ? 'end' : x(peakIndex) - 50 < m.left ? 'start' : 'middle'}
             fontSize={11}
             fontWeight={600}
-            fill="#172033"
+            fill={LABEL}
           >
             Peak {peak.display}
           </text>
@@ -282,7 +283,7 @@ export function SegmentedBar({ parts, noun }: { parts: Part[]; noun: string }) {
         })}
       </div>
       {shown && (
-        <div aria-hidden className="pointer-events-none absolute -top-2 left-1/2 z-10 -translate-x-1/2 -translate-y-full rounded-lg bg-white px-3 py-2 text-xs whitespace-nowrap shadow-lg ring-1 ring-black/10">
+        <div aria-hidden className="pointer-events-none absolute -top-2 left-1/2 z-10 -translate-x-1/2 -translate-y-full rounded-lg bg-surface px-3 py-2 text-xs whitespace-nowrap shadow-lg ring-1 ring-line">
           <span className="text-sm font-semibold text-ink">
             {shown.count} {noun} · {share(shown.count)}%
           </span>
@@ -333,7 +334,7 @@ export function RankedBars({ rows, empty }: { rows: RankedRow[]; empty: string }
             <span className="text-xs font-semibold whitespace-nowrap text-ink tabular">{r.display}</span>
           </span>
           {active === r.name && (
-            <span aria-hidden className="pointer-events-none absolute right-0 -top-1 z-10 -translate-y-full rounded-lg bg-white px-3 py-1.5 text-xs whitespace-nowrap text-slate shadow-lg ring-1 ring-black/10">
+            <span aria-hidden className="pointer-events-none absolute right-0 -top-1 z-10 -translate-y-full rounded-lg bg-surface px-3 py-1.5 text-xs whitespace-nowrap text-slate shadow-lg ring-1 ring-line">
               {r.detail}
             </span>
           )}
@@ -350,7 +351,7 @@ export function ChartCard({ title, subtitle, lead, table, children, className = 
   const id = useId()
   const [asTable, setAsTable] = useState(false)
   return (
-    <section aria-labelledby={id} className={`min-w-0 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-line ${className}`}>
+    <section aria-labelledby={id} className={`min-w-0 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line ${className}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 id={id} className="text-sm font-semibold text-ink">

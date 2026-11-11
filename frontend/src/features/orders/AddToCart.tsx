@@ -57,7 +57,7 @@ export function AddToCart({ variantId, stock }: { variantId: number; stock: numb
             value={Math.min(quantity, Math.max(max, 1))}
             disabled={stock === 0}
             onChange={(e) => setQuantity(Number(e.target.value))}
-            className="mt-1.5 h-11 rounded-md border border-line bg-white px-3 text-sm"
+            className="mt-1.5 h-11 rounded-md border border-line bg-surface px-3 text-sm"
           >
             {Array.from({ length: Math.max(max, 1) }, (_, i) => i + 1).map((n) => (
               <option key={n} value={n}>

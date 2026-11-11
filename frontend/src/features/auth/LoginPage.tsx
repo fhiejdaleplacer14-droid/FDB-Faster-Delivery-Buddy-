@@ -60,7 +60,7 @@ export function LoginPage() {
             <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="size-4 accent-blue" />
             Keep me signed in
           </label>
-          <Link to="/forgot-password" className="font-medium text-blue hover:underline">
+          <Link to="/forgot-password" className="font-medium text-link hover:underline">
             Forgot password?
           </Link>
         </div>
@@ -70,7 +70,7 @@ export function LoginPage() {
       </form>
       <p className="mt-8 text-sm text-slate">
         New to FDB?{' '}
-        <Link to="/register" className="font-medium text-blue hover:underline">
+        <Link to="/register" className="font-medium text-link hover:underline">
           Create an account
         </Link>
       </p>

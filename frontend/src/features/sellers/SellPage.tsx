@@ -33,7 +33,7 @@ export function SellPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Sell on FDB</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Sell on FDB</h1>
 
       {load.kind === 'loading' && <p className="mt-6 text-sm text-slate" aria-live="polite">Loading your application…</p>}
       {load.kind === 'error' && (
@@ -79,7 +79,7 @@ export function SellPage() {
           )}
           {editing && (
             <section aria-labelledby="resubmit-heading" className="mt-10 border-t border-line pt-8">
-              <h2 id="resubmit-heading" className="mb-6 text-lg font-semibold text-navy">
+              <h2 id="resubmit-heading" className="mb-6 text-lg font-semibold text-heading">
                 Update your application
               </h2>
               <SellerApplicationForm

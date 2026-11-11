@@ -40,7 +40,7 @@ export function SellerApplicationDetailPage() {
       {seller && (
         <>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-navy">{seller.store_name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-heading">{seller.store_name}</h1>
             <SellerStatusBadge status={seller.status} />
           </div>
           <p className="mt-1 text-sm text-slate">Submitted {formatDateTime(seller.submitted_at)}</p>
@@ -88,7 +88,7 @@ export function SellerApplicationDetailPage() {
                     {doc.download_url && (
                       <a
                         href={doc.download_url}
-                        className="inline-flex items-center gap-1 font-medium text-blue hover:underline"
+                        className="inline-flex items-center gap-1 font-medium text-link hover:underline"
                         aria-label={`Download ${doc.type_label}`}
                       >
                         <Download className="size-4" aria-hidden />

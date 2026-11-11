@@ -56,9 +56,9 @@ function ProductTile({ product }: { product: ProductCard }) {
           View
         </span>
       </div>
-      <h3 className="mt-3 line-clamp-2 text-sm font-medium text-ink transition-colors group-hover:text-blue">{product.name}</h3>
+      <h3 className="mt-3 line-clamp-2 text-sm font-medium text-ink transition-colors group-hover:text-link">{product.name}</h3>
       <p className="mt-1 flex flex-wrap items-center justify-between gap-x-2">
-        <span className="text-base font-bold text-navy tabular">{formatPeso(product.price_from)}</span>
+        <span className="text-base font-bold text-heading tabular">{formatPeso(product.price_from)}</span>
         <RatingLine rating={product.rating} compact />
       </p>
       <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-slate">

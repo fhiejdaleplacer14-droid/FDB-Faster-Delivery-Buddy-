@@ -40,7 +40,7 @@ export function SellerOrderPage() {
       {order && (
         <>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-navy">{order.number}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-heading">{order.number}</h1>
             <OrderStatusBadge status={order.status} />
           </div>
           <p className="mt-1 text-sm text-slate">Placed {formatDateTime(order.order?.placed_at)}</p>

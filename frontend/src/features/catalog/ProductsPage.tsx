@@ -74,13 +74,13 @@ export function ProductsPage() {
 
       <div className="mt-8 lg:grid lg:grid-cols-[16rem_1fr] lg:gap-8">
         <aside aria-label="Filters" className="hidden lg:block">
-          <div className="sticky top-24 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-line">{filters}</div>
+          <div className="sticky top-24 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">{filters}</div>
         </aside>
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="min-w-0">
-              <h1 className="truncate text-2xl font-bold tracking-tight text-navy">{heading}</h1>
+              <h1 className="truncate text-2xl font-bold tracking-tight text-heading">{heading}</h1>
               <p className="mt-0.5 text-sm text-slate" aria-live="polite">
                 {result ? `${result.meta.total} ${result.meta.total === 1 ? 'product' : 'products'}` : 'Loading products…'}
               </p>
@@ -98,7 +98,7 @@ export function ProductsPage() {
                 id="sort"
                 value={query.sort ?? ''}
                 onChange={(e) => update({ sort: e.target.value })}
-                className="h-10 rounded-lg border border-line bg-white px-3 text-sm text-ink shadow-sm transition hover:border-navy/25 focus:border-blue focus:ring-4 focus:ring-blue/15 focus:outline-none"
+                className="h-10 rounded-lg border border-line bg-surface px-3 text-sm text-ink shadow-sm transition hover:border-slate/40 focus:border-blue focus:ring-4 focus:ring-blue/15 focus:outline-none"
               >
                 {sorts.map((s) => (
                   <option key={s.value} value={s.value}>
@@ -117,7 +117,7 @@ export function ProductsPage() {
                   type="button"
                   onClick={() => update(chip.clear)}
                   aria-label={`Remove filter: ${chip.label}`}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-blue-soft py-1 pr-2 pl-3 text-sm font-medium text-navy ring-1 ring-blue/15 transition hover:bg-blue/15"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-blue-soft py-1 pr-2 pl-3 text-sm font-medium text-heading ring-1 ring-blue/15 transition hover:bg-blue/15"
                 >
                   {chip.label}
                   <X className="size-3.5" aria-hidden />
@@ -134,7 +134,7 @@ export function ProductsPage() {
             {!result && !error && <ProductGridSkeleton count={8} />}
             {result && result.data.length === 0 && (
               <EmptyState icon={PackageSearch} title="No products match these filters">
-                <button type="button" onClick={clearAll} className="font-medium text-blue hover:underline">
+                <button type="button" onClick={clearAll} className="font-medium text-link hover:underline">
                   Clear all filters
                 </button>
               </EmptyState>

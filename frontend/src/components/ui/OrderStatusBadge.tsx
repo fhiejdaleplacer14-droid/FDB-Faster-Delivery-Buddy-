@@ -2,10 +2,10 @@ import type { SellerOrderStatus } from '@/types/api'
 
 const styles: Record<SellerOrderStatus, { label: string; className: string }> = {
   pending_confirmation: { label: 'Waiting for seller', className: 'bg-warning/10 text-warning' },
-  confirmed: { label: 'Confirmed', className: 'bg-blue-soft text-navy' },
-  preparing: { label: 'Preparing', className: 'bg-blue-soft text-navy' },
-  ready_for_delivery: { label: 'Ready', className: 'bg-blue-soft text-navy' },
-  out_for_delivery: { label: 'On the way', className: 'bg-blue-soft text-navy' },
+  confirmed: { label: 'Confirmed', className: 'bg-blue-soft text-heading' },
+  preparing: { label: 'Preparing', className: 'bg-blue-soft text-heading' },
+  ready_for_delivery: { label: 'Ready', className: 'bg-blue-soft text-heading' },
+  out_for_delivery: { label: 'On the way', className: 'bg-blue-soft text-heading' },
   delivered: { label: 'Delivered', className: 'bg-success/10 text-success' },
   cancelled: { label: 'Cancelled', className: 'bg-ink/10 text-slate' },
 }

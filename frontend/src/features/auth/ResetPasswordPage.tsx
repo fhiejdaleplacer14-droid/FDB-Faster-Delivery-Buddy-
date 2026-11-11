@@ -21,7 +21,7 @@ export function ResetPasswordPage() {
     return (
       <AuthPage title="This reset link is incomplete">
         <p className="text-sm text-slate">Open the link from your email again, or request a new one.</p>
-        <Link to="/forgot-password" className="mt-6 inline-block font-medium text-blue hover:underline">
+        <Link to="/forgot-password" className="mt-6 inline-block font-medium text-link hover:underline">
           Request a new link
         </Link>
       </AuthPage>
@@ -45,7 +45,7 @@ export function ResetPasswordPage() {
     return (
       <AuthPage title="Password updated">
         <Alert tone="success">{done}</Alert>
-        <Link to="/login" className="mt-6 inline-block font-medium text-blue hover:underline">
+        <Link to="/login" className="mt-6 inline-block font-medium text-link hover:underline">
           Sign in
         </Link>
       </AuthPage>

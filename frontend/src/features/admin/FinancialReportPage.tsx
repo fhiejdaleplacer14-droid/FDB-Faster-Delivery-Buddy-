@@ -41,17 +41,17 @@ export function FinancialReportPage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Financial report</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Financial report</h1>
       <p className="mt-1 text-sm text-slate">Dates are in Philippine time. Commission is earned when a seller order is delivered.</p>
 
       <form onSubmit={submit} className="mt-6 flex flex-wrap items-end gap-3" key={`${from}-${to}`}>
         <label className="text-sm">
           <span className="block font-medium text-ink">From</span>
-          <input type="date" name="from" defaultValue={from} max={today} className="mt-1 h-10 rounded-md border border-line bg-white px-3" />
+          <input type="date" name="from" defaultValue={from} max={today} className="mt-1 h-10 rounded-md border border-line bg-surface px-3" />
         </label>
         <label className="text-sm">
           <span className="block font-medium text-ink">To</span>
-          <input type="date" name="to" defaultValue={to} max={today} className="mt-1 h-10 rounded-md border border-line bg-white px-3" />
+          <input type="date" name="to" defaultValue={to} max={today} className="mt-1 h-10 rounded-md border border-line bg-surface px-3" />
         </label>
         <Button type="submit" variant="secondary">
           Show report
@@ -152,7 +152,7 @@ function Row({ label, help, strong = false, children }: { label: string; help: s
         <span className="text-sm font-medium text-ink">{label}</span>
         <span className="block text-xs text-slate">{help}</span>
       </dt>
-      <dd className={`tabular ${strong ? 'text-xl font-semibold text-navy' : 'text-base text-ink'}`}>{children}</dd>
+      <dd className={`tabular ${strong ? 'text-xl font-semibold text-heading' : 'text-base text-ink'}`}>{children}</dd>
     </div>
   )
 }

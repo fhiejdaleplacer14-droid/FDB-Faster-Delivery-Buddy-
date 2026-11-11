@@ -12,7 +12,7 @@ export function RouteError() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-paper px-4 text-center">
       <Logo variant="mark" />
-      <h1 className="mt-8 text-2xl font-bold text-navy">Something went wrong on this page</h1>
+      <h1 className="mt-8 text-2xl font-bold text-heading">Something went wrong on this page</h1>
       <p className="mt-2 max-w-md text-slate">Your cart and orders are safe. Try loading the page again, or go back to the marketplace.</p>
       <div className="mt-6 flex gap-3">
         <button
@@ -23,7 +23,7 @@ export function RouteError() {
           <RefreshCw className="size-4" aria-hidden />
           Try again
         </button>
-        <Link to="/" reloadDocument className="rounded-lg border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-paper">
+        <Link to="/" reloadDocument className="rounded-lg border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-paper">
           Go to the marketplace
         </Link>
       </div>

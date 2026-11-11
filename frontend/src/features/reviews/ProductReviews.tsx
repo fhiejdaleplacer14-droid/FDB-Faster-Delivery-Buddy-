@@ -46,7 +46,7 @@ export function ProductReviews({ slug }: { slug: string }) {
     <section aria-labelledby="reviews-heading" className="mt-14 border-t border-line pt-10">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 id="reviews-heading" className="text-xl font-bold tracking-tight text-navy">
+          <h2 id="reviews-heading" className="text-xl font-bold tracking-tight text-heading">
             Customer reviews
           </h2>
           <p className="mt-1 text-sm text-slate">Only customers who received this product can review it.</p>
@@ -61,7 +61,7 @@ export function ProductReviews({ slug }: { slug: string }) {
       )}
       {first && reviews.length === 0 && (
         <div className="mt-6 flex animate-fade-up items-center gap-3 rounded-xl bg-blue-soft/50 px-4 py-5 text-sm text-slate">
-          <MessageSquareQuote className="size-5 text-blue" aria-hidden />
+          <MessageSquareQuote className="size-5 text-link" aria-hidden />
           No reviews yet. Buyers can leave one from their order page after delivery.
         </div>
       )}
@@ -83,7 +83,7 @@ export function ProductReviews({ slug }: { slug: string }) {
 
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <li className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-navy/5">
+    <li className="rounded-xl bg-surface p-5 shadow-sm ring-1 ring-line transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-navy/5">
       <div className="flex items-center justify-between gap-3">
         <span aria-label={`${review.rating} out of 5 stars`}>
           <Stars value={review.rating} />
@@ -99,7 +99,7 @@ function ReviewCard({ review }: { review: Review }) {
       </p>
       {review.seller_reply && (
         <div className="mt-4 rounded-lg border-l-4 border-blue bg-paper px-3 py-2 text-sm">
-          <p className="flex items-center gap-1.5 text-xs font-semibold text-navy">
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-heading">
             <Store className="size-3.5" aria-hidden />
             Seller's reply
           </p>

@@ -46,7 +46,7 @@ export function ProductFilters({ categories, query, update }: Props) {
           <input type="checkbox" role="switch" checked={query.in_stock === '1'} onChange={(e) => update({ in_stock: e.target.checked ? '1' : '' })} className="peer sr-only" />
           <span
             aria-hidden
-            className="relative h-6 w-11 shrink-0 rounded-full bg-line transition-colors peer-checked:bg-blue peer-focus-visible:ring-4 peer-focus-visible:ring-blue/20 after:absolute after:top-0.5 after:left-0.5 after:size-5 after:rounded-full after:bg-white after:shadow-sm after:transition-transform peer-checked:after:translate-x-5"
+            className="relative h-6 w-11 shrink-0 rounded-full bg-line transition-colors peer-checked:bg-blue peer-focus-visible:ring-4 peer-focus-visible:ring-blue/20 after:absolute after:top-0.5 after:left-0.5 after:size-5 after:rounded-full after:bg-surface after:shadow-sm after:transition-transform peer-checked:after:translate-x-5"
           />
         </label>
       </Section>
@@ -107,7 +107,7 @@ function Row({ active, onClick, children, leading, trailing, small = false }: Ro
       onClick={onClick}
       aria-pressed={active}
       className={`flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${small ? 'text-[13px]' : 'text-sm'} ${
-        active ? 'bg-blue-soft font-semibold text-navy' : 'text-ink/80 hover:bg-paper hover:text-ink'
+        active ? 'bg-blue-soft font-semibold text-heading' : 'text-ink/80 hover:bg-paper hover:text-ink'
       }`}
     >
       <span className="flex min-w-0 items-center gap-2">
@@ -129,7 +129,7 @@ function PriceRange({ min, max, update }: { min: string; max: string; update: Up
     update({ min_price: low.trim(), max_price: high.trim() })
   }
 
-  const input = 'h-10 w-full min-w-0 rounded-lg border border-line bg-white pr-2 pl-6 text-sm shadow-sm transition focus:border-blue focus:ring-4 focus:ring-blue/15 focus:outline-none'
+  const input = 'h-10 w-full min-w-0 rounded-lg border border-line bg-surface pr-2 pl-6 text-sm shadow-sm transition focus:border-blue focus:ring-4 focus:ring-blue/15 focus:outline-none'
 
   return (
     <form onSubmit={apply} className="space-y-3">
@@ -196,7 +196,7 @@ export function FilterSheet({ open, onClose, total, children }: { open: boolean;
   return createPortal(
     <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Filters">
       <button type="button" aria-label="Close filters" onClick={onClose} className="absolute inset-0 animate-fade-in bg-navy/40" />
-      <div className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] animate-fade-up flex-col rounded-t-3xl bg-white shadow-2xl">
+      <div className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] animate-fade-up flex-col rounded-t-3xl bg-surface shadow-2xl">
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <p className="font-semibold text-ink">Filters</p>
           <button type="button" onClick={onClose} aria-label="Close filters" className="rounded-full p-1.5 text-slate hover:bg-paper hover:text-ink">

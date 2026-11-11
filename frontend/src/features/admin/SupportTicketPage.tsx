@@ -34,7 +34,7 @@ export function SupportTicketPage() {
       {!ticket && !error && <div className="mt-6 h-40 skeleton rounded-xl" aria-busy="true" />}
       {ticket && (
         <>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy">{ticket.subject}</h1>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-heading">{ticket.subject}</h1>
           <p className="mt-1 text-sm text-slate">{ticket.number}</p>
           <div className="mt-6">
             <TicketThread
@@ -117,7 +117,7 @@ function StatusPanel({ ticket, onChange }: { ticket: Ticket; onChange: (t: Ticke
   }
 
   return (
-    <form onSubmit={submit} className="space-y-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-line">
+    <form onSubmit={submit} className="space-y-3 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
       <p className="text-sm font-semibold text-ink">Update request</p>
       {error && !firstError(error, 'resolution') && <Alert tone="error">{error.message}</Alert>}
       <SelectField label="Status" value={status} onChange={(e) => setStatus(e.target.value as TicketStatus)} error={firstError(error, 'status')}>

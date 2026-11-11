@@ -49,7 +49,7 @@ export function RefundsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Refunds</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Refunds</h1>
       <p className="mt-1 max-w-2xl text-sm text-slate">
         Sellers return money to customers themselves. When FDB had already collected the commission on a refunded amount, FDB owes that part back to the seller as a credit. Mark it settled once you have paid it or taken
         it off their next collection.
@@ -57,13 +57,13 @@ export function RefundsPage() {
 
       {result && (
         <dl className="stagger mt-6 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-line">
+          <div className="rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
             <dt className="text-xs text-slate">Commission credit owed to sellers</dt>
-            <dd className="mt-1 text-2xl font-bold text-navy tabular">{formatPeso(result.summary.credit_owed)}</dd>
+            <dd className="mt-1 text-2xl font-bold text-heading tabular">{formatPeso(result.summary.credit_owed)}</dd>
           </div>
-          <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-line">
+          <div className="rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
             <dt className="text-xs text-slate">Refunds in this list</dt>
-            <dd className="mt-1 text-2xl font-bold text-navy tabular">{formatPeso(result.summary.total)}</dd>
+            <dd className="mt-1 text-2xl font-bold text-heading tabular">{formatPeso(result.summary.total)}</dd>
           </div>
         </dl>
       )}
@@ -75,7 +75,7 @@ export function RefundsPage() {
             type="button"
             aria-pressed={credit === f.value}
             onClick={() => setParams({ credit: f.value })}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${credit === f.value ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${credit === f.value ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
           >
             {f.label}
           </button>
@@ -117,7 +117,7 @@ export function RefundsPage() {
                       <td className="py-3 pr-4 text-slate tabular">{formatDate(r.refunded_at)}</td>
                       <td className="py-3 pr-4">
                         {r.seller_order?.order_number ? (
-                          <Link to={`/admin/orders/${r.seller_order.order_number}`} className="font-medium text-blue hover:underline">
+                          <Link to={`/admin/orders/${r.seller_order.order_number}`} className="font-medium text-link hover:underline">
                             {r.seller_order.number}
                           </Link>
                         ) : (

@@ -62,7 +62,7 @@ export function SellerApplicationsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Seller applications</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Seller applications</h1>
 
       <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div role="group" aria-label="Filter by status" className="flex gap-1 overflow-x-auto border-b border-line">
@@ -73,7 +73,7 @@ export function SellerApplicationsPage() {
                 key={f.label}
                 aria-pressed={active}
                 onClick={() => update({ status: f.value === '' ? 'all' : f.value })}
-                className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${active ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+                className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${active ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
               >
                 {f.label}
               </button>
@@ -90,7 +90,7 @@ export function SellerApplicationsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Store, name, or email"
-            className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm lg:w-64"
+            className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm lg:w-64"
           />
           <Button type="submit" variant="secondary" aria-label="Search">
             <Search className="size-4" aria-hidden />
@@ -126,9 +126,9 @@ export function SellerApplicationsPage() {
               </thead>
               <tbody className="divide-y divide-line">
                 {result.data.map((seller) => (
-                  <tr key={seller.id} className="hover:bg-white">
+                  <tr key={seller.id} className="hover:bg-surface">
                     <td className="py-3 pr-4">
-                      <Link to={`/admin/sellers/${seller.id}`} className="font-medium text-blue hover:underline">
+                      <Link to={`/admin/sellers/${seller.id}`} className="font-medium text-link hover:underline">
                         {seller.store_name}
                       </Link>
                     </td>

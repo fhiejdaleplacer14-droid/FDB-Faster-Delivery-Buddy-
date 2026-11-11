@@ -18,12 +18,12 @@ export function SearchBox({ initial = '', size = 'md', onDark = false }: { initi
     <form
       role="search"
       onSubmit={submit}
-      className={`group flex w-full overflow-hidden rounded-xl bg-white shadow-sm ring-1 transition focus-within:ring-2 ${onDark ? 'shadow-black/20 ring-white/20 focus-within:ring-blue-300' : 'ring-line focus-within:ring-blue'}`}
+      className={`group flex w-full overflow-hidden rounded-xl bg-surface shadow-sm ring-1 transition focus-within:ring-2 ${onDark ? 'shadow-black/20 ring-white/20 focus-within:ring-blue-300' : 'ring-line focus-within:ring-blue'}`}
     >
       <label htmlFor={`search-${size}`} className="sr-only">
         Search products
       </label>
-      <Search className={`my-auto ml-4 shrink-0 text-slate transition-colors group-focus-within:text-blue ${size === 'lg' ? 'size-5' : 'size-4'}`} aria-hidden />
+      <Search className={`my-auto ml-4 shrink-0 text-slate transition-colors group-focus-within:text-link ${size === 'lg' ? 'size-5' : 'size-4'}`} aria-hidden />
       <input
         id={`search-${size}`}
         type="search"
@@ -34,7 +34,7 @@ export function SearchBox({ initial = '', size = 'md', onDark = false }: { initi
       />
       <button
         type="submit"
-        className={`m-1 rounded-lg px-4 text-sm font-semibold text-white transition active:scale-95 ${onDark ? 'bg-blue hover:bg-blue/90' : 'bg-navy hover:bg-navy-deep'}`}
+        className={`m-1 rounded-lg px-4 text-sm font-semibold text-white transition active:scale-95 ${onDark ? 'bg-blue hover:bg-blue/90' : 'bg-navy hover:bg-navy-deep dark:bg-blue dark:hover:bg-blue/90'}`}
       >
         Search
       </button>

@@ -77,7 +77,7 @@ export function AdminLayout() {
                   end={to === DASHBOARD}
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
-                      isActive ? 'bg-navy text-white shadow-md shadow-navy/15' : 'text-slate hover:translate-x-0.5 hover:bg-white hover:text-ink'
+                      isActive ? 'bg-navy text-white shadow-md shadow-navy/15 dark:bg-blue' : 'text-slate hover:translate-x-0.5 hover:bg-surface hover:text-ink'
                     }`
                   }
                 >

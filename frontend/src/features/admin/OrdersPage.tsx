@@ -40,7 +40,7 @@ export function AdminOrdersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Orders</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Orders</h1>
       <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div role="group" aria-label="Filter by status" className="flex gap-1 overflow-x-auto border-b border-line">
           {filters.map((f) => (
@@ -49,7 +49,7 @@ export function AdminOrdersPage() {
               type="button"
               aria-pressed={status === f.value}
               onClick={() => setParams({ ...(f.value ? { status: f.value } : {}), ...(search ? { search } : {}) })}
-              className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+              className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
             >
               {f.label}
             </button>
@@ -65,7 +65,7 @@ export function AdminOrdersPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Order number or email"
-            className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm lg:w-64"
+            className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm lg:w-64"
           />
           <Button type="submit" variant="secondary" aria-label="Search">
             <Search className="size-4" aria-hidden />
@@ -98,7 +98,7 @@ export function AdminOrdersPage() {
                 {result.data.map((order) => (
                   <tr key={order.number}>
                     <td className="py-3 pr-4">
-                      <Link to={`/admin/orders/${order.number}`} className="font-medium text-blue hover:underline">
+                      <Link to={`/admin/orders/${order.number}`} className="font-medium text-link hover:underline">
                         {order.number}
                       </Link>
                     </td>

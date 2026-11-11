@@ -46,7 +46,7 @@ export function StarInput({ value, onChange, label = 'Your rating' }: { value: n
               </span>
               <Star
                 aria-hidden
-                className={`size-7 rounded transition duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-blue ${n <= shown ? 'scale-110 fill-amber-400 text-amber-400' : 'fill-white text-line hover:text-amber-300'}`}
+                className={`size-7 rounded transition duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-blue ${n <= shown ? 'scale-110 fill-amber-400 text-amber-400' : 'fill-surface text-line hover:text-amber-300'}`}
               />
             </label>
           ))}

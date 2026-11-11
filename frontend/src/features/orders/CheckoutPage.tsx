@@ -58,7 +58,7 @@ export function CheckoutPage() {
     return (
       <Page>
         <p className="text-sm text-slate">{data.groups.length ? 'Some items in your cart need attention.' : 'Your cart is empty.'}</p>
-        <Link to="/cart" className="mt-3 inline-block font-medium text-blue hover:underline">
+        <Link to="/cart" className="mt-3 inline-block font-medium text-link hover:underline">
           Go to your cart
         </Link>
       </Page>
@@ -107,13 +107,13 @@ export function CheckoutPage() {
 
       <form onSubmit={placeOrder} noValidate className="space-y-10">
         <fieldset>
-          <legend className="text-lg font-semibold text-navy">Deliver to</legend>
+          <legend className="text-lg font-semibold text-heading">Deliver to</legend>
           {firstError(error, 'address_id') && <p className="mt-2 text-sm text-danger">{firstError(error, 'address_id')}</p>}
           {addresses && addresses.length > 0 && !addingAddress && (
             <ul className="mt-3 space-y-2">
               {addresses.map((a) => (
                 <li key={a.id}>
-                  <label className="flex cursor-pointer gap-3 rounded-md border border-line bg-white p-3 text-sm has-checked:border-blue has-checked:bg-blue-soft">
+                  <label className="flex cursor-pointer gap-3 rounded-md border border-line bg-surface p-3 text-sm has-checked:border-blue has-checked:bg-blue-soft">
                     <input type="radio" name="address" checked={addressId === a.id} onChange={() => setAddressId(a.id)} className="mt-1 size-4 accent-blue" />
                     <span>
                       {a.label && <span className="mb-0.5 block text-xs font-semibold tracking-wide text-slate uppercase">{a.label}</span>}
@@ -137,14 +137,14 @@ export function CheckoutPage() {
               />
             </div>
           ) : (
-            <button type="button" onClick={() => setAddingAddress(true)} className="mt-3 text-sm font-medium text-blue hover:underline">
+            <button type="button" onClick={() => setAddingAddress(true)} className="mt-3 text-sm font-medium text-link hover:underline">
               Add a new address
             </button>
           )}
         </fieldset>
 
         <fieldset>
-          <legend className="text-lg font-semibold text-navy">Payment</legend>
+          <legend className="text-lg font-semibold text-heading">Payment</legend>
           <p className="mt-1 text-sm text-slate">You pay each seller directly. FDB does not collect payment.</p>
           <div className="mt-3 space-y-2">
             {methods.map((m) => (
@@ -179,7 +179,7 @@ export function CheckoutPage() {
                 </li>
               ))}
             </ul>
-            <p className="mt-3 flex justify-between text-lg font-semibold text-navy">
+            <p className="mt-3 flex justify-between text-lg font-semibold text-heading">
               <span>Total</span>
               <span className="tabular">{formatPeso(data.total)}</span>
             </p>
@@ -197,7 +197,7 @@ export function CheckoutPage() {
 function Page({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-      <h1 className="mb-6 text-2xl font-bold tracking-tight text-navy">Checkout</h1>
+      <h1 className="mb-6 text-2xl font-bold tracking-tight text-heading">Checkout</h1>
       {children}
     </div>
   )

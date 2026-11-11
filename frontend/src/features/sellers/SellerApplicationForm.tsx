@@ -83,7 +83,7 @@ export function SellerApplicationForm({ existing, onSubmit, submitLabel }: Props
       )}
 
       <fieldset className="space-y-5">
-        <legend className="text-lg font-semibold text-navy">Your store</legend>
+        <legend className="text-lg font-semibold text-heading">Your store</legend>
         <TextField label="Store name" required maxLength={80} value={details.store_name} onChange={(e) => set('store_name', e.target.value)} error={err('store_name')} />
         <TextareaField
           label="What do you sell?"
@@ -107,7 +107,7 @@ export function SellerApplicationForm({ existing, onSubmit, submitLabel }: Props
       </fieldset>
 
       <fieldset className="space-y-5">
-        <legend className="text-lg font-semibold text-navy">Store location</legend>
+        <legend className="text-lg font-semibold text-heading">Store location</legend>
         <SelectField label="Town or city" required value={details.municipality} onChange={(e) => set('municipality', e.target.value as ApplicationDetails['municipality'])} error={err('municipality')}>
           <option value="" disabled>
             Choose where your store is
@@ -131,7 +131,7 @@ export function SellerApplicationForm({ existing, onSubmit, submitLabel }: Props
       </fieldset>
 
       <fieldset className="space-y-5">
-        <legend className="text-lg font-semibold text-navy">Business details</legend>
+        <legend className="text-lg font-semibold text-heading">Business details</legend>
         <div role="radiogroup" aria-label="Business type" className="flex flex-col gap-3 sm:flex-row sm:gap-8">
           {(
             [
@@ -168,7 +168,7 @@ export function SellerApplicationForm({ existing, onSubmit, submitLabel }: Props
       </fieldset>
 
       <fieldset>
-        <legend className="text-lg font-semibold text-navy">Verification documents</legend>
+        <legend className="text-lg font-semibold text-heading">Verification documents</legend>
         <p className="mt-1 text-sm text-slate">
           {existing
             ? 'Your earlier documents are kept. Add new ones only if the reviewer asked for them.'
@@ -197,7 +197,7 @@ export function SellerApplicationForm({ existing, onSubmit, submitLabel }: Props
                 accept={ACCEPT}
                 onChange={(e) => chooseFile(doc.key, e.target.files?.[0] ?? null)}
                 error={fileErrors[doc.key] ?? err(`documents.${index}.file`)}
-                className="file:mr-3 file:rounded file:border-0 file:bg-blue-soft file:px-3 file:py-1 file:text-sm file:font-medium file:text-navy"
+                className="file:mr-3 file:rounded file:border-0 file:bg-blue-soft file:px-3 file:py-1 file:text-sm file:font-medium file:text-heading"
               />
               <Button
                 variant="ghost"

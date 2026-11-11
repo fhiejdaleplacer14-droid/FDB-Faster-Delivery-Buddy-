@@ -73,7 +73,7 @@ export function SupportPage() {
               <li key={t.number}>
                 <Link
                   to={`/support/${t.number}`}
-                  className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl bg-white px-4 py-3 ring-1 ring-line transition hover:-translate-y-px hover:shadow-md hover:shadow-navy/5"
+                  className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl bg-surface px-4 py-3 ring-1 ring-line transition hover:-translate-y-px hover:shadow-md hover:shadow-navy/5"
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium text-ink">{t.subject}</span>

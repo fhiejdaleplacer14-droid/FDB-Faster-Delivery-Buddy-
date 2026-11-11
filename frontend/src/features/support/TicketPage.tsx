@@ -33,7 +33,7 @@ export function TicketPage({ viewer = 'customer' }: { viewer?: 'customer' | 'sel
       {!ticket && !error && <div className="mt-6 h-40 skeleton rounded-xl" aria-busy="true" />}
       {ticket && (
         <>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy">{ticket.subject}</h1>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-heading">{ticket.subject}</h1>
           <p className="mt-1 text-sm text-slate">{ticket.number}</p>
           {params.get('created') && (
             <div className="mt-4">

@@ -17,7 +17,7 @@ export function AccountPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Your account</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Your account</h1>
       {params.get('welcome') && (
         <div className="mt-4">
           <Alert tone="success">Welcome to FDB, {user.name}. Your account is ready.</Alert>
@@ -26,28 +26,28 @@ export function AccountPage() {
       {mustVerifyEmail(user) && <VerifyEmailNotice />}
 
       <section aria-labelledby="profile-heading" className="mt-10 border-t border-line pt-8">
-        <h2 id="profile-heading" className="text-lg font-semibold text-navy">
+        <h2 id="profile-heading" className="text-lg font-semibold text-heading">
           Profile
         </h2>
         <ProfileForm user={user} />
       </section>
 
       <section aria-labelledby="addresses-heading" className="mt-10 border-t border-line pt-8">
-        <h2 id="addresses-heading" className="text-lg font-semibold text-navy">
+        <h2 id="addresses-heading" className="text-lg font-semibold text-heading">
           Delivery addresses
         </h2>
         <AddressBook />
       </section>
 
       <section aria-labelledby="password-heading" className="mt-10 border-t border-line pt-8">
-        <h2 id="password-heading" className="text-lg font-semibold text-navy">
+        <h2 id="password-heading" className="text-lg font-semibold text-heading">
           Password
         </h2>
         <PasswordForm />
       </section>
 
       <section aria-labelledby="selling-heading" className="mt-10 border-t border-line pt-8">
-        <h2 id="selling-heading" className="text-lg font-semibold text-navy">
+        <h2 id="selling-heading" className="text-lg font-semibold text-heading">
           Selling on FDB
         </h2>
         <p className="mt-2 text-sm text-slate">
@@ -55,7 +55,7 @@ export function AccountPage() {
             ? `Your store, ${user.seller.store_name}, is on FDB.`
             : 'Have products to sell? Apply to open a store on FDB.'}
         </p>
-        <Link to="/sell" className="mt-3 inline-block text-sm font-semibold text-blue hover:underline">
+        <Link to="/sell" className="mt-3 inline-block text-sm font-semibold text-link hover:underline">
           {user.seller ? 'View your seller application' : 'Apply to sell'}
         </Link>
       </section>

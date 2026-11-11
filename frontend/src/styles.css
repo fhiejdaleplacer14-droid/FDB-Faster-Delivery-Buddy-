@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/inter';
 
+/* dark: utilities follow the chosen theme (set on <html> by the theme switch), not only the OS setting. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 @theme {
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
@@ -17,6 +20,13 @@
   --color-success: #15803d;
   --color-warning: #b45309;
   --color-danger: #b91c1c;
+
+  /* Theme-aware roles: cards, headings, links, and the strong fills behind white text. */
+  --color-surface: #ffffff;
+  --color-heading: #14213d;
+  --color-link: #2563eb;
+  --color-success-solid: #15803d;
+  --color-danger-solid: #b91c1c;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -189,4 +199,48 @@
   background: linear-gradient(90deg, #eef2f7 0%, #f8fafc 50%, #eef2f7 100%);
   background-size: 200% 100%;
   animation: var(--animate-shimmer);
+}
+
+/* Chart colours, validated per theme against the card surface. */
+:root {
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+  --chart-grid: #e5e7eb;
+  --chart-baseline: #cbd5e1;
+  --chart-axis: #64748b;
+}
+
+/* Dark theme: the same roles re-pointed, so every page follows without per-component changes.
+   Text colours keep at least 5.5:1 contrast on cards and on the page. Navy brand areas stay as they are. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --chart-1: #3987e5;
+  --chart-2: #d95926;
+  --chart-3: #199e70;
+  --chart-4: #c98500;
+  --chart-5: #d55181;
+  --chart-grid: #222d42;
+  --chart-baseline: #3a4763;
+  --chart-axis: #9ba8bf;
+  --color-surface: #141c2d;
+  --color-paper: #0b1120;
+  --color-heading: #e6ecfa;
+  --color-ink: #e2e8f0;
+  --color-slate: #9ba8bf;
+  --color-line: #2a3650;
+  --color-blue-soft: #172544;
+  --color-link: #7fb0ff;
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-success-solid: #16a34a;
+  --color-danger-solid: #dc2626;
+}
+
+:root[data-theme='dark'] .skeleton {
+  background: linear-gradient(90deg, #172033 0%, #1f2a40 50%, #172033 100%);
+  background-size: 200% 100%;
 }

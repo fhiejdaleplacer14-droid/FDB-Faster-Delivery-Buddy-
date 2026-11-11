@@ -24,7 +24,7 @@ export function OrdersPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Your orders</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Your orders</h1>
       {error && (
         <div className="mt-4">
           <Alert tone="error">{error.message}</Alert>
@@ -44,10 +44,10 @@ export function OrdersPage() {
           <ul className="mt-6 divide-y divide-line border-y border-line">
             {result.data.map((order) => (
               <li key={order.number}>
-                <Link to={`/orders/${order.number}`} className="block py-4 hover:bg-white">
+                <Link to={`/orders/${order.number}`} className="block py-4 hover:bg-surface">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <span className="font-semibold text-ink">{order.number}</span>
-                    <span className="font-semibold text-navy tabular">{formatPeso(order.grand_total)}</span>
+                    <span className="font-semibold text-heading tabular">{formatPeso(order.grand_total)}</span>
                   </div>
                   <p className="text-sm text-slate">{formatDateTime(order.placed_at)}</p>
                   <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">

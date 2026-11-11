@@ -48,7 +48,7 @@ export function AddressBook() {
                 {!a.is_default && (
                   <button
                     type="button"
-                    className="text-sm font-medium text-blue hover:underline"
+                    className="text-sm font-medium text-link hover:underline"
                     onClick={() =>
                       act(() =>
                         addressApi.update(a.id, {

@@ -34,7 +34,7 @@ export function SellerOrdersPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Orders</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Orders</h1>
 
       <div role="group" aria-label="Filter by status" className="mt-6 flex gap-1 overflow-x-auto border-b border-line">
         {filters.map((f) => (
@@ -43,7 +43,7 @@ export function SellerOrdersPage() {
             type="button"
             aria-pressed={status === f.value}
             onClick={() => setParams({ status: f.value })}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
           >
             {f.label}
           </button>
@@ -80,7 +80,7 @@ export function SellerOrdersPage() {
                 {result.data.map((so) => (
                   <tr key={so.id} className={so.status === 'pending_confirmation' ? 'bg-warning/5' : ''}>
                     <td className="py-3 pr-4">
-                      <Link to={`/seller/orders/${so.id}`} className="font-medium text-blue hover:underline">
+                      <Link to={`/seller/orders/${so.id}`} className="font-medium text-link hover:underline">
                         {so.number}
                       </Link>
                     </td>

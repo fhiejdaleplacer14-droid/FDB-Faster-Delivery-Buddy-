@@ -59,7 +59,7 @@ export function SupportQueuePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Support</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Support</h1>
       <p className="mt-1 text-sm text-slate">Oldest waiting requests come first.</p>
 
       <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -71,7 +71,7 @@ export function SupportQueuePage() {
                 type="button"
                 aria-pressed={status === f.value}
                 onClick={() => update({ status: f.value })}
-                className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+                className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
               >
                 {f.label}
               </button>
@@ -79,7 +79,7 @@ export function SupportQueuePage() {
           </div>
           <label>
             <span className="sr-only">Filter by topic</span>
-            <select value={category} onChange={(e) => update({ category: e.target.value })} className="rounded-md border border-line bg-white px-2 py-2 text-sm text-ink">
+            <select value={category} onChange={(e) => update({ category: e.target.value })} className="rounded-md border border-line bg-surface px-2 py-2 text-sm text-ink">
               {categories.map((c) => (
                 <option key={c.value} value={c.value}>
                   {c.label}
@@ -98,7 +98,7 @@ export function SupportQueuePage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Number, subject, or email"
-            className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm lg:w-64"
+            className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm lg:w-64"
           />
           <Button type="submit" variant="secondary" aria-label="Search">
             <Search className="size-4" aria-hidden />
@@ -135,7 +135,7 @@ export function SupportQueuePage() {
                 {result.data.map((t) => (
                   <tr key={t.number} className={t.category.value === 'dispute' && t.status === 'open' ? 'bg-danger/5' : ''}>
                     <td className="max-w-xs py-3 pr-4">
-                      <Link to={`/admin/support/${t.number}`} className="block truncate font-medium text-blue hover:underline">
+                      <Link to={`/admin/support/${t.number}`} className="block truncate font-medium text-link hover:underline">
                         {t.subject}
                       </Link>
                       <span className="text-xs text-slate">{t.number}</span>

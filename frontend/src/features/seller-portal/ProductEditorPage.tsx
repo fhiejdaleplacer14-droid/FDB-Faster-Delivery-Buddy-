@@ -66,7 +66,7 @@ function CreateNew() {
   const navigate = useNavigate()
   return (
     <>
-      <h1 className="text-2xl font-bold tracking-tight text-navy">New listing</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">New listing</h1>
       <p className="mt-1 text-sm text-slate">Save the details first, then add photos.</p>
       <DetailsForm
         initial={toInput()}
@@ -88,11 +88,11 @@ function EditExisting({ product, onChange }: { product: ManagedProduct; onChange
   return (
     <>
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold tracking-tight text-navy">{product.name}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-heading">{product.name}</h1>
         <ProductStatusBadge status={product.status} />
       </div>
       {product.status === 'published' && (
-        <Link to={`/products/${product.slug}`} className="mt-1 inline-block text-sm font-medium text-blue hover:underline">
+        <Link to={`/products/${product.slug}`} className="mt-1 inline-block text-sm font-medium text-link hover:underline">
           View on FDB
         </Link>
       )}
@@ -106,14 +106,14 @@ function EditExisting({ product, onChange }: { product: ManagedProduct; onChange
       ) : (
         <>
           <section aria-labelledby="photos-heading" className="mt-10 border-t border-line pt-8">
-            <h2 id="photos-heading" className="text-lg font-semibold text-navy">
+            <h2 id="photos-heading" className="text-lg font-semibold text-heading">
               Photos
             </h2>
             <PhotoManager product={product} onChange={onChange} />
           </section>
 
           <section aria-labelledby="details-heading" className="mt-10 border-t border-line pt-8">
-            <h2 id="details-heading" className="text-lg font-semibold text-navy">
+            <h2 id="details-heading" className="text-lg font-semibold text-heading">
               Details
             </h2>
             {product.status === 'published' && (
@@ -398,7 +398,7 @@ function PhotoManager({ product, onChange }: { product: ManagedProduct; onChange
       <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" multiple className="peer sr-only" id="photo-upload" onChange={(e) => upload(e.target.files)} />
       <label
         htmlFor="photo-upload"
-        className="mt-4 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold text-ink peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue hover:bg-paper"
+        className="mt-4 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-md border border-line bg-surface px-4 text-sm font-semibold text-ink peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue hover:bg-paper"
       >
         <Upload className="size-4" aria-hidden />
         {uploading ? `Uploading ${uploading}…` : 'Add photos'}

@@ -42,7 +42,7 @@ export function CartPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Your cart</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Your cart</h1>
       {error && (
         <div className="mt-4">
           <Alert tone="error">{error}</Alert>
@@ -65,7 +65,7 @@ export function CartPage() {
           {data.groups.map((group) => (
             <section key={group.store.id} aria-label={group.store.name} className="mt-8">
               <div className="flex items-baseline justify-between border-b border-line pb-2">
-                <Link to={`/stores/${group.store.slug}`} className="font-semibold text-ink hover:text-blue">
+                <Link to={`/stores/${group.store.slug}`} className="font-semibold text-ink hover:text-link">
                   {group.store.name}
                 </Link>
                 <span className="text-sm text-slate tabular">{formatPeso(group.subtotal)}</span>
@@ -77,7 +77,7 @@ export function CartPage() {
                       {line.image_url ? <img src={line.image_url} alt="" className="size-full object-cover" /> : <ImageOff className="size-5 text-slate" aria-hidden />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <Link to={`/products/${line.product.slug}`} className="font-medium text-ink hover:text-blue">
+                      <Link to={`/products/${line.product.slug}`} className="font-medium text-ink hover:text-link">
                         {line.product.name}
                       </Link>
                       <p className="text-sm text-slate">
@@ -127,11 +127,11 @@ export function CartPage() {
           ))}
           </div>
 
-          <aside aria-label="Cart summary" className="mt-8 animate-fade-up rounded-2xl bg-white p-6 shadow-lg shadow-navy/5 ring-1 ring-navy/5 lg:sticky lg:top-24 lg:mt-10">
+          <aside aria-label="Cart summary" className="mt-8 animate-fade-up rounded-2xl bg-surface p-6 shadow-lg shadow-navy/5 ring-1 ring-navy/5 lg:sticky lg:top-24 lg:mt-10">
             <p className="text-sm text-slate">
               {data.item_count} {data.item_count === 1 ? 'item' : 'items'} from {data.groups.length} {data.groups.length === 1 ? 'store' : 'stores'}
             </p>
-            <p className="mt-2 flex items-baseline justify-between text-lg font-semibold text-navy">
+            <p className="mt-2 flex items-baseline justify-between text-lg font-semibold text-heading">
               <span>Total</span>
               <span key={data.total} className="animate-fade-in text-2xl font-extrabold tabular">
                 {formatPeso(data.total)}

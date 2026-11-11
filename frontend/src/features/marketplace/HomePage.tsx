@@ -33,11 +33,11 @@ export function HomePage() {
     <>
       <Hero categories={categories} photos={withPhotos.slice(0, 5)} />
 
-      <section aria-label="How FDB works" className="border-b border-line bg-white">
+      <section aria-label="How FDB works" className="border-b border-line bg-surface">
         <ul className="stagger mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:grid-cols-3 sm:px-6">
           {promises.map(({ icon: Icon, title, text }, i) => (
             <li key={title} className="flex items-start gap-3" style={{ '--i': i } as CSSProperties}>
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-soft text-blue">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-soft text-link">
                 <Icon className="size-5" aria-hidden />
               </span>
               <span>
@@ -68,7 +68,7 @@ export function HomePage() {
       <section className="mx-auto mt-6 max-w-7xl px-4 sm:px-6">
         <div className="relative overflow-hidden rounded-2xl bg-blue-soft px-6 py-10 sm:px-10">
           <div className="relative max-w-xl">
-            <h2 className="text-2xl font-bold tracking-tight text-navy">Have something to sell?</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-heading">Have something to sell?</h2>
             <p className="mt-2 text-slate">Open a store on FDB and reach customers across your town. You set the prices and deliver the orders.</p>
             <Link
               to="/sell"
@@ -107,7 +107,7 @@ function Hero({ categories, photos }: { categories: Category[]; photos: ProductC
                 <li key={c.id}>
                   <Link
                     to={`/products?category=${c.slug}`}
-                    className="block rounded-full bg-white/10 px-3 py-1.5 text-sm text-white/90 ring-1 ring-white/15 transition hover:-translate-y-px hover:bg-white hover:text-navy"
+                    className="block rounded-full bg-white/10 px-3 py-1.5 text-sm text-white/90 ring-1 ring-white/15 transition hover:-translate-y-px hover:bg-surface hover:text-heading"
                   >
                     {c.name}
                   </Link>
@@ -144,11 +144,11 @@ function PhotoCollage({ photos }: { photos: ProductCard[] }) {
             key={p.id}
             to={`/products/${p.slug}`}
             tabIndex={-1}
-            className={`absolute ${spot?.className} animate-float overflow-hidden rounded-2xl bg-white p-1.5 shadow-2xl shadow-black/30 transition hover:z-10 hover:scale-105`}
+            className={`absolute ${spot?.className} animate-float overflow-hidden rounded-2xl bg-surface p-1.5 shadow-2xl shadow-black/30 transition hover:z-10 hover:scale-105`}
             style={{ '--tilt': spot?.tilt, animationDelay: spot?.delay } as CSSProperties}
           >
             <img src={p.image?.url} alt="" className="aspect-4/3 w-full rounded-xl object-cover" />
-            <span className="block truncate px-1.5 pt-1.5 pb-0.5 text-xs font-semibold text-navy">{p.name}</span>
+            <span className="block truncate px-1.5 pt-1.5 pb-0.5 text-xs font-semibold text-heading">{p.name}</span>
           </Link>
         )
       })}
@@ -184,11 +184,11 @@ function RouteLine({ className = '' }: { className?: string }) {
 function SectionHeading({ id, title, to }: { id: string; title: string; to?: string }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
-      <h2 id={id} className="text-xl font-bold tracking-tight text-navy">
+      <h2 id={id} className="text-xl font-bold tracking-tight text-heading">
         {title}
       </h2>
       {to && (
-        <Link to={to} className="group inline-flex items-center gap-1 text-sm font-medium text-blue">
+        <Link to={to} className="group inline-flex items-center gap-1 text-sm font-medium text-link">
           See all
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />
         </Link>
@@ -246,13 +246,13 @@ function StoreSpotlight({ products }: { products: ProductCard[] }) {
       <ul className="stagger mt-6 grid gap-5 md:grid-cols-3">
         {stores.map(({ store, items }, i) => (
           <li key={store.slug} style={{ '--i': i } as CSSProperties}>
-            <Link to={`/stores/${store.slug}`} className="group block rounded-xl border border-line bg-white p-4 transition duration-300 hover:-translate-y-1 hover:border-blue/30 hover:shadow-lg hover:shadow-navy/5">
+            <Link to={`/stores/${store.slug}`} className="group block rounded-xl border border-line bg-surface p-4 transition duration-300 hover:-translate-y-1 hover:border-blue/30 hover:shadow-lg hover:shadow-navy/5">
               <div className="grid grid-cols-3 gap-2">
                 {items.slice(0, 3).map((p) => (
                   <img key={p.id} src={p.image?.url} alt="" loading="lazy" className="aspect-square w-full rounded-lg object-cover" />
                 ))}
               </div>
-              <p className="mt-3 font-semibold text-ink transition-colors group-hover:text-blue">{store.name}</p>
+              <p className="mt-3 font-semibold text-ink transition-colors group-hover:text-link">{store.name}</p>
               <p className="text-sm text-slate">
                 {store.municipality} · {items.length} new {items.length === 1 ? 'listing' : 'listings'}
               </p>

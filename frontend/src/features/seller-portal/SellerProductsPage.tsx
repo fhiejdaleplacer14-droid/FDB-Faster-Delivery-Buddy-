@@ -39,7 +39,7 @@ export function SellerProductsPage() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy">Your listings</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-heading">Your listings</h1>
           {user?.seller && <p className="mt-1 text-sm text-slate">{user.seller.store_name}</p>}
         </div>
         {!suspended && (
@@ -63,7 +63,7 @@ export function SellerProductsPage() {
             type="button"
             aria-pressed={status === f.value}
             onClick={() => setParams(f.value ? { status: f.value } : {})}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-navy' : 'border-transparent text-slate hover:text-ink'}`}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${status === f.value ? 'border-blue text-heading' : 'border-transparent text-slate hover:text-ink'}`}
           >
             {f.label}
           </button>
@@ -113,7 +113,7 @@ export function SellerProductsPage() {
                 {result.data.map((p) => (
                   <tr key={p.id}>
                     <td className="py-3 pr-4">
-                      <Link to={`/seller/products/${p.id}`} className="flex items-center gap-3 font-medium text-blue hover:underline">
+                      <Link to={`/seller/products/${p.id}`} className="flex items-center gap-3 font-medium text-link hover:underline">
                         <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded bg-blue-soft">
                           {p.cover_image_url ? <img src={p.cover_image_url} alt="" className="size-full object-cover" /> : <ImageOff className="size-4 text-slate" aria-hidden />}
                         </span>

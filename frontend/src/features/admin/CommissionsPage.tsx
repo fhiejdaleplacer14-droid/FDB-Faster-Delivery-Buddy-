@@ -49,7 +49,7 @@ export function CommissionsPage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Commissions</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-heading">Commissions</h1>
       {error && (
         <div className="mt-4">
           <Alert tone="error">{error}</Alert>
@@ -62,7 +62,7 @@ export function CommissionsPage() {
       )}
 
       <section aria-labelledby="rates-heading" className="mt-8">
-        <h2 id="rates-heading" className="text-lg font-semibold text-navy">
+        <h2 id="rates-heading" className="text-lg font-semibold text-heading">
           Rates
         </h2>
         <p className="mt-1 text-sm text-slate">A new rate applies to orders placed from now on. Earlier orders keep the rate they were placed with.</p>
@@ -92,7 +92,7 @@ export function CommissionsPage() {
       </section>
 
       <section aria-labelledby="due-heading" className="mt-12 border-t border-line pt-8">
-        <h2 id="due-heading" className="text-lg font-semibold text-navy">
+        <h2 id="due-heading" className="text-lg font-semibold text-heading">
           Due from sellers
         </h2>
         {balances?.length === 0 && <p className="mt-3 text-sm text-slate">No seller owes commission right now.</p>}
@@ -312,12 +312,12 @@ function RecordsSection() {
   return (
     <section aria-labelledby="records-heading" className="mt-12 border-t border-line pt-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h2 id="records-heading" className="text-lg font-semibold text-navy">
+        <h2 id="records-heading" className="text-lg font-semibold text-heading">
           All commission records
         </h2>
         <label className="text-sm">
           <span className="sr-only">Filter by status</span>
-          <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1) }} className="h-9 rounded-md border border-line bg-white px-2">
+          <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1) }} className="h-9 rounded-md border border-line bg-surface px-2">
             <option value="">All statuses</option>
             <option value="pending">Not yet earned</option>
             <option value="due">Due to FDB</option>
@@ -366,7 +366,7 @@ function RecordsSection() {
                       (adjusting === r.id ? (
                         <AdjustForm record={r} onDone={async () => { setAdjusting(null); await load() }} onCancel={() => setAdjusting(null)} />
                       ) : (
-                        <button type="button" onClick={() => setAdjusting(r.id)} className="text-sm font-medium text-blue hover:underline">
+                        <button type="button" onClick={() => setAdjusting(r.id)} className="text-sm font-medium text-link hover:underline">
                           Adjust
                         </button>
                       ))}

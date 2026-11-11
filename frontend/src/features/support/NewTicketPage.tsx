@@ -66,7 +66,7 @@ export function NewTicketPage() {
       <Link to="/support" className="text-sm font-medium text-slate hover:text-ink">
         Help and support
       </Link>
-      <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy">Contact support</h1>
+      <h1 className="mt-2 text-2xl font-bold tracking-tight text-heading">Contact support</h1>
 
       <form onSubmit={submit} className="mt-6 animate-fade-up space-y-5">
         {error && Object.keys(error.fieldErrors).length === 0 && <Alert tone="error">{error.message}</Alert>}
@@ -77,7 +77,7 @@ export function NewTicketPage() {
             {categories.map((c) => (
               <label
                 key={c.value}
-                className="flex cursor-pointer items-center gap-3 rounded-lg border border-line bg-white px-3 py-2.5 text-sm transition hover:border-blue/40 has-checked:border-blue has-checked:bg-blue-soft has-checked:font-semibold has-focus-visible:ring-2 has-focus-visible:ring-blue"
+                className="flex cursor-pointer items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2.5 text-sm transition hover:border-blue/40 has-checked:border-blue has-checked:bg-blue-soft has-checked:font-semibold has-focus-visible:ring-2 has-focus-visible:ring-blue"
               >
                 <input type="radio" name="category" value={c.value} checked={category === c.value} onChange={() => setCategory(c.value)} className="accent-blue" />
                 {c.label}
