@@ -41,11 +41,12 @@ return [
         // Rows remember their disk by name, so these names stay. FDB_STORAGE_DRIVER=s3 moves them to
         // Neon (or any S3-compatible) buckets for hosts whose disks do not last, like Render's free plan.
         // Neon rejects ACL calls, so no per-file visibility is set; the bucket's access level decides.
+        // The region falls back to this project's Neon region: without one the S3 client refuses to start.
         'seller_documents' => env('FDB_STORAGE_DRIVER', 'local') === 's3' ? [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_REGION', env('AWS_DEFAULT_REGION')),
+            'region' => env('AWS_REGION') ?: env('AWS_DEFAULT_REGION') ?: 'ap-southeast-1',
             'bucket' => env('FDB_DOCUMENTS_BUCKET', 'fdb-documents'),
             'endpoint' => env('AWS_ENDPOINT_URL_S3', env('AWS_ENDPOINT')),
             'use_path_style_endpoint' => true,
@@ -64,7 +65,7 @@ return [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_REGION', env('AWS_DEFAULT_REGION')),
+            'region' => env('AWS_REGION') ?: env('AWS_DEFAULT_REGION') ?: 'ap-southeast-1',
             'bucket' => env('FDB_MEDIA_BUCKET', 'fdb-media'),
             'endpoint' => env('AWS_ENDPOINT_URL_S3', env('AWS_ENDPOINT')),
             'use_path_style_endpoint' => true,
