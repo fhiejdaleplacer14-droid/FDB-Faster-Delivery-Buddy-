@@ -88,8 +88,8 @@ export function HomePage() {
 function Hero({ categories, photos }: { categories: Category[]; photos: ProductCard[] }) {
   return (
     <section className="relative overflow-hidden bg-navy text-white">
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.1fr_1fr]">
-        <div className="animate-fade-up">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.1fr_1fr]">
+        <div className="min-w-0 animate-fade-up">
           <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
             <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" aria-hidden />
             Vallehermoso · Guihulngan · San Carlos City

@@ -127,6 +127,7 @@ export function CheckoutPage() {
           {addresses && (addingAddress || addresses.length === 0) ? (
             <div className="mt-4">
               <AddressForm
+                embedded
                 initialName={user?.name ?? ''}
                 onCancel={addresses.length ? () => setAddingAddress(false) : undefined}
                 onSaved={(a) => {

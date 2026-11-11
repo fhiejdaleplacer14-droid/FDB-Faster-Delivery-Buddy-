@@ -30,7 +30,7 @@ export function SearchBox({ initial = '', size = 'md', onDark = false }: { initi
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search rice, snacks, school supplies…"
-        className={`min-w-0 flex-1 bg-transparent px-3 text-ink placeholder:text-slate/70 focus:outline-none ${height}`}
+        className={`w-0 min-w-0 flex-1 bg-transparent px-3 text-ink placeholder:text-slate/70 focus:outline-none ${height}`}
       />
       <button
         type="submit"

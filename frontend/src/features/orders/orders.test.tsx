@@ -85,6 +85,26 @@ describe('checkout', () => {
     expect(secondKey).toBe(firstKey)
   })
 
+  it('saves a new address without placing the order or nesting forms', async () => {
+    const created = { ...address, id: 8, street: '12 Rizal St' }
+    const create = vi.spyOn(addressApi, 'create').mockResolvedValue(created)
+    const checkout = vi.spyOn(orderApi, 'checkout')
+    renderRoute('/checkout', { user: makeUser() })
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Add a new address' }))
+    expect(document.querySelector('form form')).toBeNull()
+    await userEvent.type(screen.getByLabelText('Mobile number'), '09171234567')
+    await userEvent.selectOptions(screen.getByLabelText('Town or city'), 'vallehermoso')
+    await userEvent.type(screen.getByLabelText('Barangay'), 'Poblacion')
+    await userEvent.type(screen.getByLabelText('Street address'), '12 Rizal St{Enter}')
+
+    await waitFor(() => expect(create).toHaveBeenCalledTimes(1))
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ street: '12 Rizal St', municipality: 'vallehermoso' }))
+    await waitFor(() => expect(screen.getAllByRole('radio', { name: /Rizal St/ })).toHaveLength(2))
+    expect(screen.getAllByRole('radio', { name: /Rizal St/ })[1]).toBeChecked()
+    expect(checkout).not.toHaveBeenCalled()
+  })
+
   it('shows GCash and Maya as coming soon and keeps them unselectable', async () => {
     renderRoute('/checkout', { user: makeUser() })
 

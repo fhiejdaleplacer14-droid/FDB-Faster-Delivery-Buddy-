@@ -85,7 +85,7 @@ export function ProductsPage() {
                 {result ? `${result.meta.total} ${result.meta.total === 1 ? 'product' : 'products'}` : 'Loading products…'}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto">
               <Button variant="secondary" className="lg:hidden" aria-expanded={sheetOpen} onClick={() => setSheetOpen(true)}>
                 <SlidersHorizontal className="size-4" aria-hidden />
                 Filters
@@ -98,7 +98,7 @@ export function ProductsPage() {
                 id="sort"
                 value={query.sort ?? ''}
                 onChange={(e) => update({ sort: e.target.value })}
-                className="h-10 rounded-lg border border-line bg-surface px-3 text-sm text-ink shadow-sm transition hover:border-slate/40 focus:border-blue focus:ring-4 focus:ring-blue/15 focus:outline-none"
+                className="h-10 min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 text-sm text-ink shadow-sm transition hover:border-slate/40 sm:flex-none focus:border-blue focus:ring-4 focus:ring-blue/15 focus:outline-none"
               >
                 {sorts.map((s) => (
                   <option key={s.value} value={s.value}>

@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from 'react'
+import { useState, type KeyboardEvent, type SubmitEvent } from 'react'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { SelectField, TextField } from '@/components/ui/Field'
@@ -9,14 +9,14 @@ import { addressApi, type AddressInput } from './api'
 
 const empty: AddressInput = { label: '', recipient_name: '', phone: '', municipality: '', barangay: '', street: '', landmark: '' }
 
-export function AddressForm({ initialName = '', onSaved, onCancel }: { initialName?: string; onSaved: (a: Address) => void; onCancel?: (() => void) | undefined }) {
+// `embedded` is for use inside another <form> (checkout): browsers do not allow nested forms, so it renders a div.
+export function AddressForm({ initialName = '', onSaved, onCancel, embedded = false }: { initialName?: string; onSaved: (a: Address) => void; onCancel?: (() => void) | undefined; embedded?: boolean }) {
   const [form, setForm] = useState<AddressInput>({ ...empty, recipient_name: initialName })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<ApiError | null>(null)
   const set = (key: keyof AddressInput) => (value: string) => setForm((f) => ({ ...f, [key]: value }))
 
-  async function submit(event: SubmitEvent) {
-    event.preventDefault()
+  async function save() {
     setBusy(true)
     setError(null)
     try {
@@ -29,8 +29,8 @@ export function AddressForm({ initialName = '', onSaved, onCancel }: { initialNa
 
   const err = (f: string) => firstError(error, f)
 
-  return (
-    <form onSubmit={submit} noValidate className="space-y-4">
+  const fields = (
+    <>
       {error && !Object.keys(error.fieldErrors).length && <Alert tone="error">{error.message}</Alert>}
       <div className="grid gap-4 sm:grid-cols-2">
         <TextField label="Recipient name" autoComplete="name" value={form.recipient_name} onChange={(e) => set('recipient_name')(e.target.value)} error={err('recipient_name')} />
@@ -51,7 +51,7 @@ export function AddressForm({ initialName = '', onSaved, onCancel }: { initialNa
       <TextField label="Landmark" hint="Optional. Helps the seller find you." value={form.landmark} onChange={(e) => set('landmark')(e.target.value)} error={err('landmark')} />
       <TextField label="Label" hint="Optional, for example Home or Work." maxLength={40} value={form.label} onChange={(e) => set('label')(e.target.value)} error={err('label')} />
       <div className="flex gap-3">
-        <Button type="submit" busy={busy}>
+        <Button type={embedded ? 'button' : 'submit'} onClick={embedded ? () => void save() : undefined} busy={busy}>
           Save address
         </Button>
         {onCancel && (
@@ -60,6 +60,32 @@ export function AddressForm({ initialName = '', onSaved, onCancel }: { initialNa
           </Button>
         )}
       </div>
+    </>
+  )
+
+  if (embedded) {
+    const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+      if (e.key !== 'Enter' || !(e.target instanceof HTMLInputElement)) return
+      e.preventDefault()
+      void save()
+    }
+    return (
+      <div onKeyDown={onKeyDown} className="space-y-4">
+        {fields}
+      </div>
+    )
+  }
+
+  return (
+    <form
+      onSubmit={(e: SubmitEvent) => {
+        e.preventDefault()
+        void save()
+      }}
+      noValidate
+      className="space-y-4"
+    >
+      {fields}
     </form>
   )
 }
