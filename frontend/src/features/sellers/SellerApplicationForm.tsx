@@ -6,6 +6,7 @@ import { SelectField, TextareaField, TextField } from '@/components/ui/Field'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import type { SellerApplication, SellerDocumentType } from '@/types/api'
 import { documentTypes, serviceAreas, type ApplicationDetails, type DocumentUpload } from './api'
+import { ProductTypePicker } from './ProductTypePicker'
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024
 const MAX_DOCUMENTS = 6
@@ -95,6 +96,7 @@ export function SellerApplicationForm({ existing, onSubmit, submitLabel, documen
           onChange={(e) => set('description', e.target.value)}
           error={err('description')}
         />
+        <ProductTypePicker value={details.description} onChange={(next) => set('description', next)} />
         <TextField
           label="Contact mobile number"
           type="tel"
