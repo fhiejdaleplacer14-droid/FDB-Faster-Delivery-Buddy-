@@ -41,6 +41,9 @@ services:
         sync: false
       - key: DB_SSLMODE
         value: require
+      # Keep database connections open between requests instead of reconnecting every time.
+      - key: DB_PERSISTENT
+        value: "true"
 
       # No Redis or worker on the free plan: sessions, cache, and queue use the database.
       - key: SESSION_DRIVER

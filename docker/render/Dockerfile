@@ -29,7 +29,9 @@ RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoload
 
 USER www-data
 # Render sets PORT (10000 by default).
-ENV PORT=10000
+# Skip the Kerberos handshake in the PostgreSQL client; Neon does not use it and it can stall each connection.
+ENV PORT=10000 \
+    PGGSSENCMODE=disable
 EXPOSE 10000
 ENTRYPOINT ["fdb-entrypoint"]
 CMD ["supervisord", "-c", "/etc/supervisor/fdb.conf"]
