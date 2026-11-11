@@ -38,7 +38,20 @@ return [
             'report' => false,
         ],
 
-        'seller_documents' => [
+        // Rows remember their disk by name, so these names stay. FDB_STORAGE_DRIVER=s3 moves them to
+        // Neon (or any S3-compatible) buckets for hosts whose disks do not last, like Render's free plan.
+        // Neon rejects ACL calls, so no per-file visibility is set; the bucket's access level decides.
+        'seller_documents' => env('FDB_STORAGE_DRIVER', 'local') === 's3' ? [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_REGION', env('AWS_DEFAULT_REGION')),
+            'bucket' => env('FDB_DOCUMENTS_BUCKET', 'fdb-documents'),
+            'endpoint' => env('AWS_ENDPOINT_URL_S3', env('AWS_ENDPOINT')),
+            'use_path_style_endpoint' => true,
+            'throw' => true,
+            'report' => false,
+        ] : [
             'driver' => 'local',
             'root' => storage_path('app/seller-documents'),
             'visibility' => 'private',
@@ -47,7 +60,19 @@ return [
             'report' => false,
         ],
 
-        'media' => [
+        'media' => env('FDB_STORAGE_DRIVER', 'local') === 's3' ? [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_REGION', env('AWS_DEFAULT_REGION')),
+            'bucket' => env('FDB_MEDIA_BUCKET', 'fdb-media'),
+            'endpoint' => env('AWS_ENDPOINT_URL_S3', env('AWS_ENDPOINT')),
+            'use_path_style_endpoint' => true,
+            // Photos are served as /storage/... on the website's own address (the Worker fetches them from the bucket).
+            'url' => rtrim(env('MEDIA_URL', '/storage'), '/'),
+            'throw' => true,
+            'report' => false,
+        ] : [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => rtrim(env('MEDIA_URL', '/storage'), '/'),

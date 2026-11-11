@@ -26,6 +26,7 @@ Frontend variables prefixed with `VITE_` are bundled into public JavaScript. Nev
 | `MEDIA_URL` | `/storage` | Base URL that product photo links are built from |
 | `FDB_PAYMENT_METHODS` | `cash_on_delivery` | Comma-separated methods customers can actually select. GCash, Maya, and "Other" are always listed at checkout, but show as "Coming soon" and are refused by the server unless enabled here. Sellers collect payment directly; FDB only records the choice |
 | `FDB_DISPUTE_WINDOW_DAYS` | `7` | How many days after delivery a customer may open a dispute. **Placeholder until the founders decide** |
+| `FDB_STORAGE_DRIVER` | `local` | `s3` moves product photos and seller documents to S3-compatible buckets (Neon Object Storage). Needs `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, and `AWS_REGION`; buckets are `FDB_MEDIA_BUCKET` (default `fdb-media`, public read) and `FDB_DOCUMENTS_BUCKET` (default `fdb-documents`, private) |
 | `FDB_REFUND_COMMISSION` | `proportional` | `proportional` lowers FDB's commission by the rate times the refunded item value (refunds count against items before the delivery fee); `none` keeps the commission. **Placeholder until the founders decide** |
 | `FDB_INITIAL_COMMISSION_RATE` | `0.0750` | Used once, to create the first default commission rate when none exists. After that, admins change rates in the app. **Placeholder until the founders decide** |
 | `DEMO_SELLER_PASSWORD` | unset | Local and staging only: password for the demo seller accounts the demo seeder creates. If unset, a random password is used |

@@ -55,6 +55,12 @@ This file describes the controls that exist in the code today. It is not a compl
 - Recording a collection locks the records it covers and refuses any that are not due or belong to another seller, so the same commission cannot be collected twice.
 - Rate changes, adjustments, and collections are written to the audit log.
 
+## File storage
+
+- With object storage, seller documents are in a private bucket: an anonymous request is refused (HTTP 403, tested) and admins download them only through the backend, which logs every access.
+- Only product photos are in the public bucket. The website's Worker serves them from the bucket's own path, rejects `..` and non-GET requests, and adds `nosniff` and a sandbox policy, so a stray file cannot run code.
+- Bucket credentials are branch-scoped, kept in `.env.local` and the Render environment, and never in git.
+
 ## Refunds
 
 - Only the seller of that order or an admin with `refunds.manage` can record a refund; another seller's order is a 404.

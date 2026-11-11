@@ -79,6 +79,22 @@ services:
       - key: MEDIA_URL
         value: /storage
 
+      # Photos and seller documents live in Neon Object Storage, because Render's free disk is erased on restart.
+      - key: FDB_STORAGE_DRIVER
+        value: s3
+      - key: FDB_MEDIA_BUCKET
+        value: fdb-media
+      - key: FDB_DOCUMENTS_BUCKET
+        value: fdb-documents
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_ENDPOINT_URL_S3
+        sync: false
+      - key: AWS_REGION
+        sync: false
+
       # Email is not connected yet: messages go to the log.
       - key: MAIL_MAILER
         value: log

@@ -3,6 +3,12 @@ import { defineConfig } from "@neon/config/v1";
 export default defineConfig({
   // Declare your Neon services here
   auth: false,
+  buckets: {
+    // Product photos: anyone can read, only the backend can write.
+    "fdb-media": { access: "public_read" },
+    // Seller verification documents: private, read only through the backend.
+    "fdb-documents": {},
+  },
   // Branch policy: per-branch tuning
   branch: (branch) => {
     if (branch.isDefault) {

@@ -135,7 +135,8 @@ class ProductService
         $disk = config('fdb.catalog.media_disk');
         $path = 'products/'.now()->format('Y/m').'/'.Str::uuid7().'.webp';
 
-        Storage::disk($disk)->put($path, $processed['binary'], ['visibility' => 'public']);
+        // Public access comes from the disk itself (a public bucket, or a public local disk), not per-file ACLs.
+        Storage::disk($disk)->put($path, $processed['binary']);
 
         try {
             return DB::transaction(function () use ($product, $disk, $path, $processed) {

@@ -33,8 +33,23 @@ The database is already migrated and seeded on Neon. To run migrations from Rend
 
 - **It sleeps after about 15 minutes without traffic.** The next visitor waits roughly a minute while it wakes up. A free uptime pinger (for example UptimeRobot, checking `/api/v1/health` every 5 minutes) keeps it awake; Render's free hours are enough for one always-on service, but check their current terms.
 - **Small machine.** About 512 MB of memory and a shared CPU. Fine for a demo; very large photo uploads can run it out of memory.
-- **Uploaded photos do not last.** The instance's disk is erased on every restart and deploy. The 7 demo photos are no longer there after the first restart, and new uploads disappear too. Durable options: Neon Object Storage (S3 compatible; available in the Singapore region, plan and price to be confirmed in the Neon console) or another S3-compatible bucket. This needs a small backend change, and the Worker can forward `/storage` to the bucket.
+- **The instance's disk is erased on every restart and deploy,** so photos and seller documents live in Neon Object Storage instead (see below).
 - **Email is not connected,** so sign-up verification and password reset do not send anything yet.
+
+## Photos and documents (Neon Object Storage)
+
+Two buckets are declared in `neon.ts` and created with `neon deploy`:
+
+| Bucket | Access | Holds |
+| --- | --- | --- |
+| `fdb-media` | Public read, write only with the credential | Product photos |
+| `fdb-documents` | Private | Seller verification documents, downloaded only through the backend by admins |
+
+`neon deploy` also saves the storage credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`) to `.env.local`. Set these on Render, together with `FDB_STORAGE_DRIVER=s3`, `FDB_MEDIA_BUCKET=fdb-media`, and `FDB_DOCUMENTS_BUCKET=fdb-documents`. With `FDB_STORAGE_DRIVER` unset the backend keeps using local disks, as in development.
+
+The backend still saves photos under the disk name `media` and documents under `seller_documents`, so existing rows keep working. Photo links stay `/storage/...` on the website's own address: the Worker fetches them from the public bucket (secret `MEDIA_ORIGIN` = the storage address plus `/fdb-media`) and Cloudflare caches them for a month. Neon rejects ACL calls, so no per-file visibility is set; the bucket's access level decides who can read.
+
+The free plan includes 5 GB of object storage per project. Product photos are resized to under 1600 px, so this goes a long way.
 
 ## Settings that matter
 
