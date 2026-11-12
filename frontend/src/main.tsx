@@ -25,3 +25,10 @@ createRoot(root).render(
     </ThemeProvider>
   </StrictMode>,
 )
+
+// Installable app and offline page. Only in the published build, so development always runs fresh code.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => undefined)
+  })
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#2563EB"/>
+  <text x="222" y="290" text-anchor="middle" font-family="system-ui, 'Segoe UI', sans-serif" font-size="138" font-weight="900" font-style="italic" letter-spacing="-10" fill="#FFFFFF">FDB</text>
+  <path d="M378 238h24v-28l42 44-42 44v-28h-24z" fill="#FFFFFF"/>
+</svg>
