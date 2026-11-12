@@ -1,15 +1,17 @@
 import { useState, type ChangeEvent, type SubmitEvent } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/Field'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import { AuthPage } from './AuthPage'
 import { useAuth } from './AuthContext'
+import { afterSignIn, withNext } from './guards'
 
 export function RegisterPage() {
   const { register } = useAuth()
   const navigate = useNavigate()
+  const next = useSearchParams()[0].get('next')
   const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<ApiError | null>(null)
@@ -23,7 +25,7 @@ export function RegisterPage() {
     setError(null)
     try {
       await register(form)
-      navigate('/account?welcome=1', { replace: true })
+      navigate(afterSignIn(next, true), { replace: true })
     } catch (e) {
       setError(toApiError(e))
       setBusy(false)
@@ -62,7 +64,7 @@ export function RegisterPage() {
       </form>
       <p className="mt-8 text-sm text-slate">
         Already have an account?{' '}
-        <Link to="/login" className="font-medium text-link hover:underline">
+        <Link to={withNext('/login', next)} className="font-medium text-link hover:underline">
           Sign in
         </Link>
       </p>

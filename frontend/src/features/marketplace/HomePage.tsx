@@ -20,7 +20,7 @@ export function HomePage() {
   const [error, setError] = useState<ApiError | null>(null)
 
   useEffect(() => {
-    catalogApi.categories().then(setCategories, () => setCategories([]))
+    catalogApi.categories({ withProducts: true }).then(setCategories, () => setCategories([]))
     catalogApi
       .products({ per_page: 24, sort: 'newest' })
       .then((r) => setProducts(r.data))

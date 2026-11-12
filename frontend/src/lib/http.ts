@@ -87,6 +87,13 @@ async function send<T>(method: Method, url: string, body: unknown, options: Requ
     return send<T>(method, url, body, options, true)
   }
 
+  // Too many requests: a read waits as long as the server asks (at most 5 s) and tries once more.
+  if (response.status === 429 && !retried && SAFE_METHODS.includes(method)) {
+    const wait = Math.min(Number(response.headers.get('Retry-After')) || 2, 5)
+    await new Promise((resolve) => setTimeout(resolve, wait * 1000))
+    return send<T>(method, url, body, options, true)
+  }
+
   const data = await parse(response).catch(() => null)
   if (!response.ok) throw new HttpError(response.status, data)
 
@@ -127,9 +134,16 @@ export function toApiError(error: unknown): ApiError {
     }
 
     const body = (error.data && typeof error.data === 'object' ? error.data : {}) as LaravelErrorBody
+    // The server's own wording for these ("Too Many Attempts.", "Server Error") is not meant for people.
+    const message =
+      error.status === 429
+        ? 'Too many tries in a short time. Please wait a minute, then try again.'
+        : error.status >= 500
+          ? 'Something went wrong on our side. Please try again.'
+          : (body.message ?? 'Something went wrong on our side. Please try again.')
     return {
       status: error.status,
-      message: body.message ?? 'Something went wrong on our side. Please try again.',
+      message,
       fieldErrors: body.errors ?? {},
     }
   }

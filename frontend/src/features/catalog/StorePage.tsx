@@ -47,10 +47,12 @@ export function StorePage() {
       {store && (
         <header className="border-b border-line pb-6">
           <h1 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">{store.name}</h1>
-          <p className="mt-1 flex items-center gap-1 text-sm text-slate">
-            <MapPin className="size-3.5" aria-hidden />
-            {store.barangay}, {store.municipality}
-            {store.selling_since && <span> · On FDB since {formatDate(store.selling_since)}</span>}
+          <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate">
+            <span className="inline-flex items-center gap-1">
+              <MapPin className="size-3.5 shrink-0" aria-hidden />
+              {store.barangay}, {store.municipality}
+            </span>
+            {store.selling_since && <span>On FDB since {formatDate(store.selling_since)}</span>}
           </p>
           {store.description && <p className="mt-3 max-w-2xl text-sm whitespace-pre-line text-ink">{store.description}</p>}
         </header>

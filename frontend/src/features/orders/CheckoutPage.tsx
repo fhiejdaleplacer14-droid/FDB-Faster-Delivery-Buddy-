@@ -114,7 +114,7 @@ export function CheckoutPage() {
               {addresses.map((a) => (
                 <li key={a.id}>
                   <label className="flex cursor-pointer gap-3 rounded-md border border-line bg-surface p-3 text-sm has-checked:border-blue has-checked:bg-blue-soft">
-                    <input type="radio" name="address" checked={addressId === a.id} onChange={() => setAddressId(a.id)} className="mt-1 size-4 accent-blue" />
+                    <input type="radio" name="address" checked={addressId === a.id} onChange={() => setAddressId(a.id)} className="mt-1 size-4 shrink-0 accent-blue" />
                     <span>
                       {a.label && <span className="mb-0.5 block text-xs font-semibold tracking-wide text-slate uppercase">{a.label}</span>}
                       <AddressLines address={a} />
@@ -160,7 +160,7 @@ export function CheckoutPage() {
                   className="size-4 accent-blue"
                 />
                 {m.label}
-                {!m.available && <span className="rounded bg-ink/5 px-1.5 py-0.5 text-xs">Coming soon</span>}
+                {!m.available && <span className="shrink-0 rounded bg-ink/5 px-1.5 py-0.5 text-xs whitespace-nowrap">Coming soon</span>}
               </label>
             ))}
           </div>
@@ -174,7 +174,7 @@ export function CheckoutPage() {
               {data.groups.map((g) => (
                 <li key={g.store.id} className="flex justify-between">
                   <span className="text-ink">
-                    {g.store.name} · {g.items.reduce((n, i) => n + i.quantity, 0)} items
+                    {g.store.name} · {itemCount(g.items.reduce((n, i) => n + i.quantity, 0))}
                   </span>
                   <span className="tabular">{formatPeso(g.subtotal)}</span>
                 </li>
@@ -194,6 +194,8 @@ export function CheckoutPage() {
     </Page>
   )
 }
+
+const itemCount = (n: number) => `${n} ${n === 1 ? 'item' : 'items'}`
 
 function Page({ children }: { children: ReactNode }) {
   return (

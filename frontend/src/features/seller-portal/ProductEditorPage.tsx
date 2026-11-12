@@ -204,12 +204,13 @@ function StatusPanel({ product, onChange, disabled }: { product: ManagedProduct;
 
 function DetailsForm({ initial, submitLabel, onSave }: { initial: ProductInput; submitLabel: string; onSave: (input: ProductInput) => Promise<void> }) {
   const [categories, setCategories] = useState<Category[]>([])
+  const [categoriesFailed, setCategoriesFailed] = useState(false)
   const [form, setForm] = useState<ProductInput>(initial)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<ApiError | null>(null)
 
   useEffect(() => {
-    catalogApi.categories().then(setCategories, () => setCategories([]))
+    catalogApi.categories().then(setCategories, () => setCategoriesFailed(true))
   }, [])
 
   const setVariant = (index: number, change: Partial<VariantInput>) =>
@@ -240,7 +241,7 @@ function DetailsForm({ initial, submitLabel, onSave }: { initial: ProductInput; 
         required
         value={String(form.category_id)}
         onChange={(e) => setForm({ ...form, category_id: e.target.value ? Number(e.target.value) : '' })}
-        error={err('category_id')}
+        error={err('category_id') ?? (categoriesFailed ? 'Categories could not load. Reload the page to choose one.' : undefined)}
       >
         <option value="" disabled>
           Choose a category
@@ -283,16 +284,18 @@ function DetailsForm({ initial, submitLabel, onSave }: { initial: ProductInput; 
               <TextField label="Option name" value={v.name} maxLength={60} onChange={(e) => setVariant(i, { name: e.target.value })} error={err(`variants.${i}.name`)} />
               <TextField label="Price (₱)" inputMode="decimal" value={v.price} onChange={(e) => setVariant(i, { price: e.target.value })} error={err(`variants.${i}.price`)} />
               <TextField label="Stock" inputMode="numeric" value={v.stock} onChange={(e) => setVariant(i, { stock: e.target.value })} error={err(`variants.${i}.stock`)} />
-              <TextField label="SKU" hint="Optional" value={v.sku} maxLength={60} onChange={(e) => setVariant(i, { sku: e.target.value })} error={err(`variants.${i}.sku`)} />
-              <Button
-                variant="ghost"
-                className="self-end sm:mt-6"
-                disabled={form.variants.length === 1}
-                aria-label={`Remove option ${v.name || i + 1}`}
-                onClick={() => setForm((f) => ({ ...f, variants: f.variants.filter((_, j) => j !== i) }))}
-              >
-                <X className="size-4" aria-hidden />
-              </Button>
+              <TextField label="SKU (optional)" value={v.sku} maxLength={60} onChange={(e) => setVariant(i, { sku: e.target.value })} error={err(`variants.${i}.sku`)} />
+              {form.variants.length > 1 && (
+                <Button
+                  variant="ghost"
+                  className="col-span-2 justify-self-start text-danger sm:col-span-1 sm:mt-6 sm:justify-self-auto sm:text-ink"
+                  aria-label={`Remove option ${v.name || i + 1}`}
+                  onClick={() => setForm((f) => ({ ...f, variants: f.variants.filter((_, j) => j !== i) }))}
+                >
+                  <X className="size-4" aria-hidden />
+                  <span className="sm:hidden">Remove this option</span>
+                </Button>
+              )}
             </li>
           ))}
         </ul>
@@ -409,7 +412,7 @@ function PhotoManager({ product, onChange }: { product: ManagedProduct; onChange
 
 function IconButton({ label, children, ...props }: { label: string; children: ReactNode; disabled?: boolean; onClick: () => void }) {
   return (
-    <button type="button" aria-label={label} title={label} className="rounded p-1.5 text-slate hover:bg-ink/5 hover:text-ink disabled:opacity-30" {...props}>
+    <button type="button" aria-label={label} title={label} className="rounded-md p-2.5 text-slate hover:bg-ink/5 hover:text-ink disabled:opacity-30 sm:p-1.5" {...props}>
       {children}
     </button>
   )

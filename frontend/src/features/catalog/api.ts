@@ -15,8 +15,9 @@ export type ProductQuery = {
 }
 
 export const catalogApi = {
-  async categories() {
-    return (await http.get<Resource<Category[]>>('/categories')).data.data
+  // Shoppers: only categories with something to buy. Sellers (choosing a category) get them all.
+  async categories(options: { withProducts?: boolean } = {}) {
+    return (await http.get<Resource<Category[]>>('/categories', { params: options.withProducts ? { with_products: 1 } : undefined })).data.data
   },
   async products(query: ProductQuery) {
     return (await http.get<Paginated<ProductCard>>('/products', { params: query })).data

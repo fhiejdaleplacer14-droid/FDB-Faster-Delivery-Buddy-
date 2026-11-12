@@ -4,6 +4,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router'
 import { useAuth } from '@/features/auth/AuthContext'
 import { http } from '@/lib/http'
 import { formatPeso } from '@/lib/money'
+import { useActiveTabInView } from '@/lib/useActiveTabInView'
 import { sellerOrdersApi } from './ordersApi'
 
 const tabs = [
@@ -19,6 +20,7 @@ type Attention = { awaiting: number; due: string; requests: number }
 export function SellerLayout() {
   const { user } = useAuth()
   const { pathname } = useLocation()
+  const tabsRef = useActiveTabInView<HTMLUListElement>()
   const [attention, setAttention] = useState<Attention | null>(null)
   const seller = user?.seller
 
@@ -91,7 +93,7 @@ export function SellerLayout() {
           </div>
 
           <nav aria-label="Seller tools" className="mt-5">
-            <ul className="flex gap-1 overflow-x-auto">
+            <ul ref={tabsRef} className="flex gap-1 overflow-x-auto max-md:scroll-fade">
               {tabs.map(({ to, label, icon: Icon }) => (
                 <li key={to}>
                   <NavLink

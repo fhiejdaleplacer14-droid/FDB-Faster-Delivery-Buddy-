@@ -33,24 +33,26 @@ export function CategoriesPage() {
       {categories?.length === 0 && <p className="mt-8 text-sm text-slate">No categories yet. Sellers need at least one to create listings.</p>}
 
       {parents.length > 0 && (
-        <table className="mt-8 w-full text-left text-sm">
-          <thead className="border-b border-line text-xs tracking-wide text-slate uppercase">
-            <tr>
-              <th scope="col" className="py-2 pr-4 font-medium">Name</th>
-              <th scope="col" className="py-2 pr-4 text-right font-medium">Listings</th>
-              <th scope="col" className="py-2 pr-4 font-medium">Shown</th>
-              <th scope="col" className="py-2 font-medium">
-                <span className="sr-only">Actions</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-line">
-            {parents.flatMap((parent) => [
-              <CategoryRow key={parent.id} category={parent} onChanged={reload} />,
-              ...childrenOf(parent.id).map((child) => <CategoryRow key={child.id} category={child} onChanged={reload} indent />),
-            ])}
-          </tbody>
-        </table>
+        <div className="mt-8 overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-line text-xs tracking-wide text-slate uppercase">
+              <tr>
+                <th scope="col" className="py-2 pr-4 font-medium">Name</th>
+                <th scope="col" className="py-2 pr-4 text-right font-medium">Listings</th>
+                <th scope="col" className="py-2 pr-4 font-medium">Shown</th>
+                <th scope="col" className="py-2 font-medium">
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {parents.flatMap((parent) => [
+                <CategoryRow key={parent.id} category={parent} onChanged={reload} />,
+                ...childrenOf(parent.id).map((child) => <CategoryRow key={child.id} category={child} onChanged={reload} indent />),
+              ])}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   )
@@ -182,15 +184,15 @@ function CategoryRow({ category, onChanged, indent = false }: { category: Catego
           <span className="sr-only">Show {category.name} to customers</span>
         </label>
       </td>
-      <td className="py-2 text-right whitespace-nowrap">
+      <td className="py-2 text-right sm:whitespace-nowrap">
         {!editing && (
-          <button type="button" onClick={() => setEditing(true)} className="px-2 text-sm font-medium text-link hover:underline">
+          <button type="button" onClick={() => setEditing(true)} className="block w-full px-2 py-1.5 text-right text-sm font-medium text-link hover:underline sm:inline sm:w-auto sm:py-0">
             Rename
           </button>
         )}
         {(category.products_count ?? 0) === 0 && (
-          <button type="button" onClick={remove} disabled={busy} className="px-2 text-sm font-medium text-danger hover:underline">
-            Delete {category.name}
+          <button type="button" onClick={remove} disabled={busy} className="block w-full px-2 py-1.5 text-right text-sm font-medium text-danger hover:underline sm:inline sm:w-auto sm:py-0">
+            Delete<span className="sr-only"> {category.name}</span>
           </button>
         )}
       </td>

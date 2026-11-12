@@ -32,7 +32,7 @@ export function ProductsPage() {
   const queryKey = params.toString()
 
   useEffect(() => {
-    catalogApi.categories().then(setCategories, () => setCategories([]))
+    catalogApi.categories({ withProducts: true }).then(setCategories, () => setCategories([]))
   }, [])
 
   useEffect(() => {

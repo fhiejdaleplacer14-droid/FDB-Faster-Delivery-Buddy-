@@ -1,8 +1,9 @@
 import { BarChart3, FolderTree, LayoutDashboard, LifeBuoy, type LucideIcon, Package, ReceiptText, RotateCcw, Settings, ShoppingBag, Star, Store } from 'lucide-react'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Navigate, NavLink, Outlet, useLocation } from 'react-router'
 import { can, useAuth } from '@/features/auth/AuthContext'
 import { http } from '@/lib/http'
+import { useActiveTabInView } from '@/lib/useActiveTabInView'
 import type { PermissionSlug, User } from '@/types/api'
 
 type Badge = 'sellers' | 'listings' | 'commissions' | 'support' | 'refunds'
@@ -26,12 +27,17 @@ const links: { to: string; label: string; permission: PermissionSlug; icon: Luci
   { to: '/admin/settings', label: 'Settings', permission: 'sellers.manage', icon: Settings },
 ]
 
-// Work waiting for an admin, refreshed on each page change.
+// Work waiting for an admin. Refreshed on page changes, at most every 20 seconds, so quick clicking stays under the rate limit.
+const ATTENTION_EVERY_MS = 20_000
+
 function useAttention(user: User | null) {
   const { pathname } = useLocation()
   const [counts, setCounts] = useState<Partial<Record<Badge, number>>>({})
+  const lastLoad = useRef(0)
 
   useEffect(() => {
+    if (Date.now() - lastLoad.current < ATTENTION_EVERY_MS) return
+    lastLoad.current = Date.now()
     let current = true
     const total = (url: string, params: object) =>
       http.get<{ meta: { total: number } }>(url, { params: { ...params, per_page: 1 } }).then((r) => r.data.meta.total)
@@ -43,12 +49,15 @@ function useAttention(user: User | null) {
     if (can(user, 'commissions.manage')) {
       jobs.push(http.get<{ data: unknown[] }>('/admin/commissions/balances').then((r) => ['commissions', r.data.data.length]))
     }
+    let done = false
     Promise.all(jobs).then(
       (entries) => current && setCounts(Object.fromEntries(entries)),
       () => undefined,
-    )
+    ).finally(() => (done = true))
     return () => {
       current = false
+      // A load cut short (page left, or React's double run in development) does not count.
+      if (!done) lastLoad.current = 0
     }
   }, [user, pathname])
 
@@ -60,6 +69,7 @@ export function AdminLayout() {
   const counts = useAttention(user)
   const { pathname } = useLocation()
   const visible = links.filter((link) => can(user, link.permission))
+  const navRef = useActiveTabInView<HTMLUListElement>()
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col px-4 sm:px-6 lg:flex-row lg:gap-10">
@@ -68,7 +78,7 @@ export function AdminLayout() {
         className="border-b border-line py-3 lg:sticky lg:top-16 lg:h-[calc(100dvh-4rem)] lg:w-60 lg:shrink-0 lg:border-r lg:border-b-0 lg:py-8 lg:pr-4"
       >
         <p className="hidden px-3 text-xs font-semibold tracking-wide text-slate uppercase lg:block">Administration</p>
-        <ul className="flex gap-1 overflow-x-auto lg:mt-3 lg:flex-col">
+        <ul ref={navRef} className="flex gap-1 overflow-x-auto max-lg:scroll-fade lg:mt-3 lg:flex-col">
           {visible.map(({ to, label, icon: Icon, badge }) => {
             const count = badge ? counts[badge] : undefined
             return (

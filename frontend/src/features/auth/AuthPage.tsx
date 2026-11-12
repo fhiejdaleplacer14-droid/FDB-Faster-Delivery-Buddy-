@@ -6,8 +6,8 @@ const reasons = ['Stores from Vallehermoso, Guihulngan, and San Carlos City', 'D
 // Fills the space under the header; the brand panel shows on wide screens only.
 export function AuthPage({ title, intro, children }: { title: string; intro?: string; children: ReactNode }) {
   return (
-    <div className="mx-auto grid min-h-[calc(100dvh-4rem)] max-w-6xl items-center gap-12 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_minmax(0,26rem)] lg:py-12">
-      <aside className="relative hidden h-full max-h-[36rem] min-h-[28rem] overflow-hidden rounded-3xl bg-navy p-12 text-white lg:flex lg:flex-col lg:justify-end" aria-hidden>
+    <div className="mx-auto grid max-w-6xl items-start gap-12 px-4 py-6 sm:px-6 sm:py-10 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-[1fr_minmax(0,26rem)] lg:items-center lg:py-12">
+      <aside className="relative hidden h-full max-h-144 min-h-112 overflow-hidden rounded-3xl bg-navy p-12 text-white lg:flex lg:flex-col lg:justify-end" aria-hidden>
         <div aria-hidden className="absolute -top-24 -right-24 size-72 rounded-full bg-blue/25 blur-3xl" />
         <div aria-hidden className="absolute -bottom-32 -left-16 size-72 rounded-full bg-blue-300/10 blur-3xl" />
         <div className="relative animate-fade-up">

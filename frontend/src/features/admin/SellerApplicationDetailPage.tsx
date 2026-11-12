@@ -1,3 +1,4 @@
+import { DetailSkeleton } from '@/components/ui/DetailSkeleton'
 import { ArrowLeft, Download } from 'lucide-react'
 import { useEffect, useState, type SubmitEvent, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router'
@@ -37,6 +38,7 @@ export function SellerApplicationDetailPage() {
       )}
       {!seller && !error && <p className="mt-6 text-sm text-slate" aria-live="polite">Loading…</p>}
 
+      {!seller && !error && <DetailSkeleton />}
       {seller && (
         <>
           <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -101,7 +103,7 @@ export function SellerApplicationDetailPage() {
             ) : (
               <p className="text-sm text-slate">No documents were uploaded.</p>
             )}
-            <p className="mt-2 text-xs text-slate">Every download is recorded in the audit log.</p>
+            {seller.documents && seller.documents.length > 0 && <p className="mt-2 text-xs text-slate">Every download is recorded in the audit log.</p>}
           </Section>
 
           <Section title="History">

@@ -50,9 +50,11 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('permission', fn (User $user, PermissionSlug $permission) => $user->hasPermission($permission));
 
-        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)
-            ->by($request->user()?->id ?: $request->ip()));
-        RateLimiter::for('register', fn (Request $request) => Limit::perHour(10)->by($request->ip()));
+        // Signed-in people get their own allowance; guests share one per IP, and mobile carriers put many people behind one IP.
+        RateLimiter::for('api', fn (Request $request) => $request->user()
+            ? Limit::perMinute(300)->by('user:'.$request->user()->id)
+            : Limit::perMinute(240)->by('ip:'.$request->ip()));
+        RateLimiter::for('register', fn (Request $request) => Limit::perHour(30)->by($request->ip()));
         RateLimiter::for('password-reset', fn (Request $request) => [
             Limit::perMinute(5)->by($request->ip()),
             Limit::perHour(10)->by('email:'.mb_strtolower((string) $request->input('email'))),

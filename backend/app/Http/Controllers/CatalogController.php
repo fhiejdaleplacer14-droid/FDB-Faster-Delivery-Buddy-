@@ -22,10 +22,32 @@ use Illuminate\Validation\Rule;
 
 class CatalogController extends Controller
 {
-    public function categories(): JsonResponse
+    public function categories(Request $request): JsonResponse
+    {
+        $tree = $this->categoryTree();
+
+        // Shoppers see only categories with something to buy; sellers choosing a category get the full list.
+        if ($request->boolean('with_products')) {
+            $stocked = Product::query()->visibleToPublic()->distinct()->pluck('products.category_id')->flip();
+            $tree = collect($tree)
+                ->map(function (array $parent) use ($stocked) {
+                    $parent['children'] = array_values(array_filter($parent['children'] ?? [], fn (array $child) => $stocked->has($child['id'])));
+
+                    return $parent;
+                })
+                ->filter(fn (array $parent) => $stocked->has($parent['id']) || $parent['children'] !== [])
+                ->values()
+                ->all();
+        }
+
+        return response()->json(['data' => $tree]);
+    }
+
+    /** @return list<array<string, mixed>> */
+    private function categoryTree(): array
     {
         // Cache plain arrays only: resource objects do not survive serialization into Redis.
-        $tree = Cache::remember(Category::TREE_CACHE_KEY, now()->addMinutes(10), fn () => CategoryResource::collection(
+        return Cache::remember(Category::TREE_CACHE_KEY, now()->addMinutes(10), fn () => CategoryResource::collection(
             Category::query()
                 ->whereNull('parent_id')
                 ->where('is_active', true)
@@ -34,8 +56,6 @@ class CatalogController extends Controller
                 ->orderBy('name')
                 ->get(),
         )->response()->getData(true)['data']);
-
-        return response()->json(['data' => $tree]);
     }
 
     public function products(Request $request, ProductSearch $search): AnonymousResourceCollection

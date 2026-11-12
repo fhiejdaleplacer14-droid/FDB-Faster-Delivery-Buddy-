@@ -48,10 +48,22 @@ export function RequirePermission({ permission }: { permission: PermissionSlug }
 export function RedirectIfSignedIn() {
   const { user, ready } = useAuth()
   const [params] = useSearchParams()
+  const { pathname } = useLocation()
 
   if (!ready) return <PageLoading />
-  if (user) return <Navigate to={safeNext(params.get('next'))} replace />
+  if (user) return <Navigate to={afterSignIn(params.get('next'), pathname === '/register')} replace />
   return <Outlet />
+}
+
+// Back to the page that sent them to sign in; a brand-new account without one gets the welcome page.
+export function afterSignIn(next: string | null, justRegistered = false): string {
+  if (next) return safeNext(next)
+  return justRegistered ? '/account?welcome=1' : '/'
+}
+
+// Keeps the "come back to" page when moving between sign-in and sign-up.
+export function withNext(path: string, next: string | null): string {
+  return next ? `${path}?next=${encodeURIComponent(next)}` : path
 }
 
 // Only follow same-site paths so a crafted ?next= cannot send people to another site.

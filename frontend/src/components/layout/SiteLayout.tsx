@@ -146,6 +146,8 @@ function SiteHeader() {
         <Link to={admin ? '/admin' : '/'} aria-label={admin ? 'FDB admin dashboard' : 'Faster Delivery Buddy home'} className="transition-opacity hover:opacity-80">
           <Logo />
         </Link>
+        {/* The theme switch works before sign-in is known; the rest waits for it. */}
+        {!ready && <ThemeMenu />}
         {ready && (
           <div className="flex items-center gap-1">
             <nav aria-label="Main" className="hidden items-center gap-1 md:flex">

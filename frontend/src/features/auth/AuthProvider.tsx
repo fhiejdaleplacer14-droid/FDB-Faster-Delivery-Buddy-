@@ -23,10 +23,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    authApi
-      .currentUser()
-      .then(setUser, () => setUser(null))
-      .finally(() => setReady(true))
+    let current = true
+    const load = async () => {
+      for (let attempt = 0; ; attempt++) {
+        try {
+          return await authApi.currentUser()
+        } catch (error) {
+          const status = httpStatus(error)
+          // Signed out for real, or still failing after a few tries (server down, no signal).
+          if (status === 401 || status === 403 || attempt >= 2) return null
+          await new Promise((resolve) => setTimeout(resolve, 800 * (attempt + 1)))
+        }
+      }
+    }
+    load()
+      .then((found) => current && setUser(found))
+      .finally(() => current && setReady(true))
+    return () => {
+      current = false
+    }
   }, [])
 
   const value = useMemo<AuthState>(

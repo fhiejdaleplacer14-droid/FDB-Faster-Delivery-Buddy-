@@ -244,3 +244,11 @@
   background: linear-gradient(90deg, #172033 0%, #1f2a40 50%, #172033 100%);
   background-size: 200% 100%;
 }
+
+/* Sideways-scrolling tab rows: the right edge fades so people can see there is more to swipe to. */
+@utility scroll-fade {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+  padding-right: 2rem;
+  scrollbar-width: none;
+}

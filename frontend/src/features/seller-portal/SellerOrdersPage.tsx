@@ -36,7 +36,7 @@ export function SellerOrdersPage() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <h1 className="text-2xl font-bold tracking-tight text-heading">Orders</h1>
 
-      <div role="group" aria-label="Filter by status" className="mt-6 flex gap-1 overflow-x-auto border-b border-line">
+      <div role="group" aria-label="Filter by status" className="mt-6 flex gap-1 overflow-x-auto border-b border-line max-md:scroll-fade">
         {filters.map((f) => (
           <button
             key={f.label}
@@ -65,7 +65,7 @@ export function SellerOrdersPage() {
       {result && result.data.length > 0 && (
         <>
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[40rem] text-left text-sm">
+            <table className="w-full min-w-160 text-left text-sm">
               <thead className="border-b border-line text-xs tracking-wide text-slate uppercase">
                 <tr>
                   <th scope="col" className="py-2 pr-4 font-medium">Order</th>
@@ -80,7 +80,7 @@ export function SellerOrdersPage() {
                 {result.data.map((so) => (
                   <tr key={so.id} className={so.status === 'pending_confirmation' ? 'bg-warning/5' : ''}>
                     <td className="py-3 pr-4">
-                      <Link to={`/seller/orders/${so.id}`} className="font-medium text-link hover:underline">
+                      <Link to={`/seller/orders/${so.id}`} className="font-medium whitespace-nowrap text-link hover:underline">
                         {so.number}
                       </Link>
                     </td>

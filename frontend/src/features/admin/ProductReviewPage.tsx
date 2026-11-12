@@ -1,3 +1,4 @@
+import { DetailSkeleton } from '@/components/ui/DetailSkeleton'
 import { ArrowLeft } from 'lucide-react'
 import { useEffect, useState, type SubmitEvent } from 'react'
 import { Link, useParams } from 'react-router'
@@ -33,6 +34,7 @@ export function ProductReviewPage() {
         </div>
       )}
 
+      {!product && !error && <DetailSkeleton />}
       {product && (
         <>
           <div className="mt-4 flex flex-wrap items-center gap-3">

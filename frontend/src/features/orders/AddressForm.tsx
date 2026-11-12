@@ -99,7 +99,7 @@ export function AddressLines({ address }: { address: Pick<Address, 'recipient_na
       </span>
       <span className="block text-slate">
         {address.street}, {address.barangay}, {town}
-        {address.landmark && ` (near ${address.landmark})`}
+        {address.landmark && ` (${/^near\b/i.test(address.landmark) ? address.landmark : `near ${address.landmark}`})`}
       </span>
     </>
   )

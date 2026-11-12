@@ -74,12 +74,13 @@ export function NewTicketPage() {
         <fieldset>
           <legend className="text-sm font-medium text-ink">What is this about?</legend>
           <div className="stagger mt-2 grid gap-2 sm:grid-cols-2">
+            {categories.length === 0 && !error && [0, 1, 2, 3].map((i) => <div key={i} className="skeleton h-11 rounded-lg" aria-hidden />)}
             {categories.map((c) => (
               <label
                 key={c.value}
                 className="flex cursor-pointer items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2.5 text-sm transition hover:border-blue/40 has-checked:border-blue has-checked:bg-blue-soft has-checked:font-semibold has-focus-visible:ring-2 has-focus-visible:ring-blue"
               >
-                <input type="radio" name="category" value={c.value} checked={category === c.value} onChange={() => setCategory(c.value)} className="accent-blue" />
+                <input type="radio" name="category" value={c.value} checked={category === c.value} onChange={() => setCategory(c.value)} className="size-4 shrink-0 accent-blue" />
                 {c.label}
               </label>
             ))}

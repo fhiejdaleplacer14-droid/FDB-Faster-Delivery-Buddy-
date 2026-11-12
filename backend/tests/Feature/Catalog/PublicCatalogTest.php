@@ -116,6 +116,31 @@ it('lists active categories as a cached tree', function () {
     expect(Cache::has(Category::TREE_CACHE_KEY))->toBeTrue();
 });
 
+it('shows shoppers only categories with something to buy, and sellers all of them', function () {
+    $clothing = Category::factory()->create(['name' => 'Clothing']);
+    $shirts = Category::factory()->create(['name' => 'Shirts', 'parent_id' => $clothing->id]);
+    Category::factory()->create(['name' => 'Shoes', 'parent_id' => $clothing->id]);
+    $food = Category::factory()->create(['name' => 'Food']);
+    $snacks = Category::factory()->create(['name' => 'Snacks', 'parent_id' => $food->id]);
+    $crafts = Category::factory()->create(['name' => 'Crafts']);
+    Category::factory()->create(['name' => 'Empty']);
+
+    Product::factory()->published()->create(['category_id' => $shirts->id]);
+    Product::factory()->create(['category_id' => $snacks->id]);
+    Product::factory()->published()->create(['category_id' => $crafts->id]);
+
+    $this->getJson('/api/v1/categories?with_products=1')
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('data.0.name', 'Clothing')
+        ->assertJsonCount(1, 'data.0.children')
+        ->assertJsonPath('data.0.children.0.name', 'Shirts')
+        ->assertJsonPath('data.1.name', 'Crafts')
+        ->assertJsonCount(0, 'data.1.children');
+
+    $this->getJson('/api/v1/categories')->assertOk()->assertJsonCount(4, 'data');
+});
+
 it('caches the category tree as plain data that survives a Redis round trip', function () {
     $food = Category::factory()->create(['name' => 'Food']);
     Category::factory()->create(['name' => 'Snacks', 'parent_id' => $food->id]);

@@ -56,7 +56,7 @@ export function SellerProductsPage() {
         </div>
       )}
 
-      <div role="group" aria-label="Filter by status" className="mt-6 flex gap-1 overflow-x-auto border-b border-line">
+      <div role="group" aria-label="Filter by status" className="mt-6 flex gap-1 overflow-x-auto border-b border-line max-md:scroll-fade">
         {filters.map((f) => (
           <button
             key={f.label}
@@ -99,7 +99,7 @@ export function SellerProductsPage() {
       {result && result.data.length > 0 && (
         <>
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[40rem] text-left text-sm">
+            <table className="w-full min-w-160 text-left text-sm">
               <thead className="border-b border-line text-xs tracking-wide text-slate uppercase">
                 <tr>
                   <th scope="col" className="py-2 pr-4 font-medium">Product</th>

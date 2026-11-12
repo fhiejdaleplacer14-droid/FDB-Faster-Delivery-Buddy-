@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { Navigate, type RouteObject } from 'react-router'
+import { AppLoading } from '@/components/layout/AppLoading'
 import { RouteError } from '@/components/layout/RouteError'
 import { SiteLayout } from '@/components/layout/SiteLayout'
 import { AdminHome, AdminLayout } from '@/features/admin/AdminLayout'
@@ -29,6 +30,7 @@ export const routes: RouteObject[] = [
   {
     element: <SiteLayout />,
     errorElement: <RouteError />,
+    hydrateFallbackElement: <AppLoading />,
     children: [
       {
         element: <ShopperOnly />,

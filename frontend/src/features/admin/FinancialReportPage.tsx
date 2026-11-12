@@ -112,7 +112,7 @@ export function FinancialReportPage() {
                 By store (delivered in this period)
               </h2>
               <div className="mt-3 overflow-x-auto">
-                <table className="w-full min-w-[40rem] text-left text-sm">
+                <table className="w-full min-w-160 text-left text-sm">
                   <thead className="border-b border-line text-xs text-slate">
                     <tr>
                       <th scope="col" className="py-2 pr-4 font-medium">Store</th>

@@ -1,3 +1,4 @@
+import { DetailSkeleton } from '@/components/ui/DetailSkeleton'
 import { Check, LifeBuoy, Star } from 'lucide-react'
 import { useEffect, useState, type SubmitEvent } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
@@ -35,6 +36,7 @@ export function OrderDetailPage() {
           <Alert tone="error">{error.status === 404 ? 'We could not find this order.' : error.message}</Alert>
         </div>
       )}
+      {!order && !error && <DetailSkeleton />}
       {order && (
         <>
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-heading">Order {order.number}</h1>

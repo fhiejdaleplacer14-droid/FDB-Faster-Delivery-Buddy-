@@ -55,7 +55,7 @@ export function SellerCommissionsPage() {
           ) : (
             <>
               <div className="mt-6 overflow-x-auto">
-                <table className="w-full min-w-[40rem] text-left text-sm">
+                <table className="w-full min-w-160 text-left text-sm">
                   <thead className="border-b border-line text-xs tracking-wide text-slate uppercase">
                     <tr>
                       <th scope="col" className="py-2 pr-4 font-medium">Order</th>

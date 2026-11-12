@@ -1,3 +1,4 @@
+import { DetailSkeleton } from '@/components/ui/DetailSkeleton'
 import { ArrowLeft } from 'lucide-react'
 import { useEffect, useState, type SubmitEvent } from 'react'
 import { Link, useParams } from 'react-router'
@@ -37,6 +38,7 @@ export function SellerOrderPage() {
           <Alert tone="error">{error.status === 404 ? 'This order does not exist.' : error.message}</Alert>
         </div>
       )}
+      {!order && !error && <DetailSkeleton />}
       {order && (
         <>
           <div className="mt-4 flex flex-wrap items-center gap-3">

@@ -6,7 +6,7 @@ import { TextField } from '@/components/ui/Field'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import { AuthPage } from './AuthPage'
 import { useAuth } from './AuthContext'
-import { safeNext } from './guards'
+import { safeNext, withNext } from './guards'
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -70,7 +70,7 @@ export function LoginPage() {
       </form>
       <p className="mt-8 text-sm text-slate">
         New to FDB?{' '}
-        <Link to="/register" className="font-medium text-link hover:underline">
+        <Link to={withNext('/register', params.get('next'))} className="font-medium text-link hover:underline">
           Create an account
         </Link>
       </p>

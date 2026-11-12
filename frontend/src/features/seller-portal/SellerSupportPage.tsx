@@ -34,7 +34,7 @@ export function SellerSupportPage() {
       <h1 className="text-2xl font-bold tracking-tight text-heading">Customer requests</h1>
       <p className="mt-1 text-sm text-slate">Problems customers raised about your orders. Replying quickly usually settles things before FDB needs to step in.</p>
 
-      <div role="group" aria-label="Filter by status" className="mt-6 flex gap-1 overflow-x-auto border-b border-line">
+      <div role="group" aria-label="Filter by status" className="mt-6 flex gap-1 overflow-x-auto border-b border-line max-md:scroll-fade">
         {filters.map((f) => (
           <button
             key={f.label}

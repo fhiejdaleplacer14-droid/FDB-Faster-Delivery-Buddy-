@@ -1,3 +1,4 @@
+import { DetailSkeleton } from '@/components/ui/DetailSkeleton'
 import { ArrowLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
@@ -37,6 +38,7 @@ export function AdminOrderDetailPage() {
           <Alert tone="error">{error.status === 404 ? 'This order does not exist.' : error.message}</Alert>
         </div>
       )}
+      {!order && !error && <DetailSkeleton />}
       {order && (
         <>
           <h1 className="mt-4 text-2xl font-bold tracking-tight text-heading">{order.number}</h1>

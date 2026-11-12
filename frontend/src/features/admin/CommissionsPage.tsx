@@ -3,6 +3,7 @@ import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { CommissionStatusBadge } from '@/components/ui/CommissionStatusBadge'
 import { SelectField, TextField } from '@/components/ui/Field'
+import { Pagination } from '@/components/ui/Pagination'
 import { formatDate, formatDateTime } from '@/lib/format'
 import { firstError, http, toApiError, type ApiError } from '@/lib/http'
 import { formatPeso, formatRate } from '@/lib/money'
@@ -329,7 +330,7 @@ function RecordsSection() {
       {result && result.data.length === 0 && <p className="mt-3 text-sm text-slate">No records.</p>}
       {result && result.data.length > 0 && (
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[44rem] text-left text-sm">
+          <table className="w-full min-w-176 text-left text-sm">
             <thead className="border-b border-line text-xs tracking-wide text-slate uppercase">
               <tr>
                 <th scope="col" className="py-2 pr-4 font-medium">Order</th>
@@ -375,16 +376,9 @@ function RecordsSection() {
               ))}
             </tbody>
           </table>
-          <div className="mt-4 flex justify-end gap-2">
-            <Button variant="secondary" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-              Previous
-            </Button>
-            <Button variant="secondary" disabled={page >= result.meta.last_page} onClick={() => setPage(page + 1)}>
-              Next
-            </Button>
-          </div>
         </div>
       )}
+      {result && <Pagination meta={result.meta} noun="records" onPage={setPage} />}
     </section>
   )
 }

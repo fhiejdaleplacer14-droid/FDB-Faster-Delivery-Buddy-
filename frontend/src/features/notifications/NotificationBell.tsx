@@ -70,9 +70,9 @@ export function NotificationBell() {
         aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'}
         className="relative rounded-md p-2 text-ink transition-colors hover:bg-ink/5"
       >
-        <Bell key={unread} className={`size-5 ${unread ? 'origin-top animate-ring' : ''}`} aria-hidden />
+        <Bell key={`bell-${unread}`} className={`size-5 ${unread ? 'origin-top animate-ring' : ''}`} aria-hidden />
         {unread > 0 && (
-          <span key={unread} className="absolute -top-0.5 -right-0.5 min-w-4 animate-bump rounded-full bg-danger-solid px-1 text-center text-[10px] leading-4 font-semibold text-white">
+          <span key={`badge-${unread}`} className="absolute -top-0.5 -right-0.5 min-w-4 animate-bump rounded-full bg-danger-solid px-1 text-center text-[10px] leading-4 font-semibold text-white">
             {unread > 99 ? '99+' : unread}
           </span>
         )}

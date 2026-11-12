@@ -42,7 +42,7 @@ export function AdminOrdersPage() {
     <div>
       <h1 className="text-2xl font-bold tracking-tight text-heading">Orders</h1>
       <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div role="group" aria-label="Filter by status" className="flex gap-1 overflow-x-auto border-b border-line">
+        <div role="group" aria-label="Filter by status" className="flex gap-1 overflow-x-auto border-b border-line max-md:scroll-fade">
           {filters.map((f) => (
             <button
               key={f.label}
@@ -84,7 +84,7 @@ export function AdminOrdersPage() {
       {result && result.data.length > 0 && (
         <>
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[44rem] text-left text-sm">
+            <table className="w-full min-w-176 text-left text-sm">
               <thead className="border-b border-line text-xs tracking-wide text-slate uppercase">
                 <tr>
                   <th scope="col" className="py-2 pr-4 font-medium">Order</th>
@@ -98,7 +98,7 @@ export function AdminOrdersPage() {
                 {result.data.map((order) => (
                   <tr key={order.number}>
                     <td className="py-3 pr-4">
-                      <Link to={`/admin/orders/${order.number}`} className="font-medium text-link hover:underline">
+                      <Link to={`/admin/orders/${order.number}`} className="font-medium whitespace-nowrap text-link hover:underline">
                         {order.number}
                       </Link>
                     </td>
