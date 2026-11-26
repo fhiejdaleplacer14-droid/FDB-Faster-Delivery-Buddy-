@@ -6,7 +6,6 @@ use App\Domain\Identity\PermissionSlug;
 use App\Domain\Orders\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
-use App\Http\Resources\SellerOrderResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;

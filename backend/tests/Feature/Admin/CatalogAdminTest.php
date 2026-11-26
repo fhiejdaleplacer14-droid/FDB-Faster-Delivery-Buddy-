@@ -98,3 +98,27 @@ it('only deletes categories that are unused', function () {
     $this->actingAs($this->admin)->deleteJson("/api/v1/admin/categories/{$used->id}")->assertConflict();
     $this->actingAs($this->admin)->deleteJson("/api/v1/admin/categories/{$empty->id}")->assertNoContent();
 });
+
+it('moves a listing out of Others and clears the seller suggestion', function () {
+    $product = Product::factory()->pendingReview()->create(['category_id' => Category::others()->id, 'suggested_category' => 'Handmade soap']);
+    $target = Category::factory()->create();
+
+    $this->actingAs($this->admin)->postJson("/api/v1/admin/products/{$product->id}/category", ['category_id' => $target->id])
+        ->assertOk()
+        ->assertJsonPath('data.category_id', $target->id)
+        ->assertJsonPath('data.suggested_category', null)
+        ->assertJsonPath('data.status', 'pending_review');
+
+    expect(AuditLog::where('action', 'product.recategorized')->where('subject_id', $product->id)->exists())->toBeTrue();
+
+    $closed = Category::factory()->inactive()->create();
+    $this->actingAs($this->admin)->postJson("/api/v1/admin/products/{$product->id}/category", ['category_id' => $closed->id])
+        ->assertJsonValidationErrors('category_id');
+});
+
+it('keeps the Others category on and undeletable', function () {
+    $others = Category::others();
+
+    $this->actingAs($this->admin)->patchJson("/api/v1/admin/categories/{$others->id}", ['name' => 'Others', 'is_active' => false])->assertConflict();
+    $this->actingAs($this->admin)->deleteJson("/api/v1/admin/categories/{$others->id}")->assertConflict();
+});

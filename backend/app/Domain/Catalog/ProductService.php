@@ -21,7 +21,7 @@ use Throwable;
 class ProductService
 {
     // Edits to these fields on a published listing need another review.
-    private const REVIEWED_FIELDS = ['name', 'description', 'category_id'];
+    private const REVIEWED_FIELDS = ['name', 'description', 'category_id', 'suggested_category'];
 
     public function __construct(
         private readonly ImageProcessor $images,
@@ -29,7 +29,7 @@ class ProductService
     ) {}
 
     /**
-     * @param  array{category_id: int, name: string, description: string}  $details
+     * @param  array{category_id: int, suggested_category?: string|null, name: string, description: string}  $details
      * @param  list<array{id?: int|null, name: string, sku?: string|null, price: string, stock: int}>  $variants
      */
     public function create(Seller $seller, array $details, array $variants): Product
@@ -49,7 +49,7 @@ class ProductService
     }
 
     /**
-     * @param  array{category_id: int, name: string, description: string}  $details
+     * @param  array{category_id: int, suggested_category?: string|null, name: string, description: string}  $details
      * @param  list<array{id?: int|null, name: string, sku?: string|null, price: string, stock: int}>  $variants
      */
     public function update(Product $product, array $details, array $variants): Product
@@ -309,6 +309,23 @@ class ProductService
 
             $owner = Seller::query()->with('user')->findOrFail($product->seller_id)->user;
             $owner->notify(new ProductModerated($product, $to, $reason));
+
+            return $product;
+        });
+    }
+
+    // Admin files a listing into the right category; status is unchanged.
+    public function recategorize(Product $product, Category $category, User $moderator): Product
+    {
+        return DB::transaction(function () use ($product, $category, $moderator) {
+            $product = Product::query()->lockForUpdate()->findOrFail($product->id);
+            $from = $product->category_id;
+
+            $product->category_id = $category->id;
+            $product->suggested_category = null;
+            $product->save();
+
+            $this->audit->record('product.recategorized', $moderator, $product, ['from' => $from, 'to' => $category->id]);
 
             return $product;
         });

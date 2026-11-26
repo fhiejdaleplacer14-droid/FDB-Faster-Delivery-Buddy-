@@ -151,7 +151,8 @@ export type ManagedProduct = {
   status: ProductStatus
   moderation_reason: string | null
   category_id: number
-  category?: { id: number; name: string }
+  suggested_category: string | null
+  category?: { id: number; name: string; slug: string }
   price_from: string
   stock_total: number
   submitted_at: string | null

@@ -49,6 +49,9 @@ class CategoryController extends Controller
         Gate::authorize('permission', PermissionSlug::CategoriesManage);
 
         $data = $this->validated($request, $category);
+        if ($category->isOthers() && (($data['parent_id'] ?? null) || ($data['is_active'] ?? true) === false)) {
+            abort(response()->json(['message' => 'Others holds listings that fit nowhere else. It stays on and top-level.'], 409));
+        }
         if (($data['parent_id'] ?? null) && $category->children()->exists()) {
             abort(response()->json(['message' => 'A category with subcategories cannot become a subcategory.'], 409));
         }
@@ -68,7 +71,7 @@ class CategoryController extends Controller
     {
         Gate::authorize('permission', PermissionSlug::CategoriesManage);
 
-        if ($category->children()->exists() || $category->products()->withTrashed()->exists()) {
+        if ($category->isOthers() || $category->children()->exists() || $category->products()->withTrashed()->exists()) {
             return response()->json([
                 'message' => 'This category still has subcategories or listings. Turn it off instead of deleting it.',
             ], 409);

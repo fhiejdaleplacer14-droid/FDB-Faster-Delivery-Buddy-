@@ -9,13 +9,14 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { catalogApi } from '@/features/catalog/api'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import type { Category, ManagedProduct } from '@/types/api'
-import { sellerProductsApi, type ProductInput, type VariantInput } from './api'
+import { OTHERS_SLUG, sellerProductsApi, type ProductInput, type VariantInput } from './api'
 
 const MAX_PHOTO_BYTES = 8 * 1024 * 1024
 
 function toInput(product?: ManagedProduct): ProductInput {
   return {
-    category_id: product?.category_id ?? '',
+    category_id: product?.category?.slug === OTHERS_SLUG ? 'other' : (product?.category_id ?? ''),
+    suggested_category: product?.suggested_category ?? '',
     name: product?.name ?? '',
     description: product?.description ?? '',
     variants: product?.variants?.map((v) => ({ id: v.id, name: v.name, sku: v.sku ?? '', price: v.price, stock: String(v.stock) })) ?? [
@@ -238,15 +239,19 @@ function DetailsForm({ initial, submitLabel, onSave }: { initial: ProductInput; 
       <TextField label="Product name" required maxLength={120} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} error={err('name')} />
       <SelectField
         label="Category"
+        hint={'Can\'t find a good fit? Choose "Something else" at the bottom of the list.'}
         required
         value={String(form.category_id)}
-        onChange={(e) => setForm({ ...form, category_id: e.target.value ? Number(e.target.value) : '' })}
+        onChange={(e) => {
+          const v = e.target.value
+          setForm({ ...form, category_id: v === 'other' ? 'other' : v ? Number(v) : '' })
+        }}
         error={err('category_id') ?? (categoriesFailed ? 'Categories could not load. Reload the page to choose one.' : undefined)}
       >
         <option value="" disabled>
           Choose a category
         </option>
-        {categories.map((c) =>
+        {categories.filter((c) => c.slug !== OTHERS_SLUG).map((c) =>
           c.children && c.children.length > 0 ? (
             <optgroup key={c.id} label={c.name}>
               <option value={c.id}>{c.name} (general)</option>
@@ -262,7 +267,22 @@ function DetailsForm({ initial, submitLabel, onSave }: { initial: ProductInput; 
             </option>
           ),
         )}
+        <option value="other">Something else (not listed)</option>
       </SelectField>
+      {form.category_id === 'other' && (
+        <div className="animate-fade-in">
+          <TextField
+            label="What kind of product is it?"
+            hint="For example: handmade soap, phone accessories, plants. We'll file it in the right category, or add a new one."
+            required
+            autoFocus
+            maxLength={60}
+            value={form.suggested_category}
+            onChange={(e) => setForm({ ...form, suggested_category: e.target.value })}
+            error={err('suggested_category')}
+          />
+        </div>
+      )}
       <TextareaField
         label="Description"
         hint="What it is, size or weight, and anything a buyer should know."

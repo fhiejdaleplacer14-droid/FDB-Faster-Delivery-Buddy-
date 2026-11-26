@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Catalog;
 
+use App\Models\Category;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -10,7 +11,9 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => ['required', 'integer', Rule::exists('categories', 'id')->where('is_active', true)],
+            // No category_id means "something else": the seller describes it and it goes under Others.
+            'category_id' => ['nullable', 'required_without:suggested_category', 'integer', Rule::exists('categories', 'id')->where('is_active', true)],
+            'suggested_category' => ['nullable', 'required_without:category_id', 'string', 'min:2', 'max:60'],
             'name' => ['required', 'string', 'min:3', 'max:120'],
             'description' => ['required', 'string', 'min:10', 'max:5000'],
             'variants' => ['required', 'array', 'min:1', 'max:'.config('fdb.catalog.max_variants')],
@@ -26,6 +29,8 @@ class ProductRequest extends FormRequest
     {
         return [
             'category_id.exists' => 'Choose a category from the list.',
+            'category_id.required_without' => 'Choose a category, or pick "Something else" and tell us what it is.',
+            'suggested_category.required_without' => 'Tell us what kind of product this is.',
             'variants.required' => 'Add at least one option with a price.',
             'variants.*.name.distinct' => 'Each option needs a different name.',
             'variants.*.price.decimal' => 'Enter a price like 120 or 120.50.',
@@ -39,13 +44,28 @@ class ProductRequest extends FormRequest
         $this->merge([
             'name' => trim((string) $this->input('name')),
             'description' => trim((string) $this->input('description')),
+            'suggested_category' => trim((string) $this->input('suggested_category')) ?: null,
         ]);
     }
 
-    /** @return array{category_id: int, name: string, description: string} */
+    /** @return array{category_id: int, suggested_category: string|null, name: string, description: string} */
     public function details(): array
     {
-        return $this->safe()->only(['category_id', 'name', 'description']);
+        $details = $this->safe()->only(['name', 'description']);
+        $categoryId = $this->validated('category_id');
+
+        if ($categoryId === null) {
+            $details['category_id'] = Category::others()->id;
+            $details['suggested_category'] = $this->validated('suggested_category');
+        } else {
+            $details['category_id'] = (int) $categoryId;
+            // A suggestion only makes sense while the listing sits in Others.
+            $details['suggested_category'] = Category::query()->whereKey($categoryId)->value('slug') === Category::OTHERS_SLUG
+                ? $this->validated('suggested_category')
+                : null;
+        }
+
+        return $details;
     }
 
     /** @return list<array{id: int|null, name: string, sku: string|null, price: string, stock: int}> */

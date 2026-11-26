@@ -4,12 +4,13 @@ import { useEffect, useState, type SubmitEvent } from 'react'
 import { Link, useParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
-import { TextareaField } from '@/components/ui/Field'
+import { SelectField, TextareaField } from '@/components/ui/Field'
 import { ProductStatusBadge } from '@/components/ui/ProductStatusBadge'
 import { formatDateTime } from '@/lib/format'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import { formatPeso } from '@/lib/money'
-import type { ManagedProduct } from '@/types/api'
+import { catalogApi } from '@/features/catalog/api'
+import type { Category, ManagedProduct } from '@/types/api'
 import { adminCatalogApi } from './api'
 
 export function ProductReviewPage() {
@@ -45,6 +46,7 @@ export function ProductReviewPage() {
             {product.store?.name} · {product.category?.name} · submitted {formatDateTime(product.submitted_at)}
           </p>
 
+          <CategoryPanel product={product} onDone={setProduct} />
           <ModerationPanel product={product} onDone={setProduct} />
 
           {(product.images?.length ?? 0) > 0 && (
@@ -88,6 +90,96 @@ export function ProductReviewPage() {
         </>
       )}
     </div>
+  )
+}
+
+function CategoryPanel({ product, onDone }: { product: ManagedProduct; onDone: (p: ManagedProduct) => void }) {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [choice, setChoice] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<ApiError | null>(null)
+  const [open, setOpen] = useState(false)
+  const inOthers = product.category?.slug === 'others'
+
+  useEffect(() => {
+    if (inOthers || open) catalogApi.categories().then(setCategories, (e: unknown) => setError(toApiError(e)))
+  }, [inOthers, open])
+
+  async function move(event: SubmitEvent) {
+    event.preventDefault()
+    if (!choice) return
+    setBusy(true)
+    setError(null)
+    try {
+      onDone(await adminCatalogApi.recategorize(product.id, Number(choice)))
+      setChoice('')
+      setOpen(false)
+    } catch (e) {
+      setError(toApiError(e))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (!inOthers && !open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="mt-2 text-sm font-medium text-link hover:underline">
+        Change category
+      </button>
+    )
+  }
+
+  return (
+    <form onSubmit={move} noValidate className="mt-6 animate-fade-in rounded-md border border-line p-4">
+      {inOthers && (
+        <p className="text-sm text-ink">
+          {product.suggested_category ? (
+            <>
+              The seller says this is: <strong className="font-semibold">{product.suggested_category}</strong>
+            </>
+          ) : (
+            'This listing is under Others.'
+          )}
+        </p>
+      )}
+      <p className="mt-1 text-xs text-slate">
+        Move it to a category below. If none fits,{' '}
+        <Link to="/admin/categories" className="font-medium text-link hover:underline">
+          add a new category
+        </Link>{' '}
+        first.
+      </p>
+      <div className="mt-3 flex flex-wrap items-end gap-3">
+        <div className="min-w-0 flex-1 sm:min-w-56">
+          <SelectField label="Move to" value={choice} onChange={(e) => setChoice(e.target.value)} error={firstError(error, 'category_id')}>
+            <option value="" disabled>
+              Choose a category
+            </option>
+            {categories
+              .filter((c) => c.slug !== 'others')
+              .flatMap((c) => [c, ...(c.children ?? [])])
+              .map((c) => (
+                <option key={c.id} value={c.id} disabled={c.id === product.category_id}>
+                  {c.parent_id ? `— ${c.name}` : c.name}
+                </option>
+              ))}
+          </SelectField>
+        </div>
+        <Button type="submit" busy={busy} disabled={!choice}>
+          Move listing
+        </Button>
+        {!inOthers && (
+          <Button variant="ghost" disabled={busy} onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+        )}
+      </div>
+      {error && !firstError(error, 'category_id') && (
+        <div className="mt-3">
+          <Alert tone="error">{error.message}</Alert>
+        </div>
+      )}
+    </form>
   )
 }
 

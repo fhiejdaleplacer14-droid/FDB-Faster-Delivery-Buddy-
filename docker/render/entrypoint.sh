@@ -12,6 +12,8 @@ php artisan event:cache
 # Opt-in only: Render runs this on every start, and migrations should be a deliberate step.
 if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
   php artisan migrate --force
+  # Supabase only: keep RLS on every table, including ones the migration just made.
+  php artisan fdb:enforce-rls
 fi
 
 exec "$@"

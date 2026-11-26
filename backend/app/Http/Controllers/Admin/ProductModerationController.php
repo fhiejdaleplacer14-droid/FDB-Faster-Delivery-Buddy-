@@ -7,6 +7,7 @@ use App\Domain\Catalog\ProductStatus;
 use App\Domain\Identity\PermissionSlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ManagedProductResource;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -59,6 +60,19 @@ class ProductModerationController extends Controller
         $validated = $request->validate(['reason' => ['required', 'string', 'min:5', 'max:1000']]);
 
         return $this->resource($this->products->reject($product, $request->user(), trim($validated['reason'])));
+    }
+
+    public function recategorize(Request $request, Product $product): ManagedProductResource
+    {
+        Gate::authorize('permission', PermissionSlug::ProductsModerate);
+
+        $validated = $request->validate([
+            'category_id' => ['required', 'integer', Rule::exists('categories', 'id')->where('is_active', true)],
+        ], ['category_id.exists' => 'Choose a category that is turned on.']);
+
+        $category = Category::query()->findOrFail($validated['category_id']);
+
+        return $this->resource($this->products->recategorize($product, $category, $request->user()));
     }
 
     private function resource(Product $product): ManagedProductResource

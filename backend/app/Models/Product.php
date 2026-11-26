@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['category_id', 'name', 'description'])]
+#[Fillable(['category_id', 'suggested_category', 'name', 'description'])]
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */

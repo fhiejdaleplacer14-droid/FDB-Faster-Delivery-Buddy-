@@ -103,11 +103,34 @@ describe('seller portal', () => {
 
     expect(create).toHaveBeenCalledWith({
       category_id: 4,
+      suggested_category: '',
       name: 'Banana Chips',
       description: 'Crunchy banana chips.',
       variants: [{ name: 'Regular', sku: '', price: '45.50', stock: '12' }],
     })
     await waitFor(() => expect(router.state.location.pathname).toBe('/seller/products/42'))
+  })
+
+  it('lets a seller describe a product that fits no category', async () => {
+    vi.spyOn(catalogApi, 'categories').mockResolvedValue([
+      { id: 4, parent_id: null, name: 'Snacks', slug: 'snacks', position: 0, is_active: true, children: [] },
+      { id: 9, parent_id: null, name: 'Others', slug: 'others', position: 999, is_active: true, children: [] },
+    ])
+    const create = vi.spyOn(sellerProductsApi, 'create').mockResolvedValue({ id: 43, status: 'draft' } as ManagedProduct)
+    vi.spyOn(sellerProductsApi, 'get').mockReturnValue(new Promise(() => {}))
+    renderRoute('/seller/products/new', { user: makeUser({ roles: ['customer', 'seller'], seller: { id: 1, store_name: 'Rosa', status: 'approved' } }) })
+
+    await userEvent.type(await screen.findByLabelText('Product name'), 'Lavender Soap')
+    await screen.findByRole('option', { name: 'Snacks' })
+    expect(screen.queryByRole('option', { name: 'Others' })).toBeNull()
+    await userEvent.selectOptions(screen.getByLabelText('Category'), screen.getByRole('option', { name: 'Something else (not listed)' }))
+    await userEvent.type(screen.getByLabelText(/What kind of product/), 'Handmade soap')
+    await userEvent.type(screen.getByLabelText(/Description/), 'Cold-process soap bar.')
+    await userEvent.type(screen.getByLabelText('Price (₱)'), '80')
+    await userEvent.type(screen.getByLabelText('Stock'), '5')
+    await userEvent.click(screen.getByRole('button', { name: 'Save and add photos' }))
+
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ category_id: 'other', suggested_category: 'Handmade soap' }))
   })
 })
 
@@ -121,6 +144,7 @@ describe('moderation', () => {
       status: 'published',
       moderation_reason: null,
       category_id: 1,
+      suggested_category: null,
       price_from: '120.00',
       stock_total: 3,
       submitted_at: null,

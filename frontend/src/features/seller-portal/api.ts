@@ -2,11 +2,23 @@ import { http } from '@/lib/http'
 import type { ManagedProduct, Paginated, ProductStatus, Resource } from '@/types/api'
 
 export type VariantInput = { id?: number | undefined; name: string; sku: string; price: string; stock: string }
-export type ProductInput = { category_id: number | ''; name: string; description: string; variants: VariantInput[] }
+// 'other' means no category fits; the seller describes it in suggested_category.
+export type ProductInput = {
+  category_id: number | '' | 'other'
+  suggested_category: string
+  name: string
+  description: string
+  variants: VariantInput[]
+}
+
+export const OTHERS_SLUG = 'others'
 
 function payload(input: ProductInput) {
+  const other = input.category_id === 'other'
   return {
     ...input,
+    category_id: other || input.category_id === '' ? null : input.category_id,
+    suggested_category: other ? input.suggested_category.trim() : null,
     variants: input.variants.map((v) => ({
       ...(v.id ? { id: v.id } : {}),
       name: v.name.trim(),

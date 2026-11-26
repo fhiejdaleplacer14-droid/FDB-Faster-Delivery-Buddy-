@@ -143,6 +143,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::get('/products/{product}', [ProductModerationController::class, 'show'])->name('products.show');
         Route::post('/products/{product}/approve', [ProductModerationController::class, 'approve'])->name('products.approve');
         Route::post('/products/{product}/reject', [ProductModerationController::class, 'reject'])->name('products.reject');
+        Route::post('/products/{product}/category', [ProductModerationController::class, 'recategorize'])->name('products.recategorize');
 
         Route::get('/commission-policies', [AdminCommissionController::class, 'policies'])->name('commission-policies.index');
         Route::post('/commission-policies', [AdminCommissionController::class, 'setPolicy'])->name('commission-policies.store');

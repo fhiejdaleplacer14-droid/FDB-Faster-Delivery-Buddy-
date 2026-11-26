@@ -255,3 +255,26 @@ it('lets suspended sellers view but not change listings', function () {
     $this->actingAs($suspended->user)->postJson('/api/v1/seller/products', productPayload($this->category->id))->assertForbidden();
     $this->actingAs($suspended->user)->postJson("/api/v1/seller/products/{$product->id}/submit")->assertForbidden();
 });
+
+it('files a listing under Others with the seller\'s description when no category fits', function () {
+    $this->actingAs($this->seller->user)->postJson('/api/v1/seller/products', productPayload($this->category->id, [
+        'category_id' => null,
+        'suggested_category' => '  Handmade soap ',
+    ]))->assertCreated()
+        ->assertJsonPath('data.suggested_category', 'Handmade soap')
+        ->assertJsonPath('data.category.slug', 'others');
+
+    expect(Category::where('slug', 'others')->count())->toBe(1);
+});
+
+it('needs a category or a description of the product', function () {
+    $this->actingAs($this->seller->user)->postJson('/api/v1/seller/products', productPayload($this->category->id, ['category_id' => null]))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['category_id', 'suggested_category']);
+});
+
+it('drops the suggestion when a real category is chosen', function () {
+    $this->actingAs($this->seller->user)->postJson('/api/v1/seller/products', productPayload($this->category->id, [
+        'suggested_category' => 'Handmade soap',
+    ]))->assertCreated()->assertJsonPath('data.suggested_category', null);
+});
