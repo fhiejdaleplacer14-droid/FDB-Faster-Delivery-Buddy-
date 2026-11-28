@@ -28,6 +28,12 @@ it('requires re-verification after an email change', function () {
     $user = User::factory()->customer()->create();
 
     $this->actingAs($user)->patchJson('/api/v1/user', ['name' => $user->name, 'email' => 'fresh@example.com'])
+        ->assertJsonValidationErrors(['current_password' => 'Enter your current password to change your email.']);
+    $this->actingAs($user)->patchJson('/api/v1/user', ['name' => $user->name, 'email' => 'fresh@example.com', 'current_password' => 'wrong'])
+        ->assertJsonValidationErrors(['current_password' => 'That password is incorrect.']);
+    expect($user->fresh()->email)->not->toBe('fresh@example.com');
+
+    $this->actingAs($user)->patchJson('/api/v1/user', ['name' => $user->name, 'email' => 'fresh@example.com', 'current_password' => 'password'])
         ->assertOk()
         ->assertJsonPath('data.email', 'fresh@example.com')
         ->assertJsonPath('data.email_verified', false);

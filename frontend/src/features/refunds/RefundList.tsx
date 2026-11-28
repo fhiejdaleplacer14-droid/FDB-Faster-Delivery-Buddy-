@@ -33,6 +33,8 @@ export function RefundList({ refunds }: { refunds: Refund[] }) {
             <p className="mt-0.5 text-xs text-slate">
               Recorded by {r.recorded_as === 'admin' ? (r.recorded_by ?? 'FDB') : 'the seller'}
               {r.ticket_number && ` · request ${r.ticket_number}`}
+              {r.commission_status === 'pending' && ' · commission change waiting for FDB approval'}
+              {r.commission_status === 'declined' && ' · commission unchanged (not approved by FDB)'}
               {r.commission_reduction && r.commission_reduction !== '0.00' && ` · commission lowered by ${formatPeso(r.commission_reduction)}`}
               {r.commission_credit && r.commission_credit !== '0.00' && (r.credit_settled_at ? ` · ${formatPeso(r.commission_credit)} commission credit settled` : ` · ${formatPeso(r.commission_credit)} commission credit owed to the seller`)}
             </p>

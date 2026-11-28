@@ -18,7 +18,7 @@ class ImageProcessor
         if (! $info || ! in_array($info[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
             throw ValidationException::withMessages([$field => 'Upload a JPG, PNG, or WEBP photo.']);
         }
-        if ($info[0] * $info[1] > config('fdb.catalog.image_max_pixels')) {
+        if (config('fdb.catalog.image_max_pixels') < $info[0] * $info[1]) {
             throw ValidationException::withMessages([$field => 'This photo is too large. Use one under 40 megapixels.']);
         }
 

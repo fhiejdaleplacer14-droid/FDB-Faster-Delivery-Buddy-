@@ -7,7 +7,7 @@ services:
     runtime: docker
     dockerfilePath: ./docker/render/Dockerfile
     dockerContext: .
-    region: singapore # next to the Neon database
+    region: singapore # next to the Supabase database
     plan: free
     healthCheckPath: /api/v1/health
     envVars:
@@ -34,7 +34,7 @@ services:
       - key: TRUSTED_PROXIES
         value: "*"
 
-      # Neon database (use the unpooled URL)
+      # Supabase database (Session pooler URI, port 5432)
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_URL
@@ -84,7 +84,7 @@ services:
       - key: MEDIA_URL
         value: /storage
 
-      # Photos and seller documents live in Neon Object Storage, because Render's free disk is erased on restart.
+      # Photos and seller documents live in Supabase Storage, because Render's free disk is erased on restart.
       - key: FDB_STORAGE_DRIVER
         value: s3
       - key: FDB_MEDIA_BUCKET

@@ -102,7 +102,7 @@ describe('refunds', () => {
 
   it('lets an admin mark a commission credit as settled', async () => {
     const owed: Refund = { ...refund, commission_reduction: '0.00', commission_credit: '18.75', credit_settled_at: null, seller_order: { id: 3, number: paid.number, order_number: 'FDB-261110-ABCDEF' }, store: { id: 1, name: 'Rosa' } }
-    vi.spyOn(refundApi, 'list').mockResolvedValue({ data: [owed], meta: { current_page: 1, last_page: 1, per_page: 25, total: 1 }, summary: { credit_owed: '18.75', total: '100.00' } })
+    vi.spyOn(refundApi, 'list').mockResolvedValue({ data: [owed], meta: { current_page: 1, last_page: 1, per_page: 25, total: 1 }, summary: { credit_owed: '18.75', pending: 0, total: '100.00' } })
     const settle = vi.spyOn(refundApi, 'settleCredit').mockResolvedValue({ ...owed, credit_settled_at: '2026-11-10T09:00:00Z' })
     renderRoute('/admin/refunds', { user: adminUser() })
 
@@ -112,5 +112,18 @@ describe('refunds', () => {
     expect(settle).toHaveBeenCalledWith(1)
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Mark settled' })).not.toBeInTheDocument())
     expect(screen.getByText(/credit settled/)).toBeInTheDocument()
+  })
+
+  it('lets an admin approve a commission change a seller recorded', async () => {
+    const pending: Refund = { ...refund, commission_status: 'pending', commission_reduction: '0.00', commission_credit: '0.00', credit_settled_at: null, seller_order: { id: 3, number: paid.number, order_number: 'FDB-261110-ABCDEF' }, store: { id: 1, name: 'Rosa' } }
+    vi.spyOn(refundApi, 'list').mockResolvedValue({ data: [pending], meta: { current_page: 1, last_page: 1, per_page: 25, total: 1 }, summary: { credit_owed: '0.00', pending: 1, total: '100.00' } })
+    const review = vi.spyOn(refundApi, 'reviewCommission').mockResolvedValue({ ...pending, commission_status: 'applied', commission_reduction: '7.50' })
+    renderRoute('/admin/refunds', { user: adminUser() })
+
+    expect(await screen.findByText('Waiting for approval', { selector: 'span' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Approve' }))
+
+    expect(review).toHaveBeenCalledWith(1, 'approve')
+    expect(await screen.findByText('No refunds waiting for approval')).toBeInTheDocument()
   })
 })

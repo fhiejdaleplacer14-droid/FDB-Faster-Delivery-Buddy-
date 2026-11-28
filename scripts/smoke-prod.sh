@@ -1,8 +1,5 @@
 #!/bin/sh
-# Builds the production images, starts them as a throwaway stack with random secrets, and checks
-# that the SPA, the API, and the security headers work. Removes the stack and its volumes afterwards
-# unless KEEP=1. Never touches the dev stack or a real production stack.
-# Usage: sh scripts/smoke-prod.sh
+# Smoke-tests the production images in a throwaway stack (KEEP=1 keeps it). Usage: sh scripts/smoke-prod.sh
 set -eu
 
 PORT="${SMOKE_PORT:-8088}"

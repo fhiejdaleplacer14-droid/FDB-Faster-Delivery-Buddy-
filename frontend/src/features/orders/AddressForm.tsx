@@ -9,7 +9,7 @@ import { addressApi, type AddressInput } from './api'
 
 const empty: AddressInput = { label: '', recipient_name: '', phone: '', municipality: '', barangay: '', street: '', landmark: '' }
 
-// `embedded` is for use inside another <form> (checkout): browsers do not allow nested forms, so it renders a div.
+// `embedded` renders a div, for use inside another form.
 export function AddressForm({ initialName = '', onSaved, onCancel, embedded = false }: { initialName?: string; onSaved: (a: Address) => void; onCancel?: (() => void) | undefined; embedded?: boolean }) {
   const [form, setForm] = useState<AddressInput>({ ...empty, recipient_name: initialName })
   const [busy, setBusy] = useState(false)

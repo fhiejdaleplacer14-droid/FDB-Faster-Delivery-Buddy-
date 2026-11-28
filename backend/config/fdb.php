@@ -3,14 +3,12 @@
 return [
 
     'accounts' => [
-        // A verified email is needed to check out and to apply as a seller. Turn off only on test
-        // sites that cannot send email yet; seller applications still need admin approval either way.
+        // Needed to check out or apply as a seller. Turn off only where email can't be sent.
         'require_email_verification' => (bool) env('FDB_REQUIRE_EMAIL_VERIFICATION', true),
     ],
 
     'sellers' => [
-        // Placeholder policy until the founders confirm the verification requirements.
-        // Default for the admin switch (Admin > Settings). When off, sellers apply without uploading documents.
+        // Default for Admin > Settings (placeholder policy).
         'documents_required' => (bool) env('FDB_SELLER_DOCUMENTS_REQUIRED', true),
         'required_documents' => array_filter(explode(',', env('FDB_SELLER_REQUIRED_DOCUMENTS', 'government_id'))),
         'documents_disk' => env('FDB_SELLER_DOCUMENTS_DISK', 'seller_documents'),
@@ -20,7 +18,7 @@ return [
     ],
 
     'catalog' => [
-        // Placeholder policy: listings are reviewed by FDB before customers can see them.
+        // Admins approve listings before they go public (placeholder policy).
         'requires_review' => (bool) env('FDB_LISTING_REQUIRES_REVIEW', true),
         'media_disk' => env('FDB_MEDIA_DISK', 'media'),
         'max_images' => 8,
@@ -31,9 +29,9 @@ return [
     ],
 
     'orders' => [
-        // Sellers collect payment directly; FDB only records the method chosen. Only these can be selected.
+        // Sellers collect payment; FDB only records the method.
         'payment_methods' => array_values(array_filter(explode(',', env('FDB_PAYMENT_METHODS', 'cash_on_delivery')))),
-        // Shown at checkout in this order. Methods not enabled above appear as "coming soon" placeholders.
+        // Checkout order; disabled methods show as "coming soon".
         'payment_method_labels' => [
             'cash_on_delivery' => 'Cash on delivery',
             'gcash' => 'GCash',
@@ -45,20 +43,19 @@ return [
     ],
 
     'support' => [
-        // Placeholder policy: how long after delivery a customer may open a dispute.
+        // Days after delivery to open a dispute (placeholder).
         'dispute_window_days' => (int) env('FDB_DISPUTE_WINDOW_DAYS', 7),
     ],
 
     'commission' => [
-        // Placeholder: used only to create the first default policy. Admins change rates in the app.
+        // Seeds the first default rate only.
         'initial_default_rate' => env('FDB_INITIAL_COMMISSION_RATE', '0.0750'),
         'max_rate_percent' => 50,
         'collection_methods' => ['cash', 'gcash', 'maya', 'bank_transfer', 'other'],
     ],
 
     'refunds' => [
-        // Placeholder until the founders decide: 'proportional' cuts FDB's commission by the rate times
-        // the refunded item value; 'none' leaves the commission unchanged.
+        // 'proportional' reduces commission by the refunded value; 'none' keeps it (placeholder).
         'commission_treatment' => env('FDB_REFUND_COMMISSION', 'proportional'),
         'methods' => ['cash', 'gcash', 'maya', 'bank_transfer', 'other'],
     ],

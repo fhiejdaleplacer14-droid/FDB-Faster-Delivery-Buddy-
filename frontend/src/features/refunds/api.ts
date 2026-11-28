@@ -29,8 +29,11 @@ export const refundApi = {
   async recordAsAdmin(sellerOrderId: number, input: RefundInput) {
     return (await http.post<Resource<SellerOrder>>(`/admin/seller-orders/${sellerOrderId}/refunds`, body(input))).data.data
   },
-  async list(params: { credit?: 'owed' | 'settled' | undefined; page?: number }) {
-    return (await http.get<Paginated<Refund> & { summary: { credit_owed: string; total: string } }>('/admin/refunds', { params })).data
+  async list(params: { credit?: 'owed' | 'settled' | 'pending' | undefined; page?: number }) {
+    return (await http.get<Paginated<Refund> & { summary: { credit_owed: string; pending: number; total: string } }>('/admin/refunds', { params })).data
+  },
+  async reviewCommission(id: number, decision: 'approve' | 'decline') {
+    return (await http.post<Resource<Refund>>(`/admin/refunds/${id}/${decision}-commission`)).data.data
   },
   async settleCredit(id: number) {
     return (await http.post<Resource<Refund>>(`/admin/refunds/${id}/settle-credit`)).data.data

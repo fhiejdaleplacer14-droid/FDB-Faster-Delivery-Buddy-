@@ -25,6 +25,7 @@ class RefundResource extends JsonResource
             'recorded_as' => $this->recorded_as,
             'refunded_at' => $this->refunded_at->toIso8601ZuluString(),
             'recorded_by' => $this->when($staff && $this->relationLoaded('recorder'), fn () => $this->recorder?->name),
+            'commission_status' => $this->when($business, fn () => $this->commission_status),
             'commission_reduction' => $this->when($business, fn () => $this->commission_reduction),
             'commission_credit' => $this->when($business, fn () => $this->commission_credit),
             'credit_settled_at' => $this->when($business, fn () => $this->credit_settled_at?->toIso8601ZuluString()),

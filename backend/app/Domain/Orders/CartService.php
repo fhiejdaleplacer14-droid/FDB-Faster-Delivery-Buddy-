@@ -38,7 +38,7 @@ class CartService
     }
 
     /**
-     * The cart as it stands now: current prices and availability for every line.
+     * Cart with current prices and stock.
      *
      * @return array{groups: list<array<string, mixed>>, total: string, item_count: int, can_checkout: bool}
      */

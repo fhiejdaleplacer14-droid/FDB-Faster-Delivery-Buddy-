@@ -5,10 +5,10 @@ namespace App\Providers;
 use App\Domain\Identity\PermissionSlug;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -50,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('permission', fn (User $user, PermissionSlug $permission) => $user->hasPermission($permission));
 
-        // Signed-in people get their own allowance; guests share one per IP, and mobile carriers put many people behind one IP.
+        // Per user when signed in, per IP for guests.
         RateLimiter::for('api', fn (Request $request) => $request->user()
             ? Limit::perMinute(300)->by('user:'.$request->user()->id)
             : Limit::perMinute(240)->by('ip:'.$request->ip()));

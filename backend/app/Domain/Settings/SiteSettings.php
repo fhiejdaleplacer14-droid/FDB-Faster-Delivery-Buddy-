@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 
-// Switches admins can flip at runtime. Unknown keys are rejected; missing rows fall back to the config default.
+// Admin-editable switches; missing rows fall back to config.
 class SiteSettings
 {
     public const SELLER_DOCUMENTS_REQUIRED = 'sellers.documents_required';

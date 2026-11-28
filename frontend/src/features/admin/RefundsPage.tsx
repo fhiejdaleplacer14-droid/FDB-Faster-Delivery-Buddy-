@@ -13,9 +13,10 @@ import { toApiError, type ApiError } from '@/lib/http'
 import { formatPeso } from '@/lib/money'
 import type { Paginated, Refund } from '@/types/api'
 
-type Result = Paginated<Refund> & { summary: { credit_owed: string; total: string } }
+type Result = Paginated<Refund> & { summary: { credit_owed: string; pending: number; total: string } }
 
 const filters = [
+  { value: 'pending', label: 'Waiting for approval' },
   { value: 'owed', label: 'Credit owed to sellers' },
   { value: '', label: 'All refunds' },
   { value: 'settled', label: 'Credit settled' },
@@ -24,7 +25,7 @@ const filters = [
 export function RefundsPage() {
   const toast = useToast()
   const [params, setParams] = useSearchParams()
-  const credit = (params.get('credit') ?? 'owed') as 'owed' | 'settled' | ''
+  const credit = (params.get('credit') ?? 'pending') as 'pending' | 'owed' | 'settled' | ''
   const page = Math.max(1, Number(params.get('page')) || 1)
   const [result, setResult] = useState<Result | null>(null)
   const [error, setError] = useState<ApiError | null>(null)
@@ -47,16 +48,37 @@ export function RefundsPage() {
     }
   }
 
+  async function review(refund: Refund, decision: 'approve' | 'decline') {
+    setBusy(refund.id)
+    try {
+      const updated = await refundApi.reviewCommission(refund.id, decision)
+      setResult((r) => r && {
+        ...r,
+        data: credit === 'pending' ? r.data.filter((x) => x.id !== updated.id) : r.data.map((x) => (x.id === updated.id ? updated : x)),
+        summary: { ...r.summary, pending: Math.max(0, r.summary.pending - 1) },
+      })
+      toast.show({ tone: 'success', text: decision === 'approve' ? 'Commission change approved' : 'Commission left unchanged' })
+    } catch (e) {
+      setError(toApiError(e))
+    } finally {
+      setBusy(null)
+    }
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold tracking-tight text-heading">Refunds</h1>
       <p className="mt-1 max-w-2xl text-sm text-slate">
         Sellers return money to customers themselves. When FDB had already collected the commission on a refunded amount, FDB owes that part back to the seller as a credit. Mark it settled once you have paid it or taken
-        it off their next collection.
+        it off their next collection. Refunds a seller records only lower FDB's commission after you approve them.
       </p>
 
       {result && (
-        <dl className="stagger mt-6 grid gap-3 sm:grid-cols-2">
+        <dl className="stagger mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
+            <dt className="text-xs text-slate">Waiting for approval</dt>
+            <dd className={`mt-1 text-2xl font-bold tabular ${result.summary.pending > 0 ? 'text-warning' : 'text-heading'}`}>{result.summary.pending}</dd>
+          </div>
           <div className="rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
             <dt className="text-xs text-slate">Commission credit owed to sellers</dt>
             <dd className="mt-1 text-2xl font-bold text-heading tabular">{formatPeso(result.summary.credit_owed)}</dd>
@@ -89,7 +111,10 @@ export function RefundsPage() {
       )}
       {!result && !error && <TableSkeleton />}
       {result?.data.length === 0 && (
-        <EmptyState icon={credit === 'owed' ? CheckCircle2 : RotateCcw} title={credit === 'owed' ? 'FDB owes no commission credits' : 'No refunds here'}>
+        <EmptyState
+          icon={credit === 'owed' || credit === 'pending' ? CheckCircle2 : RotateCcw}
+          title={credit === 'pending' ? 'No refunds waiting for approval' : credit === 'owed' ? 'FDB owes no commission credits' : 'No refunds here'}
+        >
           Refunds are recorded from the order page by the seller or by FDB.
         </EmptyState>
       )}
@@ -131,7 +156,11 @@ export function RefundsPage() {
                         <span className="block text-xs text-slate">{r.method_label}</span>
                       </td>
                       <td className="py-3 pr-4 text-right text-xs tabular">
-                        {r.commission_credit !== '0.00' ? (
+                        {r.commission_status === 'pending' ? (
+                          <span className="font-semibold text-warning">Waiting for approval</span>
+                        ) : r.commission_status === 'declined' ? (
+                          <span className="text-slate">Declined, unchanged</span>
+                        ) : r.commission_credit !== '0.00' ? (
                           <span className={owed ? 'font-semibold text-warning' : 'text-success'}>
                             {formatPeso(r.commission_credit ?? '0')} credit {owed ? 'owed' : `settled ${formatDate(r.credit_settled_at)}`}
                           </span>
@@ -142,6 +171,16 @@ export function RefundsPage() {
                         )}
                       </td>
                       <td className="py-3 text-right">
+                        {r.commission_status === 'pending' && (
+                          <div className="flex justify-end gap-2">
+                            <Button busy={busy === r.id} onClick={() => review(r, 'approve')}>
+                              Approve
+                            </Button>
+                            <Button variant="ghost" disabled={busy === r.id} onClick={() => review(r, 'decline')}>
+                              Decline
+                            </Button>
+                          </div>
+                        )}
                         {owed && (
                           <Button variant="secondary" busy={busy === r.id} onClick={() => settle(r)}>
                             Mark settled

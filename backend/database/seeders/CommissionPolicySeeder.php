@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\CommissionPolicy;
 use Illuminate\Database\Seeder;
 
-// Creates the first marketplace-wide rate only if no default exists. After that, admins manage rates in the app.
+// Seeds the default commission rate once; admins manage it after that.
 class CommissionPolicySeeder extends Seeder
 {
     public function run(): void

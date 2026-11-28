@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Http\Response;
+use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends Controller
 {
@@ -50,6 +50,7 @@ class NotificationController extends Controller
     // Links are always paths inside the app, never somewhere else.
     private function safeUrl(mixed $url): ?string
     {
-        return is_string($url) && str_starts_with($url, '/') && ! str_starts_with($url, '//') ? $url : null;
+        // Same-site paths only; browsers treat "/\" like "//" (another site).
+        return is_string($url) && str_starts_with($url, '/') && ! str_starts_with($url, '//') && ! str_contains($url, '\\') ? $url : null;
     }
 }

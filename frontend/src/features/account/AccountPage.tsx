@@ -102,6 +102,8 @@ function ProfileForm({ user }: { user: User }) {
   const { setUser } = useAuth()
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)
+  const [password, setPassword] = useState('')
+  const emailChanged = email.trim().toLowerCase() !== user.email
   const [busy, setBusy] = useState(false)
   const [saved, setSaved] = useState<string | null>(null)
   const [error, setError] = useState<ApiError | null>(null)
@@ -112,8 +114,9 @@ function ProfileForm({ user }: { user: User }) {
     setError(null)
     setSaved(null)
     try {
-      const updated = await authApi.updateProfile({ name, email })
+      const updated = await authApi.updateProfile({ name, email, ...(emailChanged ? { current_password: password } : {}) })
       setUser(updated)
+      setPassword('')
       setSaved(
         updated.email_verified ? 'Profile saved.' : 'Profile saved. We sent a verification link to your new email.',
       )
@@ -137,6 +140,19 @@ function ProfileForm({ user }: { user: User }) {
         onChange={(e) => setEmail(e.target.value)}
         error={firstError(error, 'email')}
       />
+      {emailChanged && (
+        <div className="animate-fade-in">
+          <PasswordField
+            label="Password to confirm"
+            hint="For your safety, enter your password to change your email."
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={firstError(error, 'current_password')}
+          />
+        </div>
+      )}
       <Button type="submit" busy={busy}>
         Save profile
       </Button>

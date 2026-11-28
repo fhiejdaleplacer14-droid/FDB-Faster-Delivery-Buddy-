@@ -98,7 +98,7 @@ return [
             // Supabase keeps extensions such as pg_trgm in their own schema; a missing schema is ignored.
             'search_path' => 'public,extensions',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
-            // Reuses the connection across requests; a remote database like Neon is slow to connect to.
+            // Reuses the connection across requests; remote databases are slow to connect to.
             'options' => extension_loaded('pdo_pgsql') ? [PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', false)] : [],
         ],
 

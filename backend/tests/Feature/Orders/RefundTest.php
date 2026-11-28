@@ -34,6 +34,13 @@ function refundPayload(array $overrides = []): array
     return array_replace(['amount' => '100.00', 'method' => 'gcash', 'reference' => 'GC-123', 'reason' => 'One pack was damaged'], $overrides);
 }
 
+function approvePendingRefunds(object $test): void
+{
+    foreach (Refund::where('commission_status', 'pending')->orderBy('id')->pluck('id') as $id) {
+        $test->actingAs($test->admin)->postJson("/api/v1/admin/refunds/{$id}/approve-commission")->assertOk();
+    }
+}
+
 function paidAndDelivered(object $test): void
 {
     $test->actingAs($test->sellerUser)->postJson("{$test->sellerUrl}/status", ['status' => 'delivered'])->assertOk();
@@ -45,7 +52,7 @@ it('refuses refunds before the seller has received the payment', function () {
     expect(Refund::count())->toBe(0);
 });
 
-it('lets the seller record a partial refund that lowers the due commission proportionally', function () {
+it('lowers the due commission for a seller refund only after an admin approves it', function () {
     paidAndDelivered($this);
 
     $this->actingAs($this->sellerUser)->postJson("{$this->sellerUrl}/refunds", refundPayload())
@@ -53,12 +60,22 @@ it('lets the seller record a partial refund that lowers the due commission propo
         ->assertJsonPath('data.payment_status', 'partially_refunded')
         ->assertJsonPath('data.refunded_total', '100.00')
         ->assertJsonPath('data.refunds.0.method_label', 'GCash')
+        ->assertJsonPath('data.refunds.0.commission_status', 'pending')
+        ->assertJsonPath('data.refunds.0.commission_reduction', '0.00');
+
+    $record = CommissionRecord::sole();
+    expect($record->netAmount())->toBe('37.50');
+    $this->actingAs($this->admin)->getJson('/api/v1/admin/refunds?credit=pending')->assertJsonCount(1, 'data')->assertJsonPath('summary.pending', 1);
+    $this->actingAs($this->sellerUser)->postJson('/api/v1/admin/refunds/'.Refund::sole()->id.'/approve-commission')->assertForbidden();
+
+    approvePendingRefunds($this);
+    $this->actingAs($this->sellerUser)->getJson($this->sellerUrl)
+        ->assertJsonPath('data.refunds.0.commission_status', 'applied')
         ->assertJsonPath('data.refunds.0.commission_reduction', '7.50')
         ->assertJsonPath('data.commission.amount', '30.00')
         ->assertJsonPath('data.commission.seller_amount', '370.00');
 
-    $record = CommissionRecord::sole();
-    expect($record->netAmount())->toBe('30.00')
+    expect($record->fresh()->netAmount())->toBe('30.00')
         ->and($record->adjustments()->sole()->amount)->toBe('-7.50');
 
     Notification::assertSentTo($this->customer, RefundRecorded::class);
@@ -81,6 +98,7 @@ it('never refunds more than was paid, and marks a full refund', function () {
     $this->actingAs($this->sellerUser)->postJson("{$this->sellerUrl}/refunds", refundPayload(['amount' => '100']))
         ->assertOk()
         ->assertJsonPath('data.payment_status', 'refunded');
+    approvePendingRefunds($this);
 
     // The whole commission is gone, never below zero.
     expect(CommissionRecord::sole()->netAmount())->toBe('0.00');
@@ -133,8 +151,9 @@ it('turns the reduction into a credit owed when FDB already collected the commis
         'seller_id' => $this->so->seller_id, 'record_ids' => [$record->id], 'method' => 'gcash',
     ])->assertCreated();
 
-    $this->actingAs($this->sellerUser)->postJson("{$this->sellerUrl}/refunds", refundPayload(['amount' => '250.00']))
-        ->assertOk()
+    $this->actingAs($this->sellerUser)->postJson("{$this->sellerUrl}/refunds", refundPayload(['amount' => '250.00']))->assertOk();
+    approvePendingRefunds($this);
+    $this->actingAs($this->sellerUser)->getJson($this->sellerUrl)
         ->assertJsonPath('data.refunds.0.commission_reduction', '0.00')
         ->assertJsonPath('data.refunds.0.commission_credit', '18.75');
 
@@ -166,8 +185,28 @@ it('counts refunds against items before the delivery fee', function () {
 
     $this->actingAs($this->sellerUser)->postJson("{$this->sellerUrl}/refunds", refundPayload(['amount' => '480.00']))->assertOk();
     // Only 20.00 of item value is left, so the last 70.00 reduces commission by 1.50.
-    $this->actingAs($this->sellerUser)->postJson("{$this->sellerUrl}/refunds", refundPayload(['amount' => '70.00']))
-        ->assertOk()
-        ->assertJsonPath('data.refunds.1.commission_reduction', '1.50');
+    $this->actingAs($this->sellerUser)->postJson("{$this->sellerUrl}/refunds", refundPayload(['amount' => '70.00']))->assertOk();
+    approvePendingRefunds($this);
+    expect(Refund::orderBy('id')->get()->pluck('commission_reduction')->all())->toBe(['36.00', '1.50']);
     expect(CommissionRecord::sole()->netAmount())->toBe('0.00');
+});
+
+it('applies admin-recorded refunds at once and lets an admin decline a seller\'s claim', function () {
+    paidAndDelivered($this);
+
+    $this->actingAs($this->admin)->postJson("/api/v1/admin/seller-orders/{$this->so->id}/refunds", refundPayload())
+        ->assertOk()
+        ->assertJsonPath('data.refunds.0.commission_status', 'applied')
+        ->assertJsonPath('data.refunds.0.commission_reduction', '7.50');
+
+    $this->actingAs($this->sellerUser)->postJson("{$this->sellerUrl}/refunds", refundPayload(['amount' => '50.00']))->assertOk();
+    $pending = Refund::where('commission_status', 'pending')->sole();
+
+    $this->actingAs($this->admin)->postJson("/api/v1/admin/refunds/{$pending->id}/decline-commission")
+        ->assertOk()->assertJsonPath('data.commission_status', 'declined');
+    $this->actingAs($this->admin)->postJson("/api/v1/admin/refunds/{$pending->id}/approve-commission")->assertJsonValidationErrors('refund');
+
+    expect(CommissionRecord::sole()->netAmount())->toBe('30.00')
+        ->and(SellerOrder::sole()->refunded_total)->toBe('150.00')
+        ->and(AuditLog::where('action', 'refund.commission_declined')->exists())->toBeTrue();
 });

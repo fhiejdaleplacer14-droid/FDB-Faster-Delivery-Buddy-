@@ -5,9 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-// Supabase exposes the public schema through its Data API (roles anon and authenticated).
-// FDB never uses that API, so every table gets RLS with no policies and those roles lose all grants.
-// The app connects as the table owner, which bypasses RLS, so Laravel keeps working.
+// Locks Supabase's Data API out (RLS, no policies); the app owns the tables, so it bypasses RLS.
 class EnforceRowLevelSecurity extends Command
 {
     protected $signature = 'fdb:enforce-rls {--check : Report tables without RLS and change nothing}';

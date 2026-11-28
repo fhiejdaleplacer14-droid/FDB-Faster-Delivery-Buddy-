@@ -16,7 +16,7 @@ use function Laravel\Prompts\text;
 
 class CreateAdmin extends Command
 {
-    // The password is read from FDB_ADMIN_PASSWORD when set, so it never appears in shell history or process lists.
+    // FDB_ADMIN_PASSWORD keeps the password out of shell history.
     protected $signature = 'fdb:create-admin {--name= : Full name} {--email= : Email address}';
 
     protected $description = 'Create an FDB administrator account';

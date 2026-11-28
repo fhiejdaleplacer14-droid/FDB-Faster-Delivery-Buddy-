@@ -116,7 +116,7 @@ class SellerApplicationService
     }
 
     /**
-     * Files are written before the transaction and removed again if it fails.
+     * Stores files first; deletes them if the transaction fails.
      *
      * @param  list<array{type: SellerDocumentType, file: UploadedFile}>  $documents
      * @param  callable(list<array<string, mixed>>): Seller  $callback

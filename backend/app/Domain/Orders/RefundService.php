@@ -67,9 +67,15 @@ class RefundService
                 'recorded_by' => $actor->id,
                 'recorded_as' => $recordedAs,
                 'refunded_at' => $refundedAt ?? now(),
+                'commission_items_value' => $this->itemsValue($sellerOrder, $before, $after),
             ])->save();
 
-            $this->applyCommission($refund, $sellerOrder, $before, $after, $actor);
+            // A seller's own refund could be used to dodge commission, so an admin approves it first.
+            if ($recordedAs === 'seller' && $this->affectsCommission($refund)) {
+                $refund->forceFill(['commission_status' => 'pending'])->save();
+            } else {
+                $this->applyCommission($refund, $sellerOrder, $actor);
+            }
 
             $sellerOrder->refunded_total = $after;
             $sellerOrder->payment_status = bccomp($after, $sellerOrder->total, 2) === 0 ? PaymentStatus::Refunded : PaymentStatus::PartiallyRefunded;
@@ -80,6 +86,7 @@ class RefundService
                 'amount' => $amount,
                 'method' => $method,
                 'recorded_as' => $recordedAs,
+                'commission_status' => $refund->commission_status,
                 'commission_reduction' => $refund->commission_reduction,
                 'commission_credit' => $refund->commission_credit,
                 'ticket' => $ticket?->number,
@@ -95,6 +102,44 @@ class RefundService
         }
 
         return $refund;
+    }
+
+    public function approveCommission(Refund $refund, User $actor): Refund
+    {
+        return $this->review($refund, $actor, 'applied', function (Refund $refund) use ($actor) {
+            $this->applyCommission($refund, SellerOrder::query()->lockForUpdate()->findOrFail($refund->seller_order_id), $actor);
+        });
+    }
+
+    // The refund still stands for the customer; only FDB's commission is left unchanged.
+    public function declineCommission(Refund $refund, User $actor): Refund
+    {
+        return $this->review($refund, $actor, 'declined', fn () => null);
+    }
+
+    private function review(Refund $refund, User $actor, string $status, callable $apply): Refund
+    {
+        return DB::transaction(function () use ($refund, $actor, $status, $apply) {
+            $refund = Refund::query()->lockForUpdate()->findOrFail($refund->id);
+            if ($refund->commission_status !== 'pending') {
+                throw ValidationException::withMessages(['refund' => 'This refund is not waiting for a commission decision.']);
+            }
+
+            $apply($refund);
+            $refund->forceFill([
+                'commission_status' => $status,
+                'commission_reviewed_by' => $actor->id,
+                'commission_reviewed_at' => now(),
+            ])->save();
+
+            $this->audit->record("refund.commission_{$status}", $actor, $refund, array_filter([
+                'amount' => $refund->amount,
+                'commission_reduction' => $refund->commission_reduction,
+                'commission_credit' => $refund->commission_credit,
+            ]));
+
+            return $refund;
+        });
     }
 
     public function settleCredit(Refund $refund, User $actor): Refund
@@ -114,7 +159,19 @@ class RefundService
     }
 
     // Only the item value carries commission, so refunds count against items first.
-    private function applyCommission(Refund $refund, SellerOrder $sellerOrder, string $before, string $after, User $actor): void
+    private function itemsValue(SellerOrder $sellerOrder, string $before, string $after): string
+    {
+        $base = $sellerOrder->items_total;
+
+        return Money::subtract($this->min($after, $base), $this->min($before, $base));
+    }
+
+    private function affectsCommission(Refund $refund): bool
+    {
+        return config('fdb.refunds.commission_treatment') === 'proportional' && bccomp($refund->commission_items_value, '0', 2) > 0;
+    }
+
+    private function applyCommission(Refund $refund, SellerOrder $sellerOrder, User $actor): void
     {
         if (config('fdb.refunds.commission_treatment') !== 'proportional') {
             return;
@@ -125,9 +182,7 @@ class RefundService
             return;
         }
 
-        $base = $sellerOrder->items_total;
-        $itemsRefunded = Money::subtract($this->min($after, $base), $this->min($before, $base));
-        $reduction = $this->min(Money::percentOf($itemsRefunded, $record->rate), $record->netAmount());
+        $reduction = $this->min(Money::percentOf($refund->commission_items_value, $record->rate), $record->netAmount());
         if (bccomp($reduction, '0', 2) <= 0) {
             return;
         }

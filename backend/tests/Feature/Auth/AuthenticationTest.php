@@ -37,6 +37,20 @@ it('locks sign-in after five failed attempts', function () {
     $this->assertGuest();
 });
 
+it('locks one account after repeated failures from many addresses', function () {
+    User::factory()->create(['email' => 'juan@example.com']);
+
+    foreach (range(1, 20) as $attempt) {
+        $this->withServerVariables(['REMOTE_ADDR' => "10.0.0.{$attempt}"])
+            ->postJson('/api/v1/auth/login', ['email' => 'juan@example.com', 'password' => 'wrong'])->assertUnprocessable();
+    }
+
+    $this->withServerVariables(['REMOTE_ADDR' => '10.0.1.1'])
+        ->postJson('/api/v1/auth/login', ['email' => 'juan@example.com', 'password' => 'password'])
+        ->assertTooManyRequests();
+    $this->assertGuest();
+});
+
 it('refuses to sign in a suspended account', function () {
     User::factory()->suspended()->create(['email' => 'banned@example.com']);
 

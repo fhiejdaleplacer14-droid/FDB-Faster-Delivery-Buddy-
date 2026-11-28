@@ -12,8 +12,6 @@ RUN npm run build
 FROM nginx:1.30.6-alpine
 COPY docker/nginx/production.conf /etc/nginx/conf.d/default.conf
 COPY --from=spa /app/dist /usr/share/nginx/spa
-# nginx only needs this path to exist; PHP runs in the app container.
-# The media volume is shared with the app, whose www-data is uid 1000, so it must own the folder
-# whichever container first fills the volume.
+# Placeholder index.php for nginx; media is owned by uid 1000 to match the app's www-data.
 RUN mkdir -p /var/www/html/public /var/www/media && touch /var/www/html/public/index.php \
     && chown 1000:1000 /var/www/media

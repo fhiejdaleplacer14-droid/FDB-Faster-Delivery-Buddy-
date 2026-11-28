@@ -16,7 +16,6 @@ use App\Support\Money;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class CheckoutService
 {
@@ -26,7 +25,7 @@ class CheckoutService
     ) {}
 
     /**
-     * Returns [order, created]. Replaying the same idempotency key returns the original order.
+     * Returns [order, created]; a repeated idempotency key returns the first order.
      *
      * @return array{0: Order, 1: bool}
      */

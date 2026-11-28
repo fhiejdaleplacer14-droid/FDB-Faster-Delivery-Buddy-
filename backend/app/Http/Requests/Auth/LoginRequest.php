@@ -12,6 +12,11 @@ class LoginRequest extends FormRequest
 {
     private const MAX_ATTEMPTS = 5;
 
+    // Caps guessing on one account even when the attacker rotates IPs.
+    private const MAX_ATTEMPTS_PER_ACCOUNT = 20;
+
+    private const ACCOUNT_DECAY_SECONDS = 900;
+
     public function rules(): array
     {
         return [
@@ -29,17 +34,21 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $key = $this->throttleKey();
+        $accountKey = 'login-account:'.sha1((string) $this->input('email'));
 
-        if (RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS)) {
-            event(new Lockout($this));
+        foreach ([[$key, self::MAX_ATTEMPTS], [$accountKey, self::MAX_ATTEMPTS_PER_ACCOUNT]] as [$k, $max]) {
+            if (RateLimiter::tooManyAttempts($k, $max)) {
+                event(new Lockout($this));
 
-            throw ValidationException::withMessages([
-                'email' => 'Too many sign-in attempts. Try again in '.RateLimiter::availableIn($key).' seconds.',
-            ])->status(429);
+                throw ValidationException::withMessages([
+                    'email' => 'Too many sign-in attempts. Try again in '.RateLimiter::availableIn($k).' seconds.',
+                ])->status(429);
+            }
         }
 
         if (! Auth::guard('web')->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($key, 60);
+            RateLimiter::hit($accountKey, self::ACCOUNT_DECAY_SECONDS);
 
             throw ValidationException::withMessages([
                 'email' => 'The email or password is incorrect.',
@@ -47,6 +56,7 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($key);
+        RateLimiter::clear($accountKey);
     }
 
     private function throttleKey(): string

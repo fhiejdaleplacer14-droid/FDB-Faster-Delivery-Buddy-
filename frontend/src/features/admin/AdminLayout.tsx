@@ -27,7 +27,7 @@ const links: { to: string; label: string; permission: PermissionSlug; icon: Luci
   { to: '/admin/settings', label: 'Settings', permission: 'sellers.manage', icon: Settings },
 ]
 
-// Work waiting for an admin. Refreshed on page changes, at most every 20 seconds, so quick clicking stays under the rate limit.
+// Pending-work badge refresh, throttled to stay under the rate limit.
 const ATTENTION_EVERY_MS = 20_000
 
 function useAttention(user: User | null) {

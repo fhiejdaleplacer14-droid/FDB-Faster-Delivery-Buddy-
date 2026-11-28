@@ -26,19 +26,20 @@ class RefundController extends Controller
         Gate::authorize('permission', PermissionSlug::RefundsManage);
 
         $filters = $request->validate([
-            'credit' => ['nullable', Rule::in(['owed', 'settled'])],
+            'credit' => ['nullable', Rule::in(['owed', 'settled', 'pending'])],
             'seller_id' => ['nullable', 'integer'],
         ]);
 
         $query = Refund::query()
             ->when($filters['seller_id'] ?? null, fn ($q, $id) => $q->where('seller_id', $id))
             ->when(($filters['credit'] ?? null) === 'owed', fn ($q) => $q->where('commission_credit', '>', 0)->whereNull('credit_settled_at'))
-            ->when(($filters['credit'] ?? null) === 'settled', fn ($q) => $q->whereNotNull('credit_settled_at'));
+            ->when(($filters['credit'] ?? null) === 'settled', fn ($q) => $q->whereNotNull('credit_settled_at'))
+            ->when(($filters['credit'] ?? null) === 'pending', fn ($q) => $q->where('commission_status', 'pending'));
 
         $owed = bcadd((string) Refund::query()->where('commission_credit', '>', 0)->whereNull('credit_settled_at')->sum('commission_credit'), '0', 2);
 
         return RefundResource::collection($query->clone()->with(self::DETAIL)->orderByDesc('refunded_at')->orderByDesc('id')->paginate(25)->withQueryString())
-            ->additional(['summary' => ['credit_owed' => $owed, 'total' => bcadd((string) $query->clone()->sum('amount'), '0', 2)]]);
+            ->additional(['summary' => ['credit_owed' => $owed, 'pending' => Refund::query()->where('commission_status', 'pending')->count(), 'total' => bcadd((string) $query->clone()->sum('amount'), '0', 2)]]);
     }
 
     public function store(RecordRefundRequest $request, int $sellerOrderId): SellerOrderResource
@@ -49,6 +50,20 @@ class RefundController extends Controller
         $request->record($this->refunds, $sellerOrder, $request->user(), 'admin');
 
         return new SellerOrderResource($sellerOrder->fresh()->load(['seller', 'items', 'history.actor', 'refunds.recorder', 'refunds.ticket']));
+    }
+
+    public function approveCommission(Request $request, int $refundId): RefundResource
+    {
+        Gate::authorize('permission', PermissionSlug::RefundsManage);
+
+        return new RefundResource($this->refunds->approveCommission(Refund::query()->findOrFail($refundId), $request->user())->load(self::DETAIL));
+    }
+
+    public function declineCommission(Request $request, int $refundId): RefundResource
+    {
+        Gate::authorize('permission', PermissionSlug::RefundsManage);
+
+        return new RefundResource($this->refunds->declineCommission(Refund::query()->findOrFail($refundId), $request->user())->load(self::DETAIL));
     }
 
     public function settleCredit(Request $request, int $refundId): RefundResource

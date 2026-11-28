@@ -17,8 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
 
-// Fictional stores and listings for local and staging demos. Photos: Wikimedia Commons, see demo-images/CREDITS.md.
-// Run with: php artisan db:seed --class=DemoMarketplaceSeeder
+// Demo stores and listings (photos: demo-images/CREDITS.md). php artisan db:seed --class=DemoMarketplaceSeeder
 class DemoMarketplaceSeeder extends Seeder
 {
     private const CATEGORIES = [

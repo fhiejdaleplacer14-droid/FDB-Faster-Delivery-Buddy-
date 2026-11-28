@@ -1,7 +1,6 @@
 import { useCallback, useId, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 
-// Categorical slots in fixed order, validated for colour-blind safety on each theme's card surface (see styles.css).
-// Never cycle or generate more: past five, fold into "Other".
+// Colour-blind-safe series colours; past five, group the rest into "Other".
 export const SERIES = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'] as const
 // Text set inside a filled block: white, except near-black on yellow.
 const INK_ON = ['#ffffff', '#ffffff', '#ffffff', '#0b0b0b', '#ffffff'] as const
@@ -12,9 +11,7 @@ const SURFACE = 'var(--color-surface)'
 const DEEMPHASIS = 'var(--chart-baseline)'
 const LABEL = 'var(--color-ink)'
 
-// Chart geometry uses plain numbers; every value a person reads is formatted from the exact API string.
-// Charts draw nothing until their box is measured, so a chart never props its card wider than the screen.
-// The fallback is only for environments without layout (tests).
+// Measures the chart box before drawing so charts never overflow; the fallback is for tests.
 export function useWidth<T extends HTMLElement>(fallback = 640) {
   const [width, setWidth] = useState(0)
   const ref = useCallback((el: T | null) => {

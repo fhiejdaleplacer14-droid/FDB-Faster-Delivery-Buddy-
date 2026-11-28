@@ -19,7 +19,7 @@ class CurrentUserController extends Controller
     public function update(UpdateProfileRequest $request): UserResource
     {
         $user = $request->user();
-        $user->fill($request->validated());
+        $user->fill($request->safe()->only(['name', 'email']));
 
         $emailChanged = $user->isDirty('email');
         if ($emailChanged) {

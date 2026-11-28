@@ -14,6 +14,8 @@ class Refund extends Model
             'amount' => 'decimal:2',
             'commission_reduction' => 'decimal:2',
             'commission_credit' => 'decimal:2',
+            'commission_items_value' => 'decimal:2',
+            'commission_reviewed_at' => 'datetime',
             'credit_settled_at' => 'datetime',
             'refunded_at' => 'datetime',
         ];

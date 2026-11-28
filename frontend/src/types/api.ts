@@ -235,6 +235,7 @@ export type Refund = {
   recorded_as: 'seller' | 'admin'
   refunded_at: string
   recorded_by?: string | null
+  commission_status?: 'pending' | 'applied' | 'declined'
   commission_reduction?: string
   commission_credit?: string
   credit_settled_at?: string | null

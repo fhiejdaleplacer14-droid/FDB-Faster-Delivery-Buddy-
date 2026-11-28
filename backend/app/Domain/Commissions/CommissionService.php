@@ -30,7 +30,7 @@ class CommissionService
     }
 
     /**
-     * Starts a new rate now and ends the current one for the same scope. Past orders keep their snapshot.
+     * Ends the current rate for this scope and starts a new one. Past orders keep theirs.
      *
      * @param  string  $ratePercent  e.g. "7.5"
      */

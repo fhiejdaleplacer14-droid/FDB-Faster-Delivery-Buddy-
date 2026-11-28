@@ -30,7 +30,7 @@ export const authApi = {
   async resendVerification() {
     return (await http.post<{ message: string }>('/auth/verify-email/resend')).data.message
   },
-  async updateProfile(input: { name: string; email: string }) {
+  async updateProfile(input: { name: string; email: string; current_password?: string }) {
     return (await http.patch<Resource<User>>('/user', input)).data.data
   },
   async updatePassword(input: { current_password: string; password: string; password_confirmation: string }) {
