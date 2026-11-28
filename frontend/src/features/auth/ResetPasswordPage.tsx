@@ -2,7 +2,7 @@ import { useState, type SubmitEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
-import { TextField } from '@/components/ui/Field'
+import { PasswordField } from '@/components/ui/Field'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import { authApi } from './api'
 import { AuthPage } from './AuthPage'
@@ -65,9 +65,8 @@ export function ResetPasswordPage() {
             </Link>
           </Alert>
         )}
-        <TextField
+        <PasswordField
           label="New password"
-          type="password"
           autoComplete="new-password"
           hint="At least 10 characters, with letters and numbers."
           required
@@ -75,9 +74,8 @@ export function ResetPasswordPage() {
           onChange={(e) => setPassword(e.target.value)}
           error={firstError(error, 'password')}
         />
-        <TextField
+        <PasswordField
           label="Confirm new password"
-          type="password"
           autoComplete="new-password"
           required
           value={confirmation}

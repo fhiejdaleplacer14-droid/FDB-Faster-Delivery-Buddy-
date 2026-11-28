@@ -1,4 +1,5 @@
-import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
+import { useId, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react'
 
 type FieldShellProps = {
   id: string
@@ -49,6 +50,38 @@ export function TextField({ label, hint, error, className = '', ...props }: Comm
         aria-describedby={describedBy(id, hint, error)}
         className={`${control} border-line ${className}`}
       />
+    </FieldShell>
+  )
+}
+
+// Password input with an eye button to show or hide what was typed.
+export function PasswordField({ label, hint, error, className = '', ...props }: Common & Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>) {
+  const id = useId()
+  const [visible, setVisible] = useState(false)
+  const Icon = visible ? EyeOff : Eye
+  return (
+    <FieldShell id={id} label={label} hint={hint} error={error}>
+      <div className="relative">
+        <input
+          id={id}
+          {...props}
+          type={visible ? 'text' : 'password'}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy(id, hint, error)}
+          className={`${control} border-line pr-11 ${className}`}
+        />
+        <button
+          type="button"
+          onClick={() => setVisible((v) => !v)}
+          aria-label={visible ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`}
+          aria-controls={id}
+          aria-pressed={visible}
+          title={visible ? 'Hide' : 'Show'}
+          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-slate transition hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue"
+        >
+          <Icon key={String(visible)} className="size-5 animate-scale-in" aria-hidden />
+        </button>
+      </div>
     </FieldShell>
   )
 }

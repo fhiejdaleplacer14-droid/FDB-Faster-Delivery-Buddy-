@@ -2,7 +2,7 @@ import { useState, type SubmitEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
-import { TextField } from '@/components/ui/Field'
+import { PasswordField, TextField } from '@/components/ui/Field'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import { AuthPage } from './AuthPage'
 import { useAuth } from './AuthContext'
@@ -46,9 +46,8 @@ export function LoginPage() {
           onChange={(e) => setEmail(e.target.value)}
           error={emailError}
         />
-        <TextField
+        <PasswordField
           label="Password"
-          type="password"
           autoComplete="current-password"
           required
           value={password}

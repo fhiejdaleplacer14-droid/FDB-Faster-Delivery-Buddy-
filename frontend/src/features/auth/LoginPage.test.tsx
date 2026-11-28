@@ -42,4 +42,18 @@ describe('LoginPage', () => {
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/'))
   })
+
+  it('shows and hides the password with the eye button', async () => {
+    renderRoute('/login')
+    const input = screen.getByLabelText('Password')
+    await userEvent.type(input, 'secret123')
+    expect(input).toHaveAttribute('type', 'password')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show password' }))
+    expect(input).toHaveAttribute('type', 'text')
+    expect(input).toHaveValue('secret123')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Hide password' }))
+    expect(input).toHaveAttribute('type', 'password')
+  })
 })

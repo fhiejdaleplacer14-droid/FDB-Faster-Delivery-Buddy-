@@ -2,7 +2,7 @@ import { useState, type SubmitEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
-import { TextField } from '@/components/ui/Field'
+import { PasswordField, TextField } from '@/components/ui/Field'
 import { authApi } from '@/features/auth/api'
 import { AddressBook } from './AddressBook'
 import { isAdmin, mustVerifyEmail, useAuth } from '@/features/auth/AuthContext'
@@ -170,26 +170,23 @@ function PasswordForm() {
   return (
     <form onSubmit={submit} noValidate className="mt-4 max-w-md space-y-5">
       {saved && <Alert tone="success">Password changed. Other devices have been signed out.</Alert>}
-      <TextField
+      <PasswordField
         label="Current password"
-        type="password"
         autoComplete="current-password"
         value={form.current_password}
         onChange={(e) => setForm({ ...form, current_password: e.target.value })}
         error={firstError(error, 'current_password')}
       />
-      <TextField
+      <PasswordField
         label="New password"
-        type="password"
         autoComplete="new-password"
         hint="At least 10 characters, with letters and numbers."
         value={form.password}
         onChange={(e) => setForm({ ...form, password: e.target.value })}
         error={firstError(error, 'password')}
       />
-      <TextField
+      <PasswordField
         label="Confirm new password"
-        type="password"
         autoComplete="new-password"
         value={form.password_confirmation}
         onChange={(e) => setForm({ ...form, password_confirmation: e.target.value })}

@@ -2,7 +2,7 @@ import { useState, type ChangeEvent, type SubmitEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
-import { TextField } from '@/components/ui/Field'
+import { PasswordField, TextField } from '@/components/ui/Field'
 import { firstError, toApiError, type ApiError } from '@/lib/http'
 import { AuthPage } from './AuthPage'
 import { useAuth } from './AuthContext'
@@ -40,9 +40,8 @@ export function RegisterPage() {
         {error && !hasFieldErrors && <Alert tone="error">{error.message}</Alert>}
         <TextField label="Full name" autoComplete="name" required value={form.name} onChange={update('name')} error={firstError(error, 'name')} />
         <TextField label="Email" type="email" autoComplete="email" required value={form.email} onChange={update('email')} error={firstError(error, 'email')} />
-        <TextField
+        <PasswordField
           label="Password"
-          type="password"
           autoComplete="new-password"
           hint="At least 10 characters, with letters and numbers."
           required
@@ -50,9 +49,8 @@ export function RegisterPage() {
           onChange={update('password')}
           error={firstError(error, 'password')}
         />
-        <TextField
+        <PasswordField
           label="Confirm password"
-          type="password"
           autoComplete="new-password"
           required
           value={form.password_confirmation}
