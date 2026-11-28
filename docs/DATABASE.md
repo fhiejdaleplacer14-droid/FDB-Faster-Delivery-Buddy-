@@ -44,8 +44,8 @@ Each change is made inside a transaction that locks the seller row. The caller m
 
 | Table | Purpose | Notes |
 | --- | --- | --- |
-| `categories` | Two-level category tree | `is_active=false` hides the category's listings. Deleting is blocked while it has listings or subcategories |
-| `products` | A seller's listing | `status`: draft, pending_review, published, rejected, archived. `price_from` and `stock_total` are cached from the variants for browsing. Soft-deleted. Trigram index on `name` |
+| `categories` | Two-level category tree | `is_active=false` hides the category's listings. Deleting is blocked while it has listings or subcategories. `others` is a catch-all created on first use; it cannot be turned off or deleted |
+| `products` | A seller's listing | `status`: draft, pending_review, published, rejected, archived. `price_from` and `stock_total` are cached from the variants for browsing. `suggested_category` is what the seller typed when no category fit (cleared when an admin files it). Soft-deleted. Trigram index on `name` |
 | `product_variants` | Price and stock options (every product has at least one) | `numeric(12,2)` price above 0, stock 0 or more (CHECK constraints). Soft-deleted so past orders can still refer to them. Option names are unique per product, ignoring case |
 | `product_images` | Photo metadata | WEBP files on the `media` disk under UUID names. `position` 0 is the cover |
 
@@ -69,7 +69,7 @@ archived ◄─archive── rejected ◄──take down── pending_review
 | `cart_items` | Server-side cart | One line per variant per customer; quantity 1–99 |
 | `orders` | One checkout | Unique `(user_id, idempotency_key)`. The delivery address is copied in. `grand_total = items_total + delivery_fee_total` (CHECK). `status` is derived from the seller orders: in_progress, completed, cancelled |
 | `seller_orders` | One store's part of a checkout | Own status, payment status (`unpaid`, `paid`, `partially_refunded`, `refunded`; CHECK), totals, `refunded_total`, delivery note, and cancellation details. `total = items_total + delivery_fee` and `0 <= refunded_total <= total` (CHECK) |
-| `refunds` | Money a seller returned to the customer, outside FDB | `amount > 0` (CHECK), method, reference, reason, who recorded it (`recorded_as` seller or admin), optional support ticket. `commission_reduction` is what was taken off an uncollected commission; `commission_credit` is what FDB owes back on a commission it already collected, until `credit_settled_at` is set. Amounts are never edited |
+| `refunds` | Money a seller returned to the customer, outside FDB | `amount > 0` (CHECK), method, reference, reason, who recorded it (`recorded_as` seller or admin), optional support ticket. `commission_reduction` is what was taken off an uncollected commission; `commission_credit` is what FDB owes back on a commission it already collected, until `credit_settled_at` is set. `commission_status` is pending (seller refund awaiting admin approval), applied, or declined; `commission_items_value` is the item value the refund covers. Amounts are never edited |
 | `order_items` | Snapshot of each purchased line | Product and option names, unit price, quantity, and `line_total = unit_price * quantity` (CHECK). Never changes when the product changes |
 | `order_status_histories` | Every seller-order status change, with who made it and any note | Append-only |
 

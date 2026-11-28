@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Middleware\EnsureAccountIsActive;
+use App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired;
+use App\Http\Middleware\EnsureNotAdmin;
+use App\Http\Middleware\EnsureSellerAccount;
+use App\Http\Middleware\RequireEdgeSecret;
+use App\Http\Middleware\RequireSpaSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,13 +20,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(RequireEdgeSecret::class);
         $middleware->statefulApi();
         $middleware->alias([
-            'active' => \App\Http\Middleware\EnsureAccountIsActive::class,
-            'seller' => \App\Http\Middleware\EnsureSellerAccount::class,
-            'shopper' => \App\Http\Middleware\EnsureNotAdmin::class,
-            'spa.session' => \App\Http\Middleware\RequireSpaSession::class,
-            'verified' => \App\Http\Middleware\EnsureEmailIsVerifiedWhenRequired::class,
+            'active' => EnsureAccountIsActive::class,
+            'seller' => EnsureSellerAccount::class,
+            'shopper' => EnsureNotAdmin::class,
+            'spa.session' => RequireSpaSession::class,
+            'verified' => EnsureEmailIsVerifiedWhenRequired::class,
         ]);
         $middleware->trustProxies(at: env('TRUSTED_PROXIES', '127.0.0.1'));
         $middleware->throttleApi();

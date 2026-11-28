@@ -31,6 +31,9 @@ services:
         value: stderr
       - key: LOG_LEVEL
         value: info
+      # Shared with the Cloudflare Worker (EDGE_SECRET); requests without it are refused.
+      - key: FDB_EDGE_SECRET
+        sync: false
       - key: TRUSTED_PROXIES
         value: "*"
 

@@ -48,7 +48,7 @@ Prices are decimal strings such as `"120.50"`. Never parse them as floats for ca
 | Method | Path | Notes |
 | --- | --- | --- |
 | GET | `/user` | Profile with `roles`, `permissions`, and a `seller` summary. Use for display only; the API enforces every permission |
-| PATCH | `/user` | `name, email`. Changing the email clears verification and sends a new link |
+| PATCH | `/user` | `name, email, current_password?`. `current_password` is required when the email changes. Changing the email clears verification and sends a new link |
 | PUT | `/user/password` | `current_password, password, password_confirmation`. Signs out the user's other sessions |
 
 ## Seller application (applicant)
@@ -69,7 +69,7 @@ All require an approved seller account. Suspended sellers can use the read endpo
 | Method | Path | Notes |
 | --- | --- | --- |
 | GET | `/seller/products?status&search&page` | The signed-in seller's own listings |
-| POST | `/seller/products` | `category_id, name, description, variants[{name, sku?, price, stock}]`. Created as a draft |
+| POST | `/seller/products` | `category_id, name, description, variants[{name, sku?, price, stock}]`. Created as a draft. When nothing fits, send `category_id: null` with `suggested_category` (what the product is); the listing goes under Others for an admin to file |
 | GET | `/seller/products/{id}` | |
 | PUT | `/seller/products/{id}` | Full replacement of details and options. Send the `id` of each option you keep; options left out are soft-deleted. On a live listing, changing the name, description, or category sends it back for review |
 | POST | `/seller/products/{id}/submit` | From draft or rejected. Needs at least one photo. Goes to review, or straight to published when review is turned off |
@@ -122,7 +122,7 @@ Require an approved or suspended store (suspended stores can still complete orde
 | POST | `/seller/orders/{id}/status` | `status, note?`. Forward only; steps may be skipped |
 | POST | `/seller/orders/{id}/cancel` | `reason` required. Allowed until the order is out for delivery. Stock is returned |
 | POST | `/seller/orders/{id}/payment-received` | Records that the seller collected payment. Once only; written to the audit log |
-| POST | `/seller/orders/{id}/refunds` | `amount, method, reason, reference?, refunded_at?, support_ticket_number?`. Paid orders only; the total refunded can never exceed the order total. Returns the updated seller order. 30 per hour |
+| POST | `/seller/orders/{id}/refunds` | `amount, method, reason, reference?, refunded_at?, support_ticket_number?`. Paid orders only; the total refunded can never exceed the order total. The commission change waits for admin approval (`commission_status: pending`). Returns the updated seller order. 30 per hour |
 | PUT | `/seller/orders/{id}/delivery` | `delivery_note`, shown to the customer |
 | GET | `/seller/commissions?status&page` | The seller's own commission records, plus `summary` totals for pending, due, and collected |
 
@@ -173,7 +173,9 @@ Each endpoint checks a permission, not a role name.
 | POST | `/admin/commissions/{id}/adjustments` | `commissions.manage` | `amount` (signed, non-zero), `reason`. Pending or due records only; the net can never go below zero |
 | GET · POST | `/admin/commission-collections` | `commissions.manage` | POST `seller_id, record_ids[], method, reference?, notes?, collected_at?`. Every record must be due and belong to that seller; recording the same records twice is refused |
 | POST | `/admin/seller-orders/{id}/refunds` | `refunds.manage` | Same body and rules as the seller endpoint. The seller is notified |
-| GET | `/admin/refunds?credit=owed\|settled&seller_id&page` | `refunds.manage` | With `summary { credit_owed, total }` |
+| GET | `/admin/refunds?credit=pending\|owed\|settled&seller_id&page` | `refunds.manage` | With `summary { credit_owed, pending, total }`. `pending` lists seller refunds waiting for a commission decision |
+| POST | `/admin/refunds/{id}/approve-commission` | `refunds.manage` | Applies a seller refund's commission reduction or credit. Pending refunds only; audited |
+| POST | `/admin/refunds/{id}/decline-commission` | `refunds.manage` | Leaves commission unchanged; the refund itself stands. Pending refunds only; audited |
 | POST | `/admin/refunds/{id}/settle-credit` | `refunds.manage` | Marks a commission credit as paid back to the seller. Once only; written to the audit log |
 | GET | `/admin/reviews?status&rating&search&page` | `reviews.moderate` | Includes the reviewer's email and the store |
 | POST | `/admin/reviews/{id}/hide` | `reviews.moderate` | `reason` required. Removes it from the product page and the rating; written to the audit log |
@@ -189,6 +191,7 @@ Each endpoint checks a permission, not a role name.
 | GET | `/admin/products/{id}` | `products.moderate` | |
 | POST | `/admin/products/{id}/approve` | `products.moderate` | Pending → published |
 | POST | `/admin/products/{id}/reject` | `products.moderate` | Pending or published → rejected. Requires `reason` |
+| POST | `/admin/products/{id}/category` | `products.moderate` | `category_id` (an active category). Moves the listing and clears `suggested_category`; status is unchanged. Audited |
 | GET · POST | `/admin/categories` | `categories.manage` | `name, parent_id?, position?, is_active?`. Two levels only |
 | PATCH · DELETE | `/admin/categories/{id}` | `categories.manage` | Delete returns 409 if the category has subcategories or listings; turn it off instead |
 

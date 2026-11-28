@@ -28,7 +28,8 @@ Frontend variables prefixed with `VITE_` are bundled into public JavaScript. Nev
 | `FDB_PAYMENT_METHODS` | `cash_on_delivery` | Comma-separated methods customers can actually select. GCash, Maya, and "Other" are always listed at checkout, but show as "Coming soon" and are refused by the server unless enabled here. Sellers collect payment directly; FDB only records the choice |
 | `FDB_DISPUTE_WINDOW_DAYS` | `7` | How many days after delivery a customer may open a dispute. **Placeholder until the founders decide** |
 | `FDB_REQUIRE_EMAIL_VERIFICATION` | `true` | A verified email is required to check out and to apply as a seller. The test site sets `false` because email is not connected yet; seller applications still need admin approval. **Turn back on before real customers** |
-| `FDB_STORAGE_DRIVER` | `local` | `s3` moves product photos and seller documents to S3-compatible buckets (Neon Object Storage). Needs `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, and `AWS_REGION`; buckets are `FDB_MEDIA_BUCKET` (default `fdb-media`, public read) and `FDB_DOCUMENTS_BUCKET` (default `fdb-documents`, private) |
+| `FDB_STORAGE_DRIVER` | `local` | `s3` moves product photos and seller documents to S3-compatible buckets (Supabase Storage on the live site). Needs `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, and `AWS_REGION`; buckets are `FDB_MEDIA_BUCKET` (default `fdb-media`, public read) and `FDB_DOCUMENTS_BUCKET` (default `fdb-documents`, private) |
+| `FDB_EDGE_SECRET` | (unset) | When set, the API refuses requests without the matching `X-FDB-Edge` header that the Cloudflare Worker adds. Leave unset locally |
 | `FDB_REFUND_COMMISSION` | `proportional` | `proportional` lowers FDB's commission by the rate times the refunded item value (refunds count against items before the delivery fee); `none` keeps the commission. **Placeholder until the founders decide** |
 | `FDB_INITIAL_COMMISSION_RATE` | `0.0750` | Used once, to create the first default commission rate when none exists. After that, admins change rates in the app. **Placeholder until the founders decide** |
 | `DEMO_SELLER_PASSWORD` | unset | Local and staging only: password for the demo seller accounts the demo seeder creates. If unset, a random password is used |
@@ -56,17 +57,18 @@ These are read from your shell or a root `.env` file. All are optional.
 
 The PostgreSQL container also creates a `<database>_testing` database on first start, which the backend tests use.
 
-## Using Neon for the database
+## Hosted database (Supabase)
 
-Neon hosts the PostgreSQL database; the app still runs where you run it. Laravel reads `DB_URL` and `DB_SSLMODE`, so no application code depends on it.
+The live site's database is Supabase PostgreSQL; the API runs on Render. Laravel reads `DB_URL` and `DB_SSLMODE`, so no application code depends on the host.
 
-**Current setup (test and demo):** `backend/.env` holds `DB_URL` (Neon's *unpooled* URL), `DB_SSLMODE=require`, and `DB_PERSISTENT=true`. `DB_URL` wins over the local `DB_HOST`, `DB_USERNAME`, and `DB_PASSWORD` lines, which stay only so the tests can reach the local `fdb_testing` database. `phpunit.xml` blanks `DB_URL` and sets `DB_SSLMODE=prefer`, so the tests can never touch Neon.
-
-- Get the URL with `neon login`, then `neon deploy` in the project root. It saves variables to `.env.local` (git-ignored). Use `DATABASE_URL_UNPOOLED`: migrations and the row locks used at checkout need real database sessions.
-- `DB_PERSISTENT=true` keeps connections open between requests. Connecting to Neon from far away takes 1 to 2 seconds, so this matters. Leave it unset for a local database.
-- **Go back to the local database:** copy `backend/.env.localdb` (a git-ignored copy of the old settings) over `backend/.env`, or delete the `DB_URL` line.
-- To run one command against Neon while `.env` points elsewhere, use `--env=neon` with a `backend/.env.neon` file.
-- **Two database logins.** The app connects as `fdb_app`, a limited login that can read and write rows but cannot create, alter, drop, or truncate tables, change or delete audit-log entries, or switch off the audit trigger. `neondb_owner` stays for schema changes: keep its address in `backend/.env.neon` and run migrations with `php artisan migrate --env=neon --force`. New tables created by the owner automatically get the same limited access for `fdb_app` (default privileges), except `audit_logs`, where the grants were narrowed by hand. `RUN_MIGRATIONS=true` on Render does not work with the limited login, on purpose.
-- **Do not run** `migrate:fresh`, `migrate:rollback`, or `DemoMarketplaceSeeder` while `backend/.env` points at Neon. Those delete or replace data. Production already blocks the destructive commands.
-- Product photos are not in the database. They stay in `backend/storage/app/public` (the `media` volume in production).
-- In production, put the same `DB_URL` and `DB_SSLMODE=require` in `backend/.env.production` and remove the `postgres` service from `docker-compose.prod.yml`. Run the app close to Neon's region (this project is in Singapore): each query is a network trip.
+- **Your computer uses the local Docker database.** `backend/.env` has no `DB_URL`, so local testing never touches live data. `phpunit.xml` also blanks `DB_URL`.
+- `backend/.env` keeps three live values the local app ignores: `SUPABASE_DB_URL` (owner login, for migrations), `SUPABASE_APP_DB_URL` (the limited `fdb_app` login that Render uses), and `RENDER_FDB_EDGE_SECRET`. Run migrations on Supabase with the owner login:
+  ```sh
+  docker compose exec -e DB_URL="<SUPABASE_DB_URL>" -e DB_SSLMODE=require app php artisan migrate --force
+  docker compose exec -e DB_URL="<SUPABASE_DB_URL>" -e DB_SSLMODE=require app php artisan fdb:enforce-rls
+  ```
+- Use the **Session pooler** URI. The direct URI is IPv6 only (Render cannot reach it) and the transaction pooler (6543) breaks Laravel's prepared statements.
+- `DB_PERSISTENT=true` on Render keeps connections open between requests.
+- The `search_path` is `public,extensions` because Supabase keeps `pg_trgm` in `extensions`; a missing schema is ignored locally.
+- **Do not run** `migrate:fresh`, `migrate:rollback`, or `DemoMarketplaceSeeder` against Supabase. Those delete or replace live data.
+- Files are not in the database. Locally they stay in `backend/storage/app`; live they are in Supabase Storage (`FDB_STORAGE_DRIVER=s3`, see [RENDER.md](RENDER.md)).

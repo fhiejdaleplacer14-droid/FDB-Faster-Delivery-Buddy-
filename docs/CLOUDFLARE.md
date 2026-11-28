@@ -23,7 +23,7 @@ In the Cloudflare dashboard, open the Worker (named `fdb-faster-delivery-buddy`,
 
 A blank page that logs "Failed to load module script ... MIME type" means Cloudflare is serving the source folder instead of the build. Check the root directory and build command above. Without `BACKEND_ORIGIN` the website loads and shows "FDB is not available right now".
 
-Set a second secret, `MEDIA_ORIGIN`, to the public photo bucket's address (for example `https://<branch>.storage.c-1.ap-southeast-1.aws.neon.tech/fdb-media`). With it, `/storage/*` is served from the bucket and cached; without it, `/storage` is forwarded to the backend. See [RENDER.md](RENDER.md).
+Set a second secret, `MEDIA_ORIGIN`, to the public photo bucket's address (for Supabase: `https://<project-ref>.supabase.co/storage/v1/object/public/fdb-media`). With it, `/storage/*` is served from the bucket and cached; without it, `/storage` is forwarded to the backend. See [RENDER.md](RENDER.md).
 
 Deploys never overwrite `BACKEND_ORIGIN` (`keep_vars` is on). Refreshing any page such as `/orders/123` returns the app because `wrangler.jsonc` turns on single-page-app routing.
 

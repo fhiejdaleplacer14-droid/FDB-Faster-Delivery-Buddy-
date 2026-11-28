@@ -2,6 +2,9 @@
 
 return [
 
+    // Shared with the Cloudflare Worker; when set, requests without it are refused.
+    'edge_secret' => env('FDB_EDGE_SECRET'),
+
     'accounts' => [
         // Needed to check out or apply as a seller. Turn off only where email can't be sent.
         'require_email_verification' => (bool) env('FDB_REQUIRE_EMAIL_VERIFICATION', true),

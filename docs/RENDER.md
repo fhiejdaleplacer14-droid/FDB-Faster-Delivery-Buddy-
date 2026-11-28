@@ -15,7 +15,8 @@ Render runs only the API, in one container (`docker/render/Dockerfile`: nginx an
    | Variable | Value |
    | --- | --- |
    | `APP_KEY` | The key from step 2 |
-   | `DB_URL` | Supabase **Session pooler** URI (Connect button, port 5432). Not the direct URI (IPv6 only) or the transaction pooler (6543). |
+   | `DB_URL` | Session pooler URI for the limited `fdb_app` login (`SUPABASE_APP_DB_URL` in `backend/.env`). Use the pooler on port 5432, not the direct URI (IPv6 only) or the transaction pooler (6543) |
+   | `FDB_EDGE_SECRET` | The same value as the Worker secret `EDGE_SECRET` (`RENDER_FDB_EDGE_SECRET` in `backend/.env`) |
    | `APP_URL`, `FRONTEND_URL` | The website address, e.g. `https://fdb-faster-delivery-buddy.<account>.workers.dev` |
    | `SANCTUM_STATEFUL_DOMAINS` | The same address without `https://` |
    | `AWS_*` | Supabase Storage S3 keys, see below |
@@ -23,11 +24,11 @@ Render runs only the API, in one container (`docker/render/Dockerfile`: nginx an
    Check `https://<service>.onrender.com/api/v1/health` returns `{"status":"ok","checks":{"database":"ok"}}`.
 4. **Point Cloudflare at it:** set the Worker variable `BACKEND_ORIGIN` to the Render address.
 
-To run migrations from Render, set `RUN_MIGRATIONS=true` for one deploy and then remove it. Each migration run is followed by `php artisan fdb:enforce-rls`.
+Run migrations from your computer with the owner login (see [ENVIRONMENT.md](ENVIRONMENT.md)), then `php artisan fdb:enforce-rls`. `RUN_MIGRATIONS=true` on Render fails with the limited login, on purpose.
 
 ## Row level security
 
-Supabase publishes the `public` schema through its Data API. FDB never uses that API, so `fdb:enforce-rls` turns RLS on for every table with no policies and removes all grants from the `anon` and `authenticated` roles. Laravel connects as the table owner, which bypasses RLS. Check with `php artisan fdb:enforce-rls --check` or Supabase's Security Advisor.
+Supabase publishes the `public` schema through its Data API. FDB never uses that API, so `fdb:enforce-rls` turns RLS on for every table with no policies and removes all grants from the `anon` and `authenticated` roles. The app's `fdb_app` login bypasses RLS but cannot change tables or the audit log; see [SECURITY.md](SECURITY.md). Check with `php artisan fdb:enforce-rls --check` or Supabase's Security Advisor.
 
 ## Photos and documents (Supabase Storage)
 
@@ -56,6 +57,10 @@ Photo links stay `/storage/...` on the website's address: the Worker fetches the
 
 ## Settings that matter
 
-- `TRUSTED_PROXIES=*` lets Laravel read the visitor IP the Worker forwards. Keep the Render address private: requests sent to it directly can fake their IP. Sign-in also limits attempts per account, so a faked IP does not help guess passwords.
+- `TRUSTED_PROXIES=*` lets Laravel read the visitor IP the Worker forwards. `FDB_EDGE_SECRET` makes the backend refuse requests that skip the Worker, so that IP cannot be faked.
 - `SESSION_SECURE_COOKIE=true`: sessions only travel over HTTPS.
 - Tests always run on a local test database, never on the hosted one.
+
+## Private repository
+
+The repository can be private. Cloudflare, Render, and Supabase deploy through their GitHub apps, which keep working as long as each app has access to this repository (GitHub, Settings, Applications, Configure). GitHub Actions on a private repository uses the free plan's monthly minutes; this CI needs a few minutes per push. Code scanning in "Security and quality" needs a paid plan on private repositories, but Dependabot alerts and the `composer audit` step in CI still work.

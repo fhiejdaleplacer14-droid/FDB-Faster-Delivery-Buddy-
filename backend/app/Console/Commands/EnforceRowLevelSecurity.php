@@ -14,6 +14,8 @@ class EnforceRowLevelSecurity extends Command
 
     private const API_ROLES = ['anon', 'authenticated'];
 
+    private const APP_ROLE = 'fdb_app';
+
     public function handle(): int
     {
         if (DB::connection()->getDriverName() !== 'pgsql') {
@@ -61,11 +63,33 @@ class EnforceRowLevelSecurity extends Command
             // Functions are executable by PUBLIC by default, which includes the API roles.
             DB::statement('REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC');
             DB::statement('ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC');
+
+            $this->grantAppRole();
         });
 
         $this->info("RLS on for {$tables->count()} tables ({$missing->count()} newly). API roles have no access.");
 
         return self::SUCCESS;
+    }
+
+    // The live app's login: rows only, no schema changes, and the audit log is append-only.
+    private function grantAppRole(): void
+    {
+        if (! DB::table('pg_roles')->where('rolname', self::APP_ROLE)->exists()) {
+            return;
+        }
+
+        $app = $this->quote(self::APP_ROLE);
+        $owner = $this->quote(DB::selectOne('select current_user as name')->name);
+        $schemas = DB::table('pg_namespace')->whereIn('nspname', ['public', 'extensions'])->pluck('nspname')->map(fn ($s) => $this->quote($s))->implode(', ');
+
+        DB::statement("REVOKE CREATE ON SCHEMA public FROM {$app}");
+        DB::statement("GRANT USAGE ON SCHEMA {$schemas} TO {$app}");
+        DB::statement("GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO {$app}");
+        DB::statement("GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO {$app}");
+        DB::statement("REVOKE UPDATE, DELETE, TRUNCATE ON public.audit_logs FROM {$app}");
+        DB::statement("ALTER DEFAULT PRIVILEGES FOR ROLE {$owner} IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {$app}");
+        DB::statement("ALTER DEFAULT PRIVILEGES FOR ROLE {$owner} IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO {$app}");
     }
 
     private function quote(string $identifier): string

@@ -4,13 +4,14 @@ This file describes the controls that exist in the code today. It is not a compl
 
 ## Authentication
 
-- Sanctum cookie sessions on a single origin. Sessions are encrypted and stored in Redis, and CSRF protection uses the `XSRF-TOKEN` cookie.
+- Sanctum cookie sessions on a single origin. Sessions are encrypted and stored in Redis (Docker) or the database (Render), and CSRF protection uses the `XSRF-TOKEN` cookie.
 - The session is regenerated on sign-in and invalidated on sign-out.
-- After 5 failed sign-ins per email and IP address, sign-in is locked for 60 seconds. A wrong password and an unknown email return the same error.
+- After 5 failed sign-ins per email and IP address, sign-in is locked for 60 seconds. After 20 failures on one account from any mix of addresses, that account is locked for 15 minutes, so rotating IPs does not help guess a password. A wrong password and an unknown email return the same error.
 - Password reset gives the same response for known and unknown emails. It is rate limited per IP and per email, and the reset token expires after 60 minutes.
 - Email verification links are signed relative URLs that expire after 60 minutes. A link stops working if the account's email changes.
 - Passwords need at least 10 characters with letters and numbers. In production they are also checked against known breached passwords.
 - Changing a password signs out the account's other sessions.
+- Changing the account email needs the current password, so a borrowed signed-in device cannot move the account to another address and reset its password.
 - Suspended accounts cannot sign in, and an existing session is ended on its next request.
 
 ## Authorisation
@@ -59,22 +60,32 @@ This file describes the controls that exist in the code today. It is not a compl
 
 - `FDB_REQUIRE_EMAIL_VERIFICATION` (default on) gates checkout and seller applications. With it off, anyone can register with any address, including one that is not theirs, and order or apply. Seller applications still need admin approval, and sign-up is rate limited. Use off only for a test site, and turn it back on before launch.
 
-## Database access
+## Database access (Supabase)
 
-- The app uses a limited database login (`fdb_app`), not the database owner. If its credentials leak, an attacker can read and change rows but cannot drop tables, add columns, create logins, or switch off the append-only audit trigger. It can add and read audit-log entries but never change or remove them. This was tested directly against the live database.
-- Rotate credentials by resetting the role's password in the Neon console, then updating `DB_URL` on Render and in `backend/.env`.
+- Supabase publishes the `public` schema through its Data API. FDB never uses that API, so every table has row level security turned on with no policies, and the `anon` and `authenticated` roles have no grants on tables, sequences, or functions. `php artisan fdb:enforce-rls` applies this and runs after every migration on Render; `--check` reports any table without RLS. Supabase's Security Advisor shows only the expected "RLS enabled, no policy" notice.
+- The live app connects as `fdb_app`, a limited login: it reads and writes rows, but cannot create, alter, drop, or truncate tables, create logins, switch off the audit trigger, or change or delete audit-log entries (all tested against Supabase). It bypasses RLS because the tables have no policies. Queries are stopped after 30 seconds and it allows at most 30 connections.
+- Migrations and `fdb:enforce-rls` run as the owner login (`SUPABASE_DB_URL`, kept only in the git-ignored `backend/.env`). The command also re-applies `fdb_app`'s grants after each migration. `RUN_MIGRATIONS=true` on Render does not work with the limited login, on purpose.
+- `pg_trgm` lives in the `extensions` schema and the audit trigger function has a fixed `search_path`, as the advisor recommends.
+- Rotate the app password with `ALTER ROLE fdb_app PASSWORD '...'` (as the owner), then update `DB_URL` on Render and `SUPABASE_APP_DB_URL` in `backend/.env`. Rotate the owner password in Supabase (Database, Settings) and update `SUPABASE_DB_URL`.
+
+## API access
+
+- The website's Worker adds a shared secret header (`X-FDB-Edge`) to every request it forwards. With `FDB_EDGE_SECRET` set, the backend refuses anything without it, so the Render address cannot be used directly to skip the website or fake a visitor IP. Only `/api/v1/health` stays open for Render's health check.
+- A client cannot supply the header itself: the Worker removes any incoming copy before adding its own.
 
 ## File storage
 
-- With object storage, seller documents are in a private bucket: an anonymous request is refused (HTTP 403, tested) and admins download them only through the backend, which logs every access.
+- Files are in Supabase Storage. Seller documents are in the private `fdb-documents` bucket: an anonymous request is refused (tested) and admins download them only through the backend, which logs every access.
+- Each bucket accepts only its expected file types (photos: WEBP, JPEG, PNG; documents: those plus PDF) up to 10 MB.
 - Only product photos are in the public bucket. The website's Worker serves them from the bucket's own path, rejects `..` and non-GET requests, and adds `nosniff` and a sandbox policy, so a stray file cannot run code.
-- Bucket credentials are branch-scoped, kept in `.env.local` and the Render environment, and never in git.
+- The S3 access keys are kept in the Render environment and the git-ignored `backend/.env`, never in git.
 
 ## Refunds
 
 - Only the seller of that order or an admin with `refunds.manage` can record a refund; another seller's order is a 404.
 - Refunds need a paid order. The seller order row is locked while recording, and a CHECK keeps `refunded_total` at or below the total. A live race of two simultaneous refunds produced one refund and one refusal.
 - A support ticket can be linked only if it belongs to the same order, so ticket numbers from other orders are never confirmed.
+- A refund recorded by the seller lowers FDB's commission only after an admin approves it (Refunds, Waiting for approval), so a seller cannot dodge commission with an invented refund. Refunds recorded by an admin apply at once. Approvals and declines are written to the audit log.
 - Customers see refunds but never their commission effect. Every refund and credit settlement is written to the audit log.
 
 ## Reviews, support, and notifications
@@ -83,7 +94,7 @@ This file describes the controls that exist in the code today. It is not a compl
 - Public reviews show a first name and last initial only. Reviewer emails are visible to moderators only.
 - A support ticket is visible to the customer who opened it, the seller of the linked order (order topics only), and staff with `support.manage`. Everyone else gets 404. Sellers never see the customer's email.
 - A message's author role is worked out on the server from the user's relation to the ticket.
-- Notification links are filtered to in-app paths, so a stored notification can never send someone to another site.
+- Notification links are filtered to in-app paths (no `//` or backslashes), so a stored notification can never send someone to another site.
 - Ticket, message, and review creation are rate limited per user.
 
 ## Audit log
@@ -93,7 +104,7 @@ This file describes the controls that exist in the code today. It is not a compl
 
 ## Secrets
 
-- `.env` files are ignored by git. Frontend `VITE_*` variables are public, so never put secrets there.
+- `.env` files are ignored by git. Dependabot opens weekly pull requests for Composer, npm, and GitHub Actions updates. Frontend `VITE_*` variables are public, so never put secrets there.
 - No default or seeded admin accounts exist. Create admins with `php artisan fdb:create-admin`; for automated setup, read the password from the `FDB_ADMIN_PASSWORD` environment variable.
 
 ## Browser protections
@@ -109,7 +120,7 @@ This file describes the controls that exist in the code today. It is not a compl
 
 ## Dependencies
 
-- `composer audit` and `npm audit` report no known vulnerabilities. The frontend pins `minimatch` to `^11.0.1` through `overrides` because ESLint's own version had a denial-of-service advisory; remove the override once ESLint ships the fix.
+- CI runs `composer audit` before the tests, so a newly published advisory fails the build until the package is updated. `composer audit` and `npm audit` report no known vulnerabilities (Symfony patched on 28 Nov 2026). The frontend pins `minimatch` to `^11.0.1` through `overrides` because ESLint's own version had a denial-of-service advisory; remove the override once ESLint ships the fix.
 
 ## Known gaps
 

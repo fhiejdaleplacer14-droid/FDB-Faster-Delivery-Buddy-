@@ -62,6 +62,9 @@ export default {
     headers.set('X-Forwarded-Proto', 'https')
     const ip = request.headers.get('CF-Connecting-IP')
     if (ip) headers.set('X-Forwarded-For', ip)
+    // Proves to the backend that the request came through this Worker.
+    headers.delete('X-FDB-Edge')
+    if (env.EDGE_SECRET) headers.set('X-FDB-Edge', env.EDGE_SECRET)
 
     try {
       return await fetch(target, {
